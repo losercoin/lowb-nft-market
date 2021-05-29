@@ -1,8 +1,11 @@
 import Vue from 'vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import VueRouter from 'vue-router'
-import App from './App.vue'
-import AppHome from './components/AppHome.vue'
+
+const App = () => import("./App.vue");
+const AppHome = () => import("./components/AppHome.vue");
+const MyNFTs = () => import("./components/MyNFTs.vue");
+const TokenDetail = () => import("./components/TokenDetail.vue");
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
@@ -19,9 +22,11 @@ const Foo = { template: '<div>foo</div>' }
 const Bar = { template: '<div>bar</div>' }
 
 const routes = [
-  { path: '/', component: AppHome },
-  { path: '/foo', component: Foo },
-  { path: '/bar', component: Bar }
+  { path: '/lowb-market', component: AppHome },
+  { path: '/lowb-market/foo', component: Foo },
+  { path: '/lowb-market/bar', component: Bar },
+  { path: '/lowb-market/my-nfts', component: MyNFTs },
+  { path: '/lowb-market/token-details/:id', component: TokenDetail }
 ]
 
 const router = new VueRouter({
