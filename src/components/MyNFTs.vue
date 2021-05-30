@@ -8,32 +8,34 @@
         </div>
         <div class="col">
           <div class="css-cogtoi">Lowb Balance</div>
-          <div class="css-94onap">56000 lowb</div>
+          <div class="css-94onap">{{$store.getters.lowb_balance}} lowb</div>
         </div>
         <div class="col">
           <div class="css-cogtoi">Lowb Market Balance</div>
-          <div class="css-94onap">1500 lowb</div>
+          <div class="css-94onap">{{$store.getters.lowb_market_balance}} lowb</div>
         </div>
       </div>
       <br>
       <div class="row">
         <h4>Deposit and Withdraw</h4>
         <div class="input-group mb-3 col">
-          <input type="text" class="form-control" placeholder="Amount of Lowb to Deposit">
-          <span class="input-group-text">lowb</span>
-          <button class="btn btn-primary" type="button">Approve</button>
-          <button class="btn btn-primary active" type="button">Deposit</button>
+          <input type="number" class="form-control" @keyup="correct_toDeposit" v-model="toDeposit">
+          <span class="input-group-text" >lowb</span>
+          <button class="btn btn-primary" type="button" v-on:click="approve">Approve</button>
+          <button class="btn btn-primary active" type="button" v-on:click="deposit" :disabled="toDeposit<=0||$store.state.approvedBalance<toDeposit*1e18">Deposit</button>
         </div>
         <div class="input-group mb-3 col">
-          <input type="text" class="form-control" placeholder="Amount of Lowb to Withdraw">
+          <input type="number" class="form-control" @keyup="correct_toWithdraw" v-model="toWithdraw">
           <span class="input-group-text">lowb</span>
-          <button class="btn btn-primary active" type="button" id="button-addon2">Withdraw</button>
+          <button class="btn btn-primary active" type="button" id="button-addon2" v-on:click="withdraw">Withdraw</button>
         </div>
       </div>
       <br>
+      <p>go to <a href="https://testnet.binance.org/faucet-smart">Testnet Funds</a> to get more BNB</p>
+      <p>You can <button @click = "claim">claim</button> 10k LOWB, then refresh the webpage after confirmed</p>
     </div>
     <br>
-    <h2>Owned</h2>
+    <h2>NFTs Owned</h2>
     <div class="row">
       <div v-for="card in cards" :key="card.name" class="col-sm-3">
         <b-card
@@ -62,10 +64,15 @@
 </template>
 
 <script>
+import airdropFile from '../assets/AirdropClaim.json'
+import { ethers } from "ethers";
+
 export default {
   data: function() {
     return {
       cards: [],
+      toDeposit: 0,
+      toWithdraw: 0
     };
   },
   created () {
@@ -73,7 +80,47 @@ export default {
       { name: 'Runoob' },
       { name: 'Google' }
     ]
-    console.log(this.cards)
+    console.log(this.$store.state.approvedBalance, this.toDeposit)
+  },
+  methods: {
+    correct_toDeposit: function () {
+      if (this.toDeposit > 0) {
+        this.toDeposit = Math.floor(this.toDeposit)
+      }
+      else {
+        this.toDeposit = 0
+      }
+    },
+    correct_toWithdraw: function () {
+      if (this.toWithdraw > 0) {
+        this.toWithdraw = Math.floor(this.toWithdraw)
+      }
+      else {
+        this.toWithdraw = 0
+      }
+    },
+    approve: function () {
+      console.log("start approve")
+      this.$store.dispatch('approveLowb', this.toDeposit)
+    },
+    deposit: function () {
+      console.log("start deposit")
+      this.$store.dispatch('depositLowb', this.toDeposit)
+    },
+    withdraw: function () {
+      console.log("start withdraw")
+      this.$store.dispatch('withdrawLowb', this.toWithdraw)
+    },
+    // should remove when migrate to mainnet
+    claim: async function () {
+      console.log("claim 10k lowb")
+      const airdropAbi = airdropFile['abi']
+      const airdropAddress = '0xD80AF329e45BB88a333F0E5E2B6dF5Bde26b2736'
+      const airdropContract = new ethers.Contract(airdropAddress, airdropAbi, global.provider);
+      const airdropWithSigner = airdropContract.connect(global.signer);
+      await airdropWithSigner.claim();
+      console.log('claim 10000 lowb!');
+    }
   }
 }
 </script>

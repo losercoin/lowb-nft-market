@@ -16,7 +16,7 @@
           <b-card-text>
             Price: 100 Lowb 
           </b-card-text>
-          <router-link :to="{path: '/lowb-market/token-details/'+card.name}">Details</router-link>
+          <router-link :to="{path: '/lowb-market/new-token-details/'+card.name}">Details</router-link>
         </b-card>
       </div>
     </div>
@@ -36,7 +36,13 @@ export default {
       { name: 'Google' },
       { name: 'Taobao' }
     ]
-    console.log(this.cards)
+    this.increment()
+  },
+  methods: {
+    increment() {
+      this.$store.dispatch('incrementAsync')
+      console.log(this.$store.state.count)
+    }
   }
 }
 </script>
