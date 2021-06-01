@@ -1,0 +1,8 @@
+{
+    "name": "Volunteer Metal",
+    "description": "Mjölnir, the legendary hammer of the Norse god of thunder.",
+    "image": "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/2/25/Mjolnir.png",
+    "imageName": "volunteer.jpg",
+    "strength": 100,
+    "circulation": 5
+}

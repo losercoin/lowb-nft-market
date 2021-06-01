@@ -50,7 +50,8 @@ const store = new Vuex.Store({
     bnbBalance: 0,
     lowbBalance: 0,
     lowbMarketBalance: 0,
-    approvedBalance: 0
+    approvedBalance: 0,
+    nftInfos: []
   },
   getters: {
     abbr_account: state => {
@@ -94,7 +95,11 @@ const store = new Vuex.Store({
       state.lowbBalance = payload.lowbBalance
       state.lowbMarketBalance = payload.lowbMarketBalance
       state.approvedBalance = payload.approvedBalance
-    }
+    },
+    setTotalGroup (state, nftInfos) {
+      state.nftInfos = nftInfos
+      console.log("set total group: ", nftInfos.length)
+    },
   },
   actions: {
     incrementAsync ({ commit }) {
@@ -119,6 +124,9 @@ const store = new Vuex.Store({
     },
     withdrawLowb ({}, amount) {
       withdrawLowb(amount)
+    },
+    updateTotalGroup () {
+      getGroupNumber()
     }
   }
 })
@@ -138,15 +146,19 @@ const isMetaMaskInstalled = () => {
 
 function handleNewChain (chainId) {
   store.commit('setChainId', chainId)
+  if(chainId == '0x61') {
+    if (store.state.account != '') {
+      getBalance(store.state.account)
+    }
+    store.dispatch('updateTotalGroup')
+  }
 }
 
 function handleNewAccounts (accounts) {
   store.commit('setAccount', accounts[0])
-  getBalance(accounts[0])
-}
-
-function handleMessage (message) {
-  console.log(message)
+  if(store.state.chainId == '0x61') {
+    getBalance(accounts[0])
+  }
 }
 
 async function getNetworkAndChainId () {
@@ -172,7 +184,7 @@ async function switchToBinanceSmartChain () {
       params: [{ 
         chainId: '0x61', //'0x38', 
         chainName: 'BSC Testnet', //'Binance Smart Chain', 
-        nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 }, 
+        nativeCurrency: { name: 'BNBT', symbol: 'BNB', decimals: 18 }, 
         rpcUrls: ['https://data-seed-prebsc-1-s2.binance.org:8545/'], //['https://bsc-dataseed.binance.org/'], 
         blockExplorerUrls: ['https://testnet.bscscan.com'] //['https://bscscan.com/'] 
       }] 
@@ -223,6 +235,21 @@ async function getContracts () {
   const marketAbi = (await marketFile())['abi']
   global.marketAddress = '0x0c8348B9408Fb7A5085f69cFa562b2eD67D085dF'
   global.marketContract = new ethers.Contract(marketAddress, marketAbi, global.provider)
+
+  const lowcFile = () => import("./assets/MyCollectible.json")
+  const lowcAbi = (await lowcFile())['abi']
+  const lowcAddress = '0x9715143c7a5aae7b52b930087303d1566bed9c2c'
+  global.lowcContract = new ethers.Contract(lowcAddress, lowcAbi, global.provider)
+
+  // update infomation after get contract!!!
+
+  ethereum.autoRefreshOnNetworkChange = false
+  store.dispatch('updateChainId')
+  store.dispatch('updateAccounts')
+
+  ethereum.on('chainChanged', handleNewChain)
+  ethereum.on('accountsChanged', handleNewAccounts)
+
 }
 
 async function approveLowb(amount) {
@@ -320,6 +347,26 @@ async function withdrawLowb(amount) {
   });
 }
 
+async function getGroupNumber () {
+  try {
+    const groupNumber = await global.lowcContract.groupIds()
+    let nftInfos = []
+    for (let i=0; i<groupNumber; i++) {
+      let nftInfo = {}
+      const testFile = () => import("./assets/test-" + (i+1) + ".json")
+      nftInfo["id"] = i+1
+      nftInfo["name"] = (await testFile())["name"]
+      nftInfo["circulation"] = (await testFile())["circulation"]
+      nftInfo["image"] = (await testFile())["imageName"]
+      nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(i+1)
+      nftInfos.push(nftInfo)
+    }
+    store.commit('setTotalGroup', nftInfos)
+  } catch (err) {
+    console.error(err)
+  }
+}
+
 if (isMetaMaskInstalled()) {
 
   global.provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -328,13 +375,5 @@ if (isMetaMaskInstalled()) {
   store.commit('setMetaMaskInstalled')
 
   getContracts()
-
-  ethereum.autoRefreshOnNetworkChange = false
-  store.dispatch('updateChainId')
-  store.dispatch('updateAccounts')
-
-  ethereum.on('chainChanged', handleNewChain)
-  ethereum.on('accountsChanged', handleNewAccounts)
-  ethereum.on('message', handleMessage)
 
 }
