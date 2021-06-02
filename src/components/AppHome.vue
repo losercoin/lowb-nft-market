@@ -17,10 +17,10 @@
             Price: Not for sale 
           </b-card-text>
           <div v-if="nft.currentSupply<nft.circulation">
-            <router-link :to="{path: '/lowb-market/new-token-details/'+nft.name}">Details</router-link>
+            <router-link :to="{path: '/lowb-market/new-token-details/'+nft.id}">Details</router-link>
           </div>
           <div v-else>
-            <router-link :to="{path: '/lowb-market/token-details/'+nft.name}">Details</router-link>
+            <router-link :to="{path: '/lowb-market/token-details/'+nft.id}">Details</router-link>
           </div>
         </b-card>
       </div>

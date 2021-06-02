@@ -51,7 +51,8 @@ const store = new Vuex.Store({
     lowbBalance: 0,
     lowbMarketBalance: 0,
     approvedBalance: 0,
-    nftInfos: []
+    nftInfos: [],
+    itemBids: {}
   },
   getters: {
     abbr_account: state => {
@@ -73,7 +74,10 @@ const store = new Vuex.Store({
     lowb_market_balance: state => {
       let number = state.lowbMarketBalance / 1e18;
       return number.toFixed(0)
-    }
+    },
+    my_bid: (state) => (id) =>  {
+      return state.itemBids[id].find(bid => bid.maker.toLowerCase() == store.state.account.toLowerCase())
+    },
   },
   mutations: {
     increment (state) {
@@ -95,10 +99,15 @@ const store = new Vuex.Store({
       state.lowbBalance = payload.lowbBalance
       state.lowbMarketBalance = payload.lowbMarketBalance
       state.approvedBalance = payload.approvedBalance
+      console.log("set balance: ", payload)
     },
     setTotalGroup (state, nftInfos) {
       state.nftInfos = nftInfos
       console.log("set total group: ", nftInfos.length)
+    },
+    setItemBids (state, payload) {
+      Vue.set(state.itemBids, payload.id, payload.bids)
+      console.log(`set ${ payload.id }'s bids`, payload.bids)
     },
   },
   actions: {
@@ -127,6 +136,15 @@ const store = new Vuex.Store({
     },
     updateTotalGroup () {
       getGroupNumber()
+    },
+    updateBids ({}, groupId) {
+      getItemBids(groupId)
+    },
+    enterBid ({}, bid) {
+      enterBid(bid.groupId, bid.amount)
+    },
+    withdrawBid ({}, id) {
+      withdrawBid(id)
     }
   }
 })
@@ -184,7 +202,7 @@ async function switchToBinanceSmartChain () {
       params: [{ 
         chainId: '0x61', //'0x38', 
         chainName: 'BSC Testnet', //'Binance Smart Chain', 
-        nativeCurrency: { name: 'BNBT', symbol: 'BNB', decimals: 18 }, 
+        nativeCurrency: { name: 'BNBT', symbol: 'BNBT', decimals: 18 }, 
         rpcUrls: ['https://data-seed-prebsc-1-s2.binance.org:8545/'], //['https://bsc-dataseed.binance.org/'], 
         blockExplorerUrls: ['https://testnet.bscscan.com'] //['https://bscscan.com/'] 
       }] 
@@ -233,7 +251,7 @@ async function getContracts () {
 
   const marketFile = () => import("./assets/LowbMarket.json")
   const marketAbi = (await marketFile())['abi']
-  global.marketAddress = '0x0c8348B9408Fb7A5085f69cFa562b2eD67D085dF'
+  global.marketAddress = '0x2D0D4CC1d4962d2070578811D3dA94Fb610C9C92'
   global.marketContract = new ethers.Contract(marketAddress, marketAbi, global.provider)
 
   const lowcFile = () => import("./assets/MyCollectible.json")
@@ -356,6 +374,7 @@ async function getGroupNumber () {
       const testFile = () => import("./assets/test-" + (i+1) + ".json")
       nftInfo["id"] = i+1
       nftInfo["name"] = (await testFile())["name"]
+      nftInfo["description"] = (await testFile())["description"]
       nftInfo["circulation"] = (await testFile())["circulation"]
       nftInfo["image"] = (await testFile())["imageName"]
       nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(i+1)
@@ -365,6 +384,91 @@ async function getGroupNumber () {
   } catch (err) {
     console.error(err)
   }
+}
+
+async function enterBid (id, amount) {
+  if (id > 0 && amount > 0) {
+    const marketWithSigner = global.marketContract.connect(global.signer);
+    const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
+    await marketWithSigner.enterBid(id, amount_in_wei);
+  }
+  
+  let filter = global.marketContract.filters.NewBidEntered(null, null, store.state.account)
+  // Receive an event when ANY transfer occurs
+  global.marketContract.on(filter, async (groupId, value, fromAddress, event) => {
+    console.log(`I bid ${ value/1e18 } lowb to group ${ groupId}`);
+    // The event object contains the verbatim log data, the
+    // EventFragment and functions to fetch the block,
+    // transaction and receipt and event functions
+    try {
+      const bnbBalance = await global.provider.getBalance(store.state.account)
+      const lowbBalance = store.state.lowbBalance
+      const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+      const approvedBalance = store.state.approvedBalance
+      store.commit('setBalance', {
+        bnbBalance: bnbBalance,
+        lowbBalance: lowbBalance,
+        lowbMarketBalance: lowbMarketBalance,
+        approvedBalance: approvedBalance
+      })
+      getItemBids(id)
+    } 
+    catch (err) {
+      console.error(err)
+    }
+  });
+}
+
+async function withdrawBid (id) {
+  if (id > 0) {
+    const marketWithSigner = global.marketContract.connect(global.signer);
+    await marketWithSigner.withdrawBid(id);
+  }
+
+  let filter = global.marketContract.filters.BidWithdrawn(null, null, store.state.account)
+  // Receive an event when ANY transfer occurs
+  global.marketContract.on(filter, async (itemId, value, fromAddress, event) => {
+    console.log(`I withdraw the bid to group ${ itemId}`);
+    // The event object contains the verbatim log data, the
+    // EventFragment and functions to fetch the block,
+    // transaction and receipt and event functions
+    try {
+      const bnbBalance = await global.provider.getBalance(store.state.account)
+      const lowbBalance = store.state.lowbBalance
+      const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+      const approvedBalance = store.state.approvedBalance
+      store.commit('setBalance', {
+        bnbBalance: bnbBalance,
+        lowbBalance: lowbBalance,
+        lowbMarketBalance: lowbMarketBalance,
+        approvedBalance: approvedBalance
+      })
+      getItemBids(id)
+    } 
+    catch (err) {
+      console.error(err)
+    }
+  });
+}
+
+async function getItemBids (groupId) {
+  if (global.marketContract == null) {
+    await getContracts()
+  }
+  
+  let bidInfo = await global.marketContract.itemBids(groupId, '0x0000000000000000000000000000000000000000')
+  let bids = []
+  while (bidInfo.nextBidder != '0x0000000000000000000000000000000000000000') {
+    let bid = {}
+    bid["maker"] = bidInfo.nextBidder
+    bid["taker"] = 'anyone'
+    bidInfo = await global.marketContract.itemBids(groupId, bidInfo.nextBidder)
+    bid["price"] = bidInfo.value/1e18
+    bid["index"] = bids.length + 1
+    bids.push(bid)
+  }
+
+  store.commit('setItemBids', {id: groupId, bids: bids})
 }
 
 if (isMetaMaskInstalled()) {

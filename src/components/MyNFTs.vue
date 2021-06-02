@@ -106,10 +106,12 @@ export default {
     deposit: function () {
       console.log("start deposit")
       this.$store.dispatch('depositLowb', this.toDeposit)
+      this.toDeposit = 0
     },
     withdraw: function () {
       console.log("start withdraw")
       this.$store.dispatch('withdrawLowb', this.toWithdraw)
+      this.toWithdraw = 0
     },
     // should remove when migrate to mainnet
     claim: async function () {
