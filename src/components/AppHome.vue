@@ -13,8 +13,11 @@
           class="mb-2"
         >
           <h6 class="card-subtitle mb-2 text-muted">Circulation: {{nft.currentSupply}}/{{nft.circulation}}</h6>
-          <b-card-text>
-            Price: Not for sale 
+          <b-card-text v-if="nft.price>0">
+            Price: {{nft.price/1e18}} 
+          </b-card-text>
+          <b-card-text v-else>
+            Not For Sale 
           </b-card-text>
           <div v-if="nft.currentSupply<nft.circulation">
             <router-link :to="{path: '/lowb-market/new-token-details/'+nft.id}">Details</router-link>

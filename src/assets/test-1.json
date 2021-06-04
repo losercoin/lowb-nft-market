@@ -4,5 +4,6 @@
     "image": "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/2/25/Mjolnir.png",
     "imageName": "low_king.jpg",
     "strength": 40,
-    "circulation": 3
+    "circulation": 3,
+    "startId": 1
 }

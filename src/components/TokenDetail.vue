@@ -4,24 +4,30 @@
       <b-card no-body class="overflow-hidden">
         <b-row no-gutters>
           <b-col md="4">
-            <b-card-img src="https://picsum.photos/400/400/?image=20" alt="Image" class="rounded-0"></b-card-img>
+            <b-card-img :src="require('../assets/'+$store.state.nftInfos[groupId-1].image)" alt="Image" class="rounded-0"></b-card-img>
           </b-col>
           <b-col md="8">
-            <b-card-body :title="$route.params.id">
-              <p>group id: #1  Circulation: 100</p>
-              <p>Details: This a very hard to solve!!!</p>
+            <b-card-body :title="$store.state.nftInfos[groupId-1].name">
+              <p>group id: #{{groupId}}  Circulation: {{$store.state.nftInfos[groupId-1].circulation}}</p>
+              <p>Details: {{$store.state.nftInfos[$route.params.id-1].description}}</p>
               <br>
-              <h4>Place a bid</h4>
-              <p>Your lowb market balance: 1000 lowb</p>
-              <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Amount of Lowb to Bid">
-                <span class="input-group-text">lowb</span>
-                <button class="btn btn-primary" type="button" id="button-addon2">Bid</button>
+              <div v-if="$store.getters.my_bid(groupId) != null">
+                <h4>Your bid</h4>
+                <p>You bid {{$store.getters.my_bid(groupId).price}} lowb for this item. <a href="#" @click="withdrawBid">[Withdraw]</a></p>
+              </div>
+              <div v-else>
+                <h4>Place a bid</h4>
+                <p>Your lowb market balance: {{$store.getters.lowb_market_balance}} lowb</p>
+                <div class="input-group mb-3">
+                  <input type="number" class="form-control" placeholder="0" @keyup="correct_toBid" v-model="toBid">
+                  <span class="input-group-text">lowb</span>
+                  <button class="btn btn-primary" type="button" id="button-addon2" @click="bid" :disabled="toBid<=0||$store.state.lowbMarketBalance<toBid*1e18">Bid</button>
+                </div>
               </div>
               <div>Market Summary</div>
               <hr class="mt-1 mb-2">
-              <p>Lowest Sale Price: 10000 lowb</p>
-              <p>Top Bid: 1000 lowb</p>
+              <p>Lowest Sale Price: {{$store.getters.min_price(groupId)}} lowb</p>
+              <p>Top Bid: {{$store.getters.max_bid(groupId)}} lowb</p>
               <br>
             </b-card-body>
           </b-col>
@@ -30,50 +36,66 @@
     </div>
     <br>
     <h2>Open Offers</h2>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Maker</th>
+          <th scope="col">Taker</th>
+          <th scope="col">Price</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="offer in $store.state.itemOffers[groupId]" :key="Number(offer.itemId)" >
+          <th scope="row">#{{offer.itemId}}</th>
+          <td>{{offer.seller}}</td>
+          <td>Anyone</td>
+          <td>{{offer.minValue/1e18}}</td>
+          <td>
+            <div v-if="offer.seller.toLowerCase() == $store.state.account.toLowerCase()">
+              <a href="#" @click="withdrawOffer(offer.itemId)">[Withdraw]</a>
+            </div>
+            <div v-else>
+              <a href="#" @click="approveLowb(offer.minValue/1e18)" v-if="offer.minValue > $store.state.approvedBalance">[Approve lowb to buy]</a>
+              <a href="#" @click="buy(offer.itemId, offer.minValue/1e18)" v-else>[Buy]</a>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-<div>
-    <b-table small :fields="offerFields" :items="offers" responsive="sm">
-      <!-- A virtual column -->
-      <template #cell(index)="data">
-        {{ data.index + 1 }}
-      </template>
-
-      <!-- A custom formatted column -->
-      <template #cell(tokenId)="data">
-        #{{data.item.tokenId}}
-      </template>
-
-      <!-- A custom formatted column -->
-      <template #cell(price)="data">
-        {{data.item.price}} lowb
-      </template>
-
-      <!-- A virtual composite column -->
-      <template #cell(action)="data">
-        <a :href="'#'+data.item.maker">Approve</a> <a :href="'#'+data.item.maker">Buy</a>
-      </template>
-
-    </b-table>
-  </div>
 
     <h2>Open Bids</h2>
-    <b-table small :fields="bidFields" :items="bids" responsive="sm">
-      <!-- A virtual column -->
-      <template #cell(index)="data">
-        {{ data.index + 1 }}
-      </template>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Maker</th>
+          <th scope="col">Taker</th>
+          <th scope="col">Price</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="bid in $store.state.itemBids[groupId]" :key="bid.index">
+          <th scope="row">{{bid.index}}</th>
+          <td>{{bid.maker}}</td>
+          <td>{{bid.taker}}</td>
+          <td>{{bid.price}}</td>
+          <td>
+            <div v-if="$store.getters.my_group_tokens(groupId).isNull">
+              N/A
+            </div>
+            <div v-else>
+              Approve: <div><a href="#" @click="approve(token)" v-for="token in $store.getters.my_group_tokens(groupId).toApprove" :key="token">[#{{token}}]</a></div>
+              Accept: <div><a href="#" @click="accept(token, bid.maker)" v-for="token in $store.getters.my_group_tokens(groupId).toAccept" :key="token">[#{{token}}]</a></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-      <!-- A custom formatted column -->
-      <template #cell(price)="data">
-        {{data.item.price}} lowb
-      </template>
-
-      <!-- A virtual composite column -->
-      <template #cell(action)="data">
-        <a :href="'#'+data.item.maker">Approve</a> <a :href="'#'+data.item.maker">Accept</a>
-      </template>
-
-    </b-table>
   </div>
 </template>
 
@@ -81,43 +103,55 @@
   export default {
     data() {
       return {
-        offerFields: [
-          // A virtual column that doesn't exist in items
-          'index',
-          // A column that needs custom formatting
-          { key: 'tokenId', label: 'token id' },
-          // A regular column
-          'maker',
-          // A regular column
-          'taker',
-          // A column that needs custom formatting
-          { key: 'price', label: 'price' },
-          // A virtual column that doesn't exist in items
-          { key: 'action', label: 'action' }
-        ],
-        offers: [
-          { tokenId: 1, maker: '0xD35a860B6fDB386Ae9d83D72209DAA704631CA15', taker: 'anyone', price: 42 },
-          { tokenId: 2, maker: '0xD53a860B6fDB386Ae9d83D72209DAA704631CA15', taker: 'anyone', price: 55 },
-          { tokenId: 3, maker: '0xD35a860B6fDB386Ae9d83D72209DAA704631CA15', taker: 'anyone', price: 42 }
-        ],
-        bidFields: [
-          // A virtual column that doesn't exist in items
-          'index',
-          // A regular column
-          'maker',
-          // A regular column
-          'taker',
-          // A column that needs custom formatting
-          { key: 'price', label: 'price' },
-          // A virtual column that doesn't exist in items
-          { key: 'action', label: 'action' }
-        ],
-        bids: [
-          { maker: '0xD35a860B6fDB386Ae9d83D72209DAA704631CA15', taker: 'anyone', price: 42 },
-          { maker: '0xD53a860B6fDB386Ae9d83D72209DAA704631CA15', taker: 'anyone', price: 55 },
-          { maker: '0xD35a860B6fDB386Ae9d83D72209DAA704631CA15', taker: 'anyone', price: 42 }
-        ]
+        groupId: this.$route.params.id,
+        toBid: 0,
       }
+    },
+    created () {
+      this.$store.commit('setItemBids', {id: this.groupId, bids: []})
+      this.$store.dispatch('updateBids', this.groupId)
+      this.$store.dispatch('updateOffers', this.groupId)
+    },
+    methods: {
+      correct_toBid: function () {
+        if (this.toBid > 0) {
+          this.toBid = Math.floor(this.toBid)
+        }
+        else {
+          this.toBid = 0
+        }
+      },
+      bid: function () {
+        console.log("Bid this token")
+        const myBid = {groupId: this.groupId, amount: this.toBid}
+        this.$store.dispatch('enterBid', myBid)
+        this.toBid = 0
+      },
+      approve: function (token) {
+        console.log("approve the nft: ", token)
+        this.$store.dispatch('approveItemBid', {item: token, group: this.groupId})
+      },
+      accept: function (token, bidder) {
+        console.log("accept the bid: ", token)
+        const bid = {id: token, bidder: bidder}
+        this.$store.dispatch('acceptBid', bid)
+      },
+      withdrawBid: function () {
+        console.log("withdraw the bid")
+        this.$store.dispatch('withdrawBid', this.groupId)
+      },
+      withdrawOffer: function (id) {
+        console.log("withdraw the offer")
+        this.$store.dispatch('withdrawOffer', {item: id, group: this.groupId})
+      },
+      approveLowb: function (amount) {
+        console.log("approve lowb")
+        this.$store.dispatch('approveLowb', amount)
+      },
+      buy: function (id, amount) {
+        console.log("buy the nft")
+        this.$store.dispatch('buyItem', {id: id, groupId: this.groupId, amount: amount})
+      },
     }
   }
 </script>

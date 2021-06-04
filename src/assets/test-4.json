@@ -1,9 +1,9 @@
 {
-    "name": "Volunteer Metal",
-    "description": "Volunteer always know things ahead of low king.",
+    "name": "Gold Metal",
+    "description": "We publish 10 Gold Metal to public to celebrate this event!!!.",
     "image": "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/2/25/Mjolnir.png",
     "imageName": "volunteer.jpg",
     "strength": 100,
     "circulation": 10,
-    "startId": 5
+    "startId": 15
 }

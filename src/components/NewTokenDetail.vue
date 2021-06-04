@@ -11,6 +11,15 @@
               <p>group id: #{{groupId}}  In progress: {{$store.state.nftInfos[groupId-1].currentSupply}}/{{$store.state.nftInfos[groupId-1].circulation}}</p>
               <p>Details: {{$store.state.nftInfos[$route.params.id-1].description}}</p>
               <br>
+              <div v-if="$store.state.bidsAdmin[groupId].address.toLowerCase() == $store.state.account.toLowerCase()">
+                <h4>Public Sale</h4>
+                <div class="input-group mb-3">
+                  <input type="number" class="form-control" placeholder="0" @keyup="correct_sellPrice" v-model="sellPrice">
+                  <span class="input-group-text">lowb</span>
+                  <button v-if="!$store.state.bidsAdmin[groupId].isApproved" class="btn btn-primary" type="button" v-on:click="approve">Approve</button>
+                  <button v-else class="btn btn-primary active" type="button" v-on:click="startSale" :disabled="sellPrice<=0">Start Sale</button>
+                </div>
+              </div>
               <div v-if="$store.getters.my_bid(groupId) != null">
                 <h4>Your bid</h4>
                 <p>You bid {{$store.getters.my_bid(groupId).price}} lowb for this item. <a href="#" @click="withdraw">[Withdraw]</a></p>
@@ -26,8 +35,8 @@
               </div>
               <div>Market Summary</div>
               <hr class="mt-1 mb-2">
-              <p>Total Bidders: 2</p>
-              <p>Top Bid: 1000 lowb</p>
+              <p>Total Bidders: {{$store.state.itemBids[groupId].length}}</p>
+              <p>Top Bid: {{$store.getters.max_bid(groupId)}} lowb</p>
               <br>
             </b-card-body>
           </b-col>
@@ -35,7 +44,13 @@
       </b-card>
     </div>
     <br>
-
+    <div v-if="$store.state.nftInfos[groupId-1].price > 0">
+      <h2>On Sale</h2>
+        <p>You can buy this item with {{$store.state.nftInfos[groupId-1].price/1e18}} lowb.   
+          <button class="btn btn-primary me-md-2" type="button" @click="approveBuy" :disabled="$store.state.nftInfos[groupId-1].price <= $store.state.approvedBalance">Approve</button>
+          <button class="btn btn-primary me-md-2" type="button" @click="buy" :disabled="$store.state.nftInfos[groupId-1].price > $store.state.approvedBalance">Buy</button>
+        </p>
+      </div>
     <h2>Open Bids</h2>
     <table class="table table-hover">
       <thead>
@@ -53,7 +68,9 @@
           <td>{{bid.maker}}</td>
           <td>{{bid.taker}}</td>
           <td>{{bid.price}}</td>
-          <td><a :href="'#'+bid.maker">Approve</a> <a :href="'#'+bid.maker">Accept</a></td>
+          <td v-if="$store.state.bidsAdmin[groupId].address.toLowerCase() != $store.state.account.toLowerCase()">N/A</td>
+          <td v-else-if="$store.state.bidsAdmin[groupId].isApproved"><a href="#" @click="accept(bid.maker)">[Accept]</a></td>
+          <td v-else><a href="#" @click="approve">[Approve]</a></td>
         </tr>
       </tbody>
     </table>
@@ -65,11 +82,13 @@
     data() {
       return {
         toBid: 0,
+        sellPrice: 0,
         groupId: this.$route.params.id
       }
     },
     created () {
       this.$store.commit('setItemBids', {id: this.groupId, bids: []})
+      this.$store.commit('setBidsAdmin', {id: this.groupId, bidAdmin: {address: "0x0", isApproved: false}})
       this.$store.dispatch('updateBids', this.groupId)
     },
     methods: {
@@ -81,6 +100,14 @@
           this.toBid = 0
         }
       },
+      correct_sellPrice: function () {
+        if (this.sellPrice > 0) {
+          this.sellPrice = Math.floor(this.sellPrice)
+        }
+        else {
+          this.sellPrice = 0
+        }
+      },
       bid: function () {
         console.log("Bid this new token")
         const myBid = {groupId: this.groupId, amount: this.toBid}
@@ -90,6 +117,30 @@
       withdraw: function () {
         console.log("withdraw the bid")
         this.$store.dispatch('withdrawBid', this.groupId)
+      },
+      approve: function () {
+        console.log("approve contract")
+        this.$store.dispatch('approveGroupBid', this.groupId)
+      },
+      accept: function (bidder) {
+        console.log("accept the bid")
+        const bid = {id: this.groupId, bidder: bidder}
+        this.$store.dispatch('acceptNewBid', bid)
+      },
+      startSale: function () {
+        console.log("start sale")
+        const offer = {id: this.groupId, amount: this.sellPrice}
+        this.$store.dispatch('startSale', offer)
+        this.sellPrice = 0
+      },
+      approveBuy: function () {
+        console.log("approve buy")
+        this.$store.dispatch('approveLowb', this.$store.state.nftInfos[this.groupId-1].price/1e18)
+      },
+      buy: function () {
+        console.log("buy")
+        const payload = {id: this.groupId, amount: this.$store.state.nftInfos[this.groupId-1].price/1e18}
+        this.$store.dispatch('buyNewItem', payload)
       },
     }
   }

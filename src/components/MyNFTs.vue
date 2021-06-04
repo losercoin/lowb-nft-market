@@ -37,26 +37,46 @@
     <br>
     <h2>NFTs Owned</h2>
     <div class="row">
-      <div v-for="card in cards" :key="card.name" class="col-sm-3">
+      <div v-for="nft in $store.state.myNfts" :key="nft.tokenId" class="col-sm-3">
         <b-card
-          :title="card.name"
-          img-src="https://picsum.photos/600/300/?image=25"
+          :title="$store.state.nftInfos[nft.groupId-1].name"
+          :img-src="require('../assets/'+$store.state.nftInfos[nft.groupId-1].image)"
           img-alt="Image"
           img-top
           tag="article"
           style="max-width: 20rem;"
           class="mb-2"
         >
-          <h6 class="card-subtitle mb-2 text-muted">Circulation: 100</h6>
+          <h6 class="card-subtitle mb-2 text-muted">
+            <div v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">#{{nft.tokenId}}  [New]</div>
+            <div v-else>#{{nft.tokenId}}  Circulation: {{$store.state.nftInfos[nft.groupId-1].circulation}}</div>
+          </h6>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Price offered for sale">
+            <input type="text" class="form-control" placeholder="0" v-model="toOffer[nft.tokenId]" @keyup="correct_toOffer(nft.tokenId)">
             <span class="input-group-text">lowb</span>
           </div>
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button class="btn btn-primary me-md-2" type="button">Approve</button>
-            <button class="btn btn-primary active" type="button">Offer</button>
+            <button 
+              class="btn btn-primary" 
+              type="button" 
+              v-on:click="approveNft(nft.tokenId, nft.groupId)" 
+              :disabled="nft.isApproved || $store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
+              Approve
+            </button>
+            <button 
+              class="btn btn-primary active" 
+              type="button" 
+              v-on:click="offer(nft.tokenId, nft.groupId)" 
+              :disabled="toOffer[nft.tokenId] <= 0 || !nft.isApproved || $store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
+              Offer
+            </button>
           </div>
-          <router-link :to="{path: '/lowb-market/token-details/'+card.name}">Details</router-link>
+          <div v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
+            <router-link :to="{path: '/lowb-market/new-token-details/'+nft.groupId}">Details</router-link>
+          </div>
+          <div v-else>
+            <router-link :to="{path: '/lowb-market/token-details/'+nft.groupId}">Details</router-link>
+          </div>
         </b-card>
       </div>
     </div>
@@ -70,16 +90,12 @@ import { ethers } from "ethers";
 export default {
   data: function() {
     return {
-      cards: [],
       toDeposit: 0,
-      toWithdraw: 0
+      toWithdraw: 0,
+      toOffer: []
     };
   },
   created () {
-    this.cards = [
-      { name: 'Runoob' },
-      { name: 'Google' }
-    ]
     console.log(this.$store.state.approvedBalance, this.toDeposit)
   },
   methods: {
@@ -97,6 +113,14 @@ export default {
       }
       else {
         this.toWithdraw = 0
+      }
+    },
+    correct_toOffer: function (tokenId) {
+      if (this.toOffer[tokenId] > 0) {
+        this.toOffer[tokenId] = Math.floor(this.toOffer[tokenId])
+      }
+      else {
+        this.toOffer[tokenId] = 0
       }
     },
     approve: function () {
@@ -122,7 +146,16 @@ export default {
       const airdropWithSigner = airdropContract.connect(global.signer);
       await airdropWithSigner.claim();
       console.log('claim 10000 lowb!');
-    }
+    },
+    approveNft: function (tokenId, groupId) {
+      console.log("start approve nft")
+      this.$store.dispatch('approveItemBid', {item: tokenId, group: groupId})
+    },
+    offer: function (tokenId, groupId) {
+      console.log("start offer nft")
+      this.$store.dispatch('offerItem', {id: tokenId, groupId: groupId, amount: this.toOffer[tokenId]})
+      this.$set(this.toOffer, tokenId, 0)
+    },
   }
 }
 </script>

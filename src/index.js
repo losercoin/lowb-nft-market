@@ -52,7 +52,10 @@ const store = new Vuex.Store({
     lowbMarketBalance: 0,
     approvedBalance: 0,
     nftInfos: [],
-    itemBids: {}
+    myNfts: [],
+    itemBids: {},
+    itemOffers: {},
+    bidsAdmin: {}
   },
   getters: {
     abbr_account: state => {
@@ -78,6 +81,49 @@ const store = new Vuex.Store({
     my_bid: (state) => (id) =>  {
       return state.itemBids[id].find(bid => bid.maker.toLowerCase() == store.state.account.toLowerCase())
     },
+    max_bid: (state) => (id) =>  {
+      if (state.itemBids[id].length == 0) {
+        return 0
+      }
+      else {
+        let max = state.itemBids[id][0].price
+        for (let i = 1; i < state.itemBids[id].length; i++) {
+          if (state.itemBids[id][i].price>max) {
+            max = state.itemBids[id][i].price
+          }
+        }
+        return max
+      }
+    },
+    min_price: (state) => (id) =>  {
+      if (state.itemOffers[id] == null || state.itemOffers[id].length == 0) {
+        return 'N/A'
+      }
+      else {
+        let min = state.itemOffers[id][0].minValue
+        for (let i = 1; i < state.itemOffers[id].length; i++) {
+          if (state.itemOffers[id][i].minValue < min) {
+            min = state.itemOffers[id][i].minValue
+          }
+        }
+        return min/1e18
+      }
+    },
+    my_group_tokens: (state) => (id) =>  {
+      let tokensToApprove = []
+      let tokensToAccept = []
+      state.myNfts.forEach(myNft => {
+        if (myNft.groupId == id) {
+          if (myNft.isApproved) {
+            tokensToAccept.push(myNft.tokenId)
+          }
+          else {
+            tokensToApprove.push(myNft.tokenId)
+          }
+        }
+      })
+      return {isNull: (tokensToAccept.length+tokensToApprove.length == 0), toAccept: tokensToAccept, toApprove: tokensToApprove}
+    },
   },
   mutations: {
     increment (state) {
@@ -101,13 +147,45 @@ const store = new Vuex.Store({
       state.approvedBalance = payload.approvedBalance
       console.log("set balance: ", payload)
     },
-    setTotalGroup (state, nftInfos) {
-      state.nftInfos = nftInfos
-      console.log("set total group: ", nftInfos.length)
+    setNftInfos (state, payload) {
+      if (payload.id <= state.nftInfos.length) {
+        Vue.set(state.nftInfos, payload.id, payload.info)
+        console.log("set group: ", payload.id)
+      }
+    },
+    setMyNfts (state, payload) {
+      if (payload.myNft == null) {
+        state.myNfts.splice(payload.id, 1)
+        console.log("delete my NFTs: ", payload.id)
+      }
+      else {
+        Vue.set(state.myNfts, payload.id, payload.myNft)
+        console.log("set my NFTs: ", payload.id)
+      }
+    },
+    setItemOffers (state, payload) {
+      Vue.set(state.itemOffers, payload.id, payload.offerInfos)
+      console.log(`set ${ payload.id }'s offer: `, payload.offerInfos)
     },
     setItemBids (state, payload) {
       Vue.set(state.itemBids, payload.id, payload.bids)
-      console.log(`set ${ payload.id }'s bids`, payload.bids)
+      console.log(`set ${ payload.id }'s bids`)
+    },
+    setBidsAdmin (state, payload) {
+      Vue.set(state.bidsAdmin, payload.id, payload.bidAdmin)
+      console.log(`set ${ payload.id }'s bids' admin:  ${ payload.bidAdmin.address }`)
+    },
+    setItemSupply (state, payload) {
+      let nftInfo = state.nftInfos[payload.id]
+      nftInfo["currentSupply"] = payload.supply
+      Vue.set(state.nftInfos, payload.id, nftInfo)
+      console.log(`set ${ payload.id }'s current supply:  ${ payload.supply }`)
+    },
+    setNewItemPrice (state, payload) {
+      let nftInfo = state.nftInfos[payload.id]
+      nftInfo["price"] = payload.price
+      Vue.set(state.nftInfos, payload.id, nftInfo)
+      console.log(`set ${ payload.id }'s sale price:  ${ payload.price/1e18 }`)
     },
   },
   actions: {
@@ -137,14 +215,48 @@ const store = new Vuex.Store({
     updateTotalGroup () {
       getGroupNumber()
     },
+    updateMyNfts () {
+      getMyNfts()
+    },
     updateBids ({}, groupId) {
       getItemBids(groupId)
+    },
+    updateOffers ({}, groupId) {
+      getItemOffers(groupId)
+    },
+    approveGroupBid ({ state }, groupId) {
+      const id = state.nftInfos[groupId-1].startId
+      approveBid(id, groupId)
+    },
+    approveItemBid ({}, id) {
+      approveBid(id.item, id.group)
+    },
+    acceptBid ({}, bid) {
+      acceptBid(bid.id, bid.bidder)
+    },
+    acceptNewBid ({}, bid) {
+      acceptNewBid(bid.id, bid.bidder)
     },
     enterBid ({}, bid) {
       enterBid(bid.groupId, bid.amount)
     },
     withdrawBid ({}, id) {
       withdrawBid(id)
+    },
+    withdrawOffer ({}, id) {
+      withdrawOffer(id.item, id.group)
+    },
+    startSale ({}, offer) {
+      startSale(offer.id, offer.amount)
+    },
+    offerItem ({}, offer) {
+      offerItem(offer.id, offer.groupId, offer.amount)
+    },
+    buyNewItem ({}, payload) {
+      buyNewItem(payload.id, payload.amount)
+    },
+    buyItem ({}, payload) {
+      buyItem(payload.id, payload.groupId, payload.amount)
     }
   }
 })
@@ -176,6 +288,7 @@ function handleNewAccounts (accounts) {
   store.commit('setAccount', accounts[0])
   if(store.state.chainId == '0x61') {
     getBalance(accounts[0])
+    store.dispatch('updateMyNfts')
   }
 }
 
@@ -368,7 +481,6 @@ async function withdrawLowb(amount) {
 async function getGroupNumber () {
   try {
     const groupNumber = await global.lowcContract.groupIds()
-    let nftInfos = []
     for (let i=0; i<groupNumber; i++) {
       let nftInfo = {}
       const testFile = () => import("./assets/test-" + (i+1) + ".json")
@@ -377,13 +489,298 @@ async function getGroupNumber () {
       nftInfo["description"] = (await testFile())["description"]
       nftInfo["circulation"] = (await testFile())["circulation"]
       nftInfo["image"] = (await testFile())["imageName"]
+      nftInfo["startId"] = (await testFile())["startId"]
       nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(i+1)
-      nftInfos.push(nftInfo)
+      nftInfo["price"] = await global.marketContract.newTokenOffer(i+1)
+      store.commit('setNftInfos', {id: i, info: nftInfo})
     }
-    store.commit('setTotalGroup', nftInfos)
   } catch (err) {
     console.error(err)
   }
+}
+
+async function getMyNfts () {
+  try {
+    let prev_length = store.state.myNfts.length
+    for (let i=0; i<prev_length; i++) {
+      store.commit('setMyNfts', {id: 0, myNft: null})
+    }
+    const lowcNumber = await global.lowcContract.balanceOf(store.state.account)
+    for (let i=0; i<lowcNumber; i++) {
+      const tokenId = (await global.lowcContract.tokenOfOwnerByIndex(store.state.account, i)).toString()
+      const groupId = (await global.lowcContract.groupOf(tokenId)).toString()
+      if (store.state.nftInfos[groupId-1] == null) {
+        let nftInfo = {}
+        const testFile = () => import("./assets/test-" + groupId + ".json")
+        nftInfo["id"] = groupId
+        nftInfo["name"] = (await testFile())["name"]
+        nftInfo["description"] = (await testFile())["description"]
+        nftInfo["circulation"] = (await testFile())["circulation"]
+        nftInfo["image"] = (await testFile())["imageName"]
+        nftInfo["startId"] = (await testFile())["startId"]
+        nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(groupId)
+        nftInfo["price"] = await global.marketContract.newTokenOffer(i+1)
+        store.commit('setNftInfos', {id: groupId-1, info: nftInfo})
+      }
+      const getApproved = await global.lowcContract.getApproved(tokenId)
+      const isApproved = (getApproved.toLowerCase() == global.marketAddress.toLowerCase())
+      const myNft = {tokenId: tokenId, groupId: groupId, isApproved: isApproved}
+      store.commit('setMyNfts', {id: i, myNft: myNft})
+    }
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+async function buyNewItem (id, amount) {
+  if (id > 0 && amount > 0) {
+    const marketWithSigner = global.marketContract.connect(global.signer);
+    const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
+    await marketWithSigner.buyNewItem(id, amount_in_wei);
+  }
+  console.log(Number(id))
+  
+  let filter = global.marketContract.filters.ItemMint(null, null, store.state.account)
+  // Receive an event when ANY transfer occurs
+  global.marketContract.on(filter, async (itemId, value, toAddress, event) => {
+    console.log(`${ toAddress } mint a new token #${ itemId } with ${ value } lowb`);
+    // The event object contains the verbatim log data, the
+    // EventFragment and functions to fetch the block,
+    // transaction and receipt and event functions
+    try {
+      const bnbBalance = await global.provider.getBalance(store.state.account)
+      const lowbBalance = store.state.lowbBalance
+      const lowbMarketBalance = store.state.lowbMarketBalance
+      const approvedBalance = Number(store.state.approvedBalance) - Number(value)
+      store.commit('setBalance', {
+        bnbBalance: bnbBalance,
+        lowbBalance: lowbBalance,
+        lowbMarketBalance: lowbMarketBalance,
+        approvedBalance: approvedBalance
+      })
+      const supply = Number(store.state.nftInfos[id-1]["currentSupply"]) + 1
+      store.commit('setItemSupply', {id: id-1, supply: supply})
+    } 
+    catch (err) {
+      console.error(err)
+    }
+  });
+}
+
+async function buyItem (id, groupId, amount) {
+  if (id > 0 && amount > 0) {
+    const marketWithSigner = global.marketContract.connect(global.signer);
+    const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
+    await marketWithSigner.buyItem(id, amount_in_wei);
+  }
+  
+  let filter = global.marketContract.filters.ItemBought(null, null, null, store.state.account)
+  // Receive an event when ANY transfer occurs
+  global.marketContract.on(filter, async (itemId, value, fromAddress, toAddress, event) => {
+    console.log(`$I buy a token #${ itemId } with ${ value } lowb from ${ fromAddress }`);
+    // The event object contains the verbatim log data, the
+    // EventFragment and functions to fetch the block,
+    // transaction and receipt and event functions
+    try {
+      const bnbBalance = await global.provider.getBalance(store.state.account)
+      const lowbBalance = Number(store.state.lowbBalance) -Number(value)
+      const lowbMarketBalance = store.state.lowbMarketBalance
+      const approvedBalance = store.state.approvedBalance
+      store.commit('setBalance', {
+        bnbBalance: bnbBalance,
+        lowbBalance: lowbBalance,
+        lowbMarketBalance: lowbMarketBalance,
+        approvedBalance: approvedBalance
+      })
+      getItemOffers(groupId)
+    } 
+    catch (err) {
+      console.error(err)
+    }
+  });
+}
+
+async function approveBid (tokenId, groupId) {
+  if (tokenId > 0) {
+    const lowcWithSigner = global.lowcContract.connect(global.signer);
+    await lowcWithSigner.approve(global.marketAddress, tokenId)
+  }
+
+  let filter = global.lowcContract.filters.Approval(store.state.account)
+  // Receive an event when ANY transfer occurs
+  global.lowcContract.on(filter, async (owner, operator, approved, event) => {
+    console.log(`I approved the contract to handle my nft`);
+    // The event object contains the verbatim log data, the
+    // EventFragment and functions to fetch the block,
+    // transaction and receipt and event functions
+    try {
+      const bnbBalance = await global.provider.getBalance(store.state.account)
+      const lowbBalance = store.state.lowbBalance
+      const lowbMarketBalance = store.state.lowbMarketBalance
+      const approvedBalance = store.state.approvedBalance
+      store.commit('setBalance', {
+        bnbBalance: bnbBalance,
+        lowbBalance: lowbBalance,
+        lowbMarketBalance: lowbMarketBalance,
+        approvedBalance: approvedBalance
+      })
+      if (store.state.nftInfos[groupId-1].currentSupply<store.state.nftInfos[groupId-1].circulation) {
+        let bidAdmin = {address: store.state.account, isApproved: true}
+        store.commit('setBidsAdmin', {id: groupId, bidAdmin: bidAdmin})
+      }
+      else {
+        for (let i=0; i<store.state.myNfts.length; i++) {
+          if (store.state.myNfts[i].tokenId == tokenId) {
+            store.commit('setMyNfts', {id: i, myNft: {tokenId: tokenId, groupId: groupId, isApproved: true}})
+          }
+        }
+      }
+    } 
+    catch (err) {
+      console.error(err)
+    }
+  });
+}
+
+async function startSale (id, amount) {
+  if (id > 0 && amount > 0) {
+    const marketWithSigner = global.marketContract.connect(global.signer);
+    const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
+    await marketWithSigner.offerItemsForPublicSale(id, amount_in_wei);
+  }
+  console.log(Number(id))
+  
+  let filter = global.marketContract.filters.NewItemsOffered(Number(id))
+  // Receive an event when ANY transfer occurs
+  global.marketContract.on(filter, async (groupId, minValue, event) => {
+    console.log(`I offer group ${ groupId} with ${ minValue/1e18 } lowb for public sale`);
+    // The event object contains the verbatim log data, the
+    // EventFragment and functions to fetch the block,
+    // transaction and receipt and event functions
+    try {
+      const bnbBalance = await global.provider.getBalance(store.state.account)
+      const lowbBalance = store.state.lowbBalance
+      const lowbMarketBalance = store.state.lowbMarketBalance
+      const approvedBalance = store.state.approvedBalance
+      store.commit('setBalance', {
+        bnbBalance: bnbBalance,
+        lowbBalance: lowbBalance,
+        lowbMarketBalance: lowbMarketBalance,
+        approvedBalance: approvedBalance
+      })
+      store.commit('setNewItemPrice', {id: groupId-1, price: minValue})
+    } 
+    catch (err) {
+      console.error(err)
+    }
+  });
+}
+
+async function offerItem (id, groupId, amount) {
+  if (id > 0 && amount > 0) {
+    const marketWithSigner = global.marketContract.connect(global.signer);
+    const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
+    await marketWithSigner.offerItemForSale(id, amount_in_wei);
+  }
+  
+  let filter = global.marketContract.filters.ItemOffered(Number(id))
+  // Receive an event when ANY transfer occurs
+  global.marketContract.on(filter, async (itemId, minValue, toAddress, event) => {
+    console.log(`I offer item ${ itemId} with ${ minValue/1e18 } lowb for sale`);
+    // The event object contains the verbatim log data, the
+    // EventFragment and functions to fetch the block,
+    // transaction and receipt and event functions
+    try {
+      const bnbBalance = await global.provider.getBalance(store.state.account)
+      const lowbBalance = store.state.lowbBalance
+      const lowbMarketBalance = store.state.lowbMarketBalance
+      const approvedBalance = store.state.approvedBalance
+      store.commit('setBalance', {
+        bnbBalance: bnbBalance,
+        lowbBalance: lowbBalance,
+        lowbMarketBalance: lowbMarketBalance,
+        approvedBalance: approvedBalance
+      })
+      getItemOffers(groupId)
+    } 
+    catch (err) {
+      console.error(err)
+    }
+  });
+}
+
+async function acceptNewBid (id, bidder) {
+  if (id > 0) {
+    const marketWithSigner = global.marketContract.connect(global.signer);
+    await marketWithSigner.approveBid(id, bidder);
+  }
+
+  let filter = global.marketContract.filters.ItemMint(null, null, bidder)
+  // Receive an event when ANY transfer occurs
+  global.marketContract.on(filter, async (itemId, value, toAddress, event) => {
+    console.log(`${ toAddress } mint a new token #${ itemId } with ${ value/1e18 } lowb`);
+    // The event object contains the verbatim log data, the
+    // EventFragment and functions to fetch the block,
+    // transaction and receipt and event functions
+    try {
+      const bnbBalance = await global.provider.getBalance(store.state.account)
+      const lowbBalance = store.state.lowbBalance
+      const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+      const approvedBalance = store.state.approvedBalance
+      store.commit('setBalance', {
+        bnbBalance: bnbBalance,
+        lowbBalance: lowbBalance,
+        lowbMarketBalance: lowbMarketBalance,
+        approvedBalance: approvedBalance
+      })
+      console.log(store.state.nftInfos[id-1])
+      const supply = Number(store.state.nftInfos[id-1]["currentSupply"]) + 1
+      store.commit('setItemSupply', {id: id-1, supply: supply})
+      getItemBids(id)
+    } 
+    catch (err) {
+      console.error(err)
+    }
+  });
+
+}
+
+async function acceptBid (id, bidder) {
+  if (id > 0) {
+    const marketWithSigner = global.marketContract.connect(global.signer);
+    await marketWithSigner.acceptBid(id, bidder);
+  }
+
+  let filter = global.marketContract.filters.ItemBought(null, null, store.state.account)
+  // Receive an event when ANY transfer occurs
+  global.marketContract.on(filter, async (itemId, value, fromAddress, toAddress, event) => {
+    console.log(`${ toAddress } bought a token #${ itemId } with ${ value/1e18 } lowb from ${ fromAddress }`);
+    // The event object contains the verbatim log data, the
+    // EventFragment and functions to fetch the block,
+    // transaction and receipt and event functions
+    try {
+      const bnbBalance = await global.provider.getBalance(store.state.account)
+      const lowbBalance = store.state.lowbBalance
+      const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+      const approvedBalance = store.state.approvedBalance
+      store.commit('setBalance', {
+        bnbBalance: bnbBalance,
+        lowbBalance: lowbBalance,
+        lowbMarketBalance: lowbMarketBalance,
+        approvedBalance: approvedBalance
+      })
+      for (let i=0; i<store.state.myNfts.length; i++) {
+        if (store.state.myNfts[i].tokenId == itemId) {
+          store.commit('setMyNfts', {id: i, myNft: null})
+        }
+      }
+      getItemBids(id)
+    } 
+    catch (err) {
+      console.error(err)
+    }
+  });
+
 }
 
 async function enterBid (id, amount) {
@@ -451,10 +848,51 @@ async function withdrawBid (id) {
   });
 }
 
+async function withdrawOffer (id, groupId) {
+  if (id > 0) {
+    const marketWithSigner = global.marketContract.connect(global.signer);
+    await marketWithSigner.itemNoLongerForSale(id);
+  }
+
+  let filter = global.marketContract.filters.ItemNoLongerForSale(Number(id))
+  // Receive an event when ANY transfer occurs
+  global.marketContract.on(filter, async (itemId, event) => {
+    console.log(`I withdraw the offer of item ${ itemId }`);
+    // The event object contains the verbatim log data, the
+    // EventFragment and functions to fetch the block,
+    // transaction and receipt and event functions
+    try {
+      const bnbBalance = await global.provider.getBalance(store.state.account)
+      const lowbBalance = store.state.lowbBalance
+      const lowbMarketBalance = store.state.lowbMarketBalance
+      const approvedBalance = store.state.approvedBalance
+      store.commit('setBalance', {
+        bnbBalance: bnbBalance,
+        lowbBalance: lowbBalance,
+        lowbMarketBalance: lowbMarketBalance,
+        approvedBalance: approvedBalance
+      })
+      getItemOffers(groupId)
+    } 
+    catch (err) {
+      console.error(err)
+    }
+  });
+}
+
 async function getItemBids (groupId) {
   if (global.marketContract == null) {
     await getContracts()
   }
+
+  let bidAdmin = {}
+  //console.log(store.state.nftInfos[groupId].currentSupply, store.state.nftInfos[groupId].circulation)
+  if (store.state.nftInfos[groupId-1].currentSupply < store.state.nftInfos[groupId-1].circulation) {
+    bidAdmin["address"] = await global.lowcContract.ownerOf(store.state.nftInfos[groupId-1].startId)
+    const getApproved = await global.lowcContract.getApproved(store.state.nftInfos[groupId-1].startId)
+    bidAdmin["isApproved"] = (getApproved.toLowerCase() == global.marketAddress.toLowerCase())
+  }
+  store.commit('setBidsAdmin', {id: groupId, bidAdmin: bidAdmin})
   
   let bidInfo = await global.marketContract.itemBids(groupId, '0x0000000000000000000000000000000000000000')
   let bids = []
@@ -469,11 +907,29 @@ async function getItemBids (groupId) {
   }
 
   store.commit('setItemBids', {id: groupId, bids: bids})
+  
+}
+
+async function getItemOffers (groupId) {
+  if (global.marketContract == null) {
+    await getContracts()
+  }
+
+  let offerInfos = []
+  for (let i=store.state.nftInfos[groupId-1].startId; i<store.state.nftInfos[groupId-1].startId+Number(store.state.nftInfos[groupId-1].currentSupply); i++) {
+    let offerInfo = await global.marketContract.itemsOfferedForSale(i)
+    if (offerInfo.isForSale) {
+      offerInfos.push(offerInfo)
+    }
+  }
+
+  store.commit('setItemOffers', {id: groupId, offerInfos: offerInfos})
+  
 }
 
 if (isMetaMaskInstalled()) {
 
-  global.provider = new ethers.providers.Web3Provider(window.ethereum)
+  global.provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
   global.signer = global.provider.getSigner()
   console.log('Access the decentralized web!')
   store.commit('setMetaMaskInstalled')
