@@ -12,12 +12,11 @@
           style="max-width: 20rem;"
           class="mb-2"
         >
-          <h6 class="card-subtitle mb-2 text-muted">Circulation: {{nft.currentSupply}}/{{nft.circulation}}</h6>
-          <b-card-text v-if="nft.price>0">
-            Price: {{nft.price/1e18}} 
-          </b-card-text>
-          <b-card-text v-else>
-            Not For Sale 
+          <b-card-text>
+            <h6 class="card-subtitle mb-2 text-muted">Circulation: {{nft.currentSupply}}/{{nft.circulation}}</h6>
+            <span class="badge rounded-pill bg-primary" v-for="feature in nft.features" :key="feature">{{feature}}</span>
+            <span class="badge rounded-pill bg-success" v-if="nft.currentSupply<nft.circulation">new</span>
+            <span class="badge rounded-pill bg-secondary" v-if="nft.price>0">{{nft.price/1e18}} lowb</span>
           </b-card-text>
           <div v-if="nft.currentSupply<nft.circulation">
             <router-link :to="{path: '/lowb-market/new-token-details/'+nft.id}">Details</router-link>

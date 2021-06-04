@@ -490,6 +490,7 @@ async function getGroupNumber () {
       nftInfo["circulation"] = (await testFile())["circulation"]
       nftInfo["image"] = (await testFile())["imageName"]
       nftInfo["startId"] = (await testFile())["startId"]
+      nftInfo["features"] = (await testFile())["features"]
       nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(i+1)
       nftInfo["price"] = await global.marketContract.newTokenOffer(i+1)
       store.commit('setNftInfos', {id: i, info: nftInfo})
@@ -518,6 +519,7 @@ async function getMyNfts () {
         nftInfo["circulation"] = (await testFile())["circulation"]
         nftInfo["image"] = (await testFile())["imageName"]
         nftInfo["startId"] = (await testFile())["startId"]
+        nftInfo["features"] = (await testFile())["features"]
         nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(groupId)
         nftInfo["price"] = await global.marketContract.newTokenOffer(i+1)
         store.commit('setNftInfos', {id: groupId-1, info: nftInfo})
