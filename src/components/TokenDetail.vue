@@ -133,7 +133,7 @@
       },
       accept: function (token, bidder) {
         console.log("accept the bid: ", token)
-        const bid = {id: token, bidder: bidder}
+        const bid = {id: token, groupId: this.groupId, bidder: bidder}
         this.$store.dispatch('acceptBid', bid)
       },
       withdrawBid: function () {

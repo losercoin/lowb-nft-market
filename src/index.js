@@ -55,7 +55,8 @@ const store = new Vuex.Store({
     myNfts: [],
     itemBids: {},
     itemOffers: {},
-    bidsAdmin: {}
+    bidsAdmin: {},
+    eventFilters: []
   },
   getters: {
     abbr_account: state => {
@@ -187,6 +188,10 @@ const store = new Vuex.Store({
       Vue.set(state.nftInfos, payload.id, nftInfo)
       console.log(`set ${ payload.id }'s sale price:  ${ payload.price/1e18 }`)
     },
+    addFilter (state, filter) {
+      state.eventFilters.push(filter)
+      console.log("register new event!")
+    }
   },
   actions: {
     incrementAsync ({ commit }) {
@@ -232,7 +237,7 @@ const store = new Vuex.Store({
       approveBid(id.item, id.group)
     },
     acceptBid ({}, bid) {
-      acceptBid(bid.id, bid.bidder)
+      acceptBid(bid.id, bid.groupId, bid.bidder)
     },
     acceptNewBid ({}, bid) {
       acceptNewBid(bid.id, bid.bidder)
@@ -391,30 +396,38 @@ async function approveLowb(amount) {
     await lowbWithSigner.approve(global.marketAddress, amount_in_wei);
   }
 
-  let filter = global.lowbContract.filters.Approval(store.state.account, null)
-  // Receive an event when ANY transfer occurs
-  global.lowbContract.on(filter, async (owner, spender, value, event) => {
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    if (value > 0) {
-      console.log(`I approved ${ value/1e18 } lowb to ${ spender}`);
-      try {
-        const bnbBalance = await global.provider.getBalance(store.state.account)
-        const lowbBalance = store.state.lowbBalance
-        const lowbMarketBalance = store.state.lowbMarketBalance
-        const approvedBalance = value
-        store.commit('setBalance', {
-          bnbBalance: bnbBalance,
-          lowbBalance: lowbBalance,
-          lowbMarketBalance: lowbMarketBalance,
-          approvedBalance: approvedBalance
-        })
-      } catch (err) {
+  const filter = global.lowbContract.filters.Approval(store.state.account, null)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("approve Lowb event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.lowbContract.on(filter, async (owner, spender, value, event) => {
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      if (value > 0) {
+        console.log(`I approved ${ value/1e18 } lowb to ${ spender}`);
+        try {
+          const bnbBalance = await global.provider.getBalance(store.state.account)
+          const lowbBalance = store.state.lowbBalance
+          const lowbMarketBalance = store.state.lowbMarketBalance
+          const approvedBalance = value
+          store.commit('setBalance', {
+            bnbBalance: bnbBalance,
+            lowbBalance: lowbBalance,
+            lowbMarketBalance: lowbMarketBalance,
+            approvedBalance: approvedBalance
+          })
+        } 
+        catch (err) {
           console.error(err)
+        }
       }
-    }
-  });
+    });
+  }
+  
 }
 
 async function depositLowb(amount) {
@@ -424,28 +437,34 @@ async function depositLowb(amount) {
     await marketWithSigner.deposit(amount_in_wei);
   }
 
-  let filter = global.lowbContract.filters.Transfer(store.state.account, null)
-  // Receive an event when ANY transfer occurs
-  global.lowbContract.on(filter, async (from, to, value, event) => {
-    console.log(`I sent ${ value/1e18 } lowb to ${ to}`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = Number(store.state.lowbBalance) - Number(value)
-      const lowbMarketBalance = Number(store.state.lowbMarketBalance) + Number(value)
-      const approvedBalance = Number(store.state.approvedBalance) - Number(value)
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      } catch (err) {
-        console.error(err)
-      }
-  });
+  const filter = global.lowbContract.filters.Transfer(store.state.account, null)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("deposit Lowb event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.lowbContract.on(filter, async (from, to, value, event) => {
+      console.log(`I sent ${ value/1e18 } lowb to ${ to}`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = Number(store.state.lowbBalance) - Number(value)
+        const lowbMarketBalance = Number(store.state.lowbMarketBalance) + Number(value)
+        const approvedBalance = Number(store.state.approvedBalance) - Number(value)
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        } catch (err) {
+          console.error(err)
+        }
+    });
+  }
 }
 
 async function withdrawLowb(amount) {
@@ -455,28 +474,35 @@ async function withdrawLowb(amount) {
     await marketWithSigner.withdraw(amount_in_wei);
   }
 
-  let filter = global.lowbContract.filters.Transfer(null, store.state.account)
-  // Receive an event when ANY transfer occurs
-  global.lowbContract.on(filter, async (from, to, value, event) => {
-    console.log(`I got ${ value/1e18 } lowb from ${ from}`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = Number(store.state.lowbBalance) + Number(value)
-      const lowbMarketBalance = Number(store.state.lowbMarketBalance) - Number(value)
-      const approvedBalance = store.state.approvedBalance
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      } catch (err) {
-        console.error(err)
-      }
-  });
+  const filter = global.lowbContract.filters.Transfer(null, store.state.account)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("withdraw Lowb event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.lowbContract.on(filter, async (from, to, value, event) => {
+      console.log(`I got ${ value/1e18 } lowb from ${ from}`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = Number(store.state.lowbBalance) + Number(value)
+        const lowbMarketBalance = Number(store.state.lowbMarketBalance) - Number(value)
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        } catch (err) {
+          console.error(err)
+        }
+    });
+  }
+  
 }
 
 async function getGroupNumber () {
@@ -544,30 +570,38 @@ async function buyNewItem (id, amount) {
   console.log(Number(id))
   
   let filter = global.marketContract.filters.ItemMint(null, null, store.state.account)
-  // Receive an event when ANY transfer occurs
-  global.marketContract.on(filter, async (itemId, value, toAddress, event) => {
-    console.log(`${ toAddress } mint a new token #${ itemId } with ${ value } lowb`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = store.state.lowbBalance
-      const lowbMarketBalance = store.state.lowbMarketBalance
-      const approvedBalance = Number(store.state.approvedBalance) - Number(value)
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      const supply = Number(store.state.nftInfos[id-1]["currentSupply"]) + 1
-      store.commit('setItemSupply', {id: id-1, supply: supply})
-    } 
-    catch (err) {
-      console.error(err)
-    }
-  });
+  filter.buyNewItem = true
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("buy new item event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.marketContract.on(filter, async (itemId, value, toAddress, event) => {
+      console.log(`${ toAddress } mint a new token #${ itemId } with ${ value } lowb`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = store.state.lowbMarketBalance
+        const approvedBalance = Number(store.state.approvedBalance) - Number(value)
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        const supply = Number(store.state.nftInfos[id-1]["currentSupply"]) + 1
+        store.commit('setItemSupply', {id: id-1, supply: supply})
+      } 
+      catch (err) {
+        console.error(err)
+      }
+    });
+  }
+  
 }
 
 async function buyItem (id, groupId, amount) {
@@ -577,30 +611,37 @@ async function buyItem (id, groupId, amount) {
     await marketWithSigner.buyItem(id, amount_in_wei);
   }
   
-  let filter = global.marketContract.filters.ItemBought(null, null, null, store.state.account)
-  // Receive an event when ANY transfer occurs
-  global.marketContract.on(filter, async (itemId, value, fromAddress, toAddress, event) => {
-    console.log(`$I buy a token #${ itemId } with ${ value } lowb from ${ fromAddress }`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = Number(store.state.lowbBalance) -Number(value)
-      const lowbMarketBalance = store.state.lowbMarketBalance
-      const approvedBalance = store.state.approvedBalance
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      getItemOffers(groupId)
-    } 
-    catch (err) {
-      console.error(err)
-    }
-  });
+  const filter = global.marketContract.filters.ItemBought(null, null, null, store.state.account)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("buy item event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.marketContract.on(filter, async (itemId, value, fromAddress, toAddress, event) => {
+      console.log(`$I buy a token #${ itemId } with ${ value } lowb from ${ fromAddress }`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = Number(store.state.lowbBalance) -Number(value)
+        const lowbMarketBalance = store.state.lowbMarketBalance
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        getItemOffers(groupId)
+      } 
+      catch (err) {
+        console.error(err)
+      }
+    });
+  }
+  
 }
 
 async function approveBid (tokenId, groupId) {
@@ -609,40 +650,47 @@ async function approveBid (tokenId, groupId) {
     await lowcWithSigner.approve(global.marketAddress, tokenId)
   }
 
-  let filter = global.lowcContract.filters.Approval(store.state.account)
-  // Receive an event when ANY transfer occurs
-  global.lowcContract.on(filter, async (owner, operator, approved, event) => {
-    console.log(`I approved the contract to handle my nft`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = store.state.lowbBalance
-      const lowbMarketBalance = store.state.lowbMarketBalance
-      const approvedBalance = store.state.approvedBalance
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      if (store.state.nftInfos[groupId-1].currentSupply<store.state.nftInfos[groupId-1].circulation) {
-        let bidAdmin = {address: store.state.account, isApproved: true}
-        store.commit('setBidsAdmin', {id: groupId, bidAdmin: bidAdmin})
-      }
-      else {
-        for (let i=0; i<store.state.myNfts.length; i++) {
-          if (store.state.myNfts[i].tokenId == tokenId) {
-            store.commit('setMyNfts', {id: i, myNft: {tokenId: tokenId, groupId: groupId, isApproved: true}})
+  const filter = global.lowcContract.filters.Approval(store.state.account)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("approve bid event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.lowcContract.on(filter, async (owner, operator, approved, event) => {
+      console.log(`I approved the contract to handle my nft`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = store.state.lowbMarketBalance
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        if (store.state.nftInfos[groupId-1].currentSupply<store.state.nftInfos[groupId-1].circulation) {
+          let bidAdmin = {address: store.state.account, isApproved: true}
+          store.commit('setBidsAdmin', {id: groupId, bidAdmin: bidAdmin})
+        }
+        else {
+          for (let i=0; i<store.state.myNfts.length; i++) {
+            if (store.state.myNfts[i].tokenId == tokenId) {
+              store.commit('setMyNfts', {id: i, myNft: {tokenId: tokenId, groupId: groupId, isApproved: true}})
+            }
           }
         }
+      } 
+      catch (err) {
+        console.error(err)
       }
-    } 
-    catch (err) {
-      console.error(err)
-    }
-  });
+    });
+  }
+  
 }
 
 async function startSale (id, amount) {
@@ -653,30 +701,37 @@ async function startSale (id, amount) {
   }
   console.log(Number(id))
   
-  let filter = global.marketContract.filters.NewItemsOffered(Number(id))
-  // Receive an event when ANY transfer occurs
-  global.marketContract.on(filter, async (groupId, minValue, event) => {
-    console.log(`I offer group ${ groupId} with ${ minValue/1e18 } lowb for public sale`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = store.state.lowbBalance
-      const lowbMarketBalance = store.state.lowbMarketBalance
-      const approvedBalance = store.state.approvedBalance
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      store.commit('setNewItemPrice', {id: groupId-1, price: minValue})
-    } 
-    catch (err) {
-      console.error(err)
-    }
-  });
+  const filter = global.marketContract.filters.NewItemsOffered(Number(id))
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("start sale event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.marketContract.on(filter, async (groupId, minValue, event) => {
+      console.log(`I offer group ${ groupId} with ${ minValue/1e18 } lowb for public sale`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = store.state.lowbMarketBalance
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        store.commit('setNewItemPrice', {id: groupId-1, price: minValue})
+      } 
+      catch (err) {
+        console.error(err)
+      }
+    });
+  }
+  
 }
 
 async function offerItem (id, groupId, amount) {
@@ -686,30 +741,37 @@ async function offerItem (id, groupId, amount) {
     await marketWithSigner.offerItemForSale(id, amount_in_wei);
   }
   
-  let filter = global.marketContract.filters.ItemOffered(Number(id))
-  // Receive an event when ANY transfer occurs
-  global.marketContract.on(filter, async (itemId, minValue, toAddress, event) => {
-    console.log(`I offer item ${ itemId} with ${ minValue/1e18 } lowb for sale`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = store.state.lowbBalance
-      const lowbMarketBalance = store.state.lowbMarketBalance
-      const approvedBalance = store.state.approvedBalance
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      getItemOffers(groupId)
-    } 
-    catch (err) {
-      console.error(err)
-    }
-  });
+  const filter = global.marketContract.filters.ItemOffered(Number(id))
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("offer item event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.marketContract.on(filter, async (itemId, minValue, toAddress, event) => {
+      console.log(`I offer item ${ itemId} with ${ minValue/1e18 } lowb for sale`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = store.state.lowbMarketBalance
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        getItemOffers(groupId)
+      } 
+      catch (err) {
+        console.error(err)
+      }
+    });
+  }
+  
 }
 
 async function acceptNewBid (id, bidder) {
@@ -719,70 +781,86 @@ async function acceptNewBid (id, bidder) {
   }
 
   let filter = global.marketContract.filters.ItemMint(null, null, bidder)
-  // Receive an event when ANY transfer occurs
-  global.marketContract.on(filter, async (itemId, value, toAddress, event) => {
-    console.log(`${ toAddress } mint a new token #${ itemId } with ${ value/1e18 } lowb`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = store.state.lowbBalance
-      const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
-      const approvedBalance = store.state.approvedBalance
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      console.log(store.state.nftInfos[id-1])
-      const supply = Number(store.state.nftInfos[id-1]["currentSupply"]) + 1
-      store.commit('setItemSupply', {id: id-1, supply: supply})
-      getItemBids(id)
-    } 
-    catch (err) {
-      console.error(err)
-    }
-  });
+  filter.acceptNewBid = true
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("accept new bid event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.marketContract.on(filter, async (itemId, value, toAddress, event) => {
+      console.log(`${ toAddress } mint a new token #${ itemId } with ${ value/1e18 } lowb`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        console.log(store.state.nftInfos[id-1])
+        const supply = Number(store.state.nftInfos[id-1]["currentSupply"]) + 1
+        store.commit('setItemSupply', {id: id-1, supply: supply})
+        getItemBids(id)
+      } 
+      catch (err) {
+        console.error(err)
+      }
+    });
+  }
+  
 
 }
 
-async function acceptBid (id, bidder) {
+async function acceptBid (id, groupId, bidder) {
   if (id > 0) {
     const marketWithSigner = global.marketContract.connect(global.signer);
     await marketWithSigner.acceptBid(id, bidder);
   }
 
-  let filter = global.marketContract.filters.ItemBought(null, null, store.state.account)
-  // Receive an event when ANY transfer occurs
-  global.marketContract.on(filter, async (itemId, value, fromAddress, toAddress, event) => {
-    console.log(`${ toAddress } bought a token #${ itemId } with ${ value/1e18 } lowb from ${ fromAddress }`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = store.state.lowbBalance
-      const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
-      const approvedBalance = store.state.approvedBalance
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      for (let i=0; i<store.state.myNfts.length; i++) {
-        if (store.state.myNfts[i].tokenId == itemId) {
-          store.commit('setMyNfts', {id: i, myNft: null})
+  const filter = global.marketContract.filters.ItemBought(null, null, store.state.account)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("accept bid event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.marketContract.on(filter, async (itemId, value, fromAddress, toAddress, event) => {
+      console.log(`${ toAddress } bought a token #${ itemId } with ${ value/1e18 } lowb from ${ fromAddress }`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        for (let i=0; i<store.state.myNfts.length; i++) {
+          if (store.state.myNfts[i].tokenId == itemId) {
+            store.commit('setMyNfts', {id: i, myNft: null})
+          }
         }
+        getItemBids(id)
+        getItemOffers(groupId)
+      } 
+      catch (err) {
+        console.error(err)
       }
-      getItemBids(id)
-    } 
-    catch (err) {
-      console.error(err)
-    }
-  });
+    });
+  }
+  
 
 }
 
@@ -793,30 +871,37 @@ async function enterBid (id, amount) {
     await marketWithSigner.enterBid(id, amount_in_wei);
   }
   
-  let filter = global.marketContract.filters.NewBidEntered(null, null, store.state.account)
-  // Receive an event when ANY transfer occurs
-  global.marketContract.on(filter, async (groupId, value, fromAddress, event) => {
-    console.log(`I bid ${ value/1e18 } lowb to group ${ groupId}`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = store.state.lowbBalance
-      const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
-      const approvedBalance = store.state.approvedBalance
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      getItemBids(id)
-    } 
-    catch (err) {
-      console.error(err)
-    }
-  });
+  const filter = global.marketContract.filters.NewBidEntered(null, null, store.state.account)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("enter bid event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.marketContract.on(filter, async (groupId, value, fromAddress, event) => {
+      console.log(`I bid ${ value/1e18 } lowb to group ${ groupId}`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        getItemBids(id)
+      } 
+      catch (err) {
+        console.error(err)
+      }
+    });
+  }
+  
 }
 
 async function withdrawBid (id) {
@@ -825,30 +910,37 @@ async function withdrawBid (id) {
     await marketWithSigner.withdrawBid(id);
   }
 
-  let filter = global.marketContract.filters.BidWithdrawn(null, null, store.state.account)
-  // Receive an event when ANY transfer occurs
-  global.marketContract.on(filter, async (itemId, value, fromAddress, event) => {
-    console.log(`I withdraw the bid to group ${ itemId}`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = store.state.lowbBalance
-      const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
-      const approvedBalance = store.state.approvedBalance
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      getItemBids(id)
-    } 
-    catch (err) {
-      console.error(err)
-    }
-  });
+  const filter = global.marketContract.filters.BidWithdrawn(null, null, store.state.account)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("withdraw bid event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.marketContract.on(filter, async (itemId, value, fromAddress, event) => {
+      console.log(`I withdraw the bid to group ${ itemId}`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        getItemBids(id)
+      } 
+      catch (err) {
+        console.error(err)
+      }
+    });
+  }
+  
 }
 
 async function withdrawOffer (id, groupId) {
@@ -857,30 +949,37 @@ async function withdrawOffer (id, groupId) {
     await marketWithSigner.itemNoLongerForSale(id);
   }
 
-  let filter = global.marketContract.filters.ItemNoLongerForSale(Number(id))
-  // Receive an event when ANY transfer occurs
-  global.marketContract.on(filter, async (itemId, event) => {
-    console.log(`I withdraw the offer of item ${ itemId }`);
-    // The event object contains the verbatim log data, the
-    // EventFragment and functions to fetch the block,
-    // transaction and receipt and event functions
-    try {
-      const bnbBalance = await global.provider.getBalance(store.state.account)
-      const lowbBalance = store.state.lowbBalance
-      const lowbMarketBalance = store.state.lowbMarketBalance
-      const approvedBalance = store.state.approvedBalance
-      store.commit('setBalance', {
-        bnbBalance: bnbBalance,
-        lowbBalance: lowbBalance,
-        lowbMarketBalance: lowbMarketBalance,
-        approvedBalance: approvedBalance
-      })
-      getItemOffers(groupId)
-    } 
-    catch (err) {
-      console.error(err)
-    }
-  });
+  const filter = global.marketContract.filters.ItemNoLongerForSale(Number(id))
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("withdraw offer event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.marketContract.on(filter, async (itemId, event) => {
+      console.log(`I withdraw the offer of item ${ itemId }`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = store.state.lowbMarketBalance
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        getItemOffers(groupId)
+      } 
+      catch (err) {
+        console.error(err)
+      }
+    });
+  }
+  
 }
 
 async function getItemBids (groupId) {
