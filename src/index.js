@@ -5,6 +5,7 @@ import VueRouter from 'vue-router'
 import { ethers } from "ethers";
 
 const App = () => import("./App.vue");
+const About = () => import("./components/About.vue");
 const AppHome = () => import("./components/AppHome.vue");
 const MyNFTs = () => import("./components/MyNFTs.vue");
 const TokenDetail = () => import("./components/TokenDetail.vue");
@@ -24,13 +25,9 @@ Vue.use(BootstrapVue)
 
 Vue.use(VueRouter)
 
-const Foo = { template: '<div>foo</div>' }
-const Bar = { template: '<div>bar</div>' }
-
 const routes = [
   { path: '/lowb-market', component: AppHome },
-  { path: '/lowb-market/foo', component: Foo },
-  { path: '/lowb-market/bar', component: Bar },
+  { path: '/lowb-market/about', component: About },
   { path: '/lowb-market/my-nfts', component: MyNFTs },
   { path: '/lowb-market/token-details/:id', component: TokenDetail },
   { path: '/lowb-market/new-token-details/:id', component: NewTokenDetail }

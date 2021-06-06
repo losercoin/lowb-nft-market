@@ -7,9 +7,7 @@
         </router-link>
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li>
-          <li><router-link to="/lowb-market/foo" class="nav-link px-2 link-dark">Owners</router-link></li>
-          <li><router-link to="/lowb-market/bar" class="nav-link px-2 link-dark">About</router-link></li>
+          <li><router-link to="/lowb-market/about" class="nav-link px-2 link-dark">About</router-link></li>
         </ul>
 
         <div v-if="!$store.state.isMetaMaskInstalled">
