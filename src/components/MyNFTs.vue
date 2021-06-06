@@ -4,7 +4,7 @@
       <div class="row">
         <div class="col-6">
           <div class="css-cogtoi">Your BSC Wallet address</div>
-          <div class="css-94onap">0xD35a860B6fDB386Ae9d83D72209DAA704631CA15</div>
+          <div class="css-94onap">{{$store.state.account}}</div>
         </div>
         <div class="col">
           <div class="css-cogtoi">Lowb Balance</div>
