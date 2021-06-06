@@ -279,6 +279,7 @@ function handleNewChain (chainId) {
   if(chainId == '0x61') {
     if (store.state.account != '') {
       getBalance(store.state.account)
+      store.dispatch('updateMyNfts')
     }
     store.dispatch('updateTotalGroup')
   }

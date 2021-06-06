@@ -100,7 +100,10 @@ export default {
   },
   methods: {
     correct_toDeposit: function () {
-      if (this.toDeposit > 0) {
+      if (this.toDeposit > Number(this.$store.getters.lowb_balance)) {
+        this.toDeposit = this.$store.getters.lowb_balance
+      }
+      else if (this.toDeposit > 0) {
         this.toDeposit = Math.floor(this.toDeposit)
       }
       else {
@@ -108,7 +111,10 @@ export default {
       }
     },
     correct_toWithdraw: function () {
-      if (this.toWithdraw > 0) {
+      if (this.toWithdraw > Number(this.$store.getters.lowb_market_balance)) {
+        this.toWithdraw = this.$store.getters.lowb_market_balance
+      }
+      else if (this.toWithdraw > 0) {
         this.toWithdraw = Math.floor(this.toWithdraw)
       }
       else {
