@@ -88,8 +88,8 @@
               N/A
             </div>
             <div v-else>
-              Approve: <div><a href="#" @click="approve(token)" v-for="token in $store.getters.my_group_tokens(groupId).toApprove" :key="token">[#{{token}}]</a></div>
-              Accept: <div><a href="#" @click="accept(token, bid.maker)" v-for="token in $store.getters.my_group_tokens(groupId).toAccept" :key="token">[#{{token}}]</a></div>
+              Approve: <div><b-button pill variant="outline-success" @click="approve(token)" v-for="token in $store.getters.my_group_tokens(groupId).toApprove" :key="token">{{token}}</b-button></div>
+              Accept: <div><b-button pill variant="outline-success" @click="accept(token, bid.maker)" v-for="token in $store.getters.my_group_tokens(groupId).toAccept" :key="token">{{token}}</b-button></div>
             </div>
           </td>
         </tr>
