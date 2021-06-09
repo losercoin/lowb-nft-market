@@ -1,0 +1,10 @@
+{
+    "name": "LoserPunk 001",
+    "description": "This is our first nft. Make loser Great again!!!",
+    "image": "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/2/25/Mjolnir.png",
+    "imageName": "LOSER666/LOSER (1).png",
+    "strength": 40,
+    "circulation": 3,
+    "startId": 1,
+    "features": ["cool", "dark"]
+}

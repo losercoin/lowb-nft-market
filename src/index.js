@@ -6,9 +6,9 @@ import { ethers } from "ethers";
 
 const App = () => import("./App.vue");
 const About = () => import("./components/About.vue");
-const AppHome = () => import("./components/AppHome.vue");
+const AppHome = () => import("./components/Loser666.vue");
 const MyNFTs = () => import("./components/MyNFTs.vue");
-const TokenDetail = () => import("./components/TokenDetail.vue");
+const TokenDetail = () => import("./components/LoserPunkDetail.vue");
 const NewTokenDetail = () => import("./components/NewTokenDetail.vue");
 
 
@@ -507,7 +507,7 @@ async function getGroupNumber () {
     const groupNumber = await global.lowcContract.groupIds()
     for (let i=0; i<groupNumber; i++) {
       let nftInfo = {}
-      const testFile = () => import("./assets/test-" + (i+1) + ".json")
+      const testFile = () => import("./assets/loserpunk/" + (i+1) + ".json")
       nftInfo["id"] = i+1
       nftInfo["name"] = (await testFile())["name"]
       nftInfo["description"] = (await testFile())["description"]
@@ -536,7 +536,7 @@ async function getMyNfts () {
       const groupId = (await global.lowcContract.groupOf(tokenId)).toString()
       if (store.state.nftInfos[groupId-1] == null) {
         let nftInfo = {}
-        const testFile = () => import("./assets/test-" + groupId + ".json")
+        const testFile = () => import("./assets/loserpunk/" + groupId + ".json")
         nftInfo["id"] = groupId
         nftInfo["name"] = (await testFile())["name"]
         nftInfo["description"] = (await testFile())["description"]

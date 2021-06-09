@@ -1,0 +1,10 @@
+{
+    "name": "LoserPunk 002",
+    "description": "Mjölnir, the legendary hammer of the Norse god of thunder.",
+    "image": "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/2/25/Mjolnir.png",
+    "imageName": "LOSER666/LOSER (2).png",
+    "strength": 40,
+    "circulation": 1,
+    "startId": 4,
+    "features": ["rare"]
+}

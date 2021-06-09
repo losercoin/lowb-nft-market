@@ -1,0 +1,10 @@
+{
+    "name": "LoserPunk 005",
+    "description": "Loser Punk is the classcal serials that salute to the first NFT project Cryto Punk on ETH network",
+    "image": "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/2/25/Mjolnir.png",
+    "imageName": "LOSER666/LOSER (5).png",
+    "strength": 40,
+    "circulation": 5,
+    "startId": 25,
+    "features": ["classical", "pixel"]
+}

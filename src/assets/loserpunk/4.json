@@ -1,0 +1,10 @@
+{
+    "name": "LoserPunk 004",
+    "description": "We publish 10 Gold Metal to public to celebrate this event!!!.",
+    "image": "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/2/25/Mjolnir.png",
+    "imageName": "LOSER666/LOSER (4).png",
+    "strength": 100,
+    "circulation": 10,
+    "startId": 15,
+    "features": ["normal"]
+}
