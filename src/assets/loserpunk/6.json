@@ -4,7 +4,7 @@
     "image": "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/2/25/Mjolnir.png",
     "imageName": "LOSER666/LOSER (6).png",
     "strength": 40,
-    "circulation": 5,
-    "startId": 30,
+    "circulation": 1,
+    "startId": 6,
     "features": ["classical", "pixel"]
 }

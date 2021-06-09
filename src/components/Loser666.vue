@@ -5,7 +5,7 @@
       <div v-for="nft in $store.state.nftInfos" :key="nft.id" class="col-md-2 col-sm-3 col-xs-6 container-punk-event-large">
         <div class="punk-image-container">
           <div>
-            <img :src="require('../assets/'+nft.image)" width="144" height="144" alt="Punk 3100" class="pixelated" style="background: #638596">
+            <img :src="nft.image" width="144" height="144" alt="Punk 3100" class="pixelated" style="background: #638596">
           </div>
         </div>
         <div class="m-t-10"><router-link :to="{path: '/lowb-market/token-details/'+nft.id}">#{{nft.id}}</router-link></div>

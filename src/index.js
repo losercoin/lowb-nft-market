@@ -367,12 +367,12 @@ async function getContracts () {
 
   const marketFile = () => import("./assets/LowbMarket.json")
   const marketAbi = (await marketFile())['abi']
-  global.marketAddress = '0x2D0D4CC1d4962d2070578811D3dA94Fb610C9C92'
+  global.marketAddress = '0x0681e1dd119aC640da6EcCb35A198B76348338A7'
   global.marketContract = new ethers.Contract(marketAddress, marketAbi, global.provider)
 
   const lowcFile = () => import("./assets/MyCollectible.json")
   const lowcAbi = (await lowcFile())['abi']
-  const lowcAddress = '0x9715143c7a5aae7b52b930087303d1566bed9c2c'
+  const lowcAddress = '0x33a8c50b066e74d2110D39ba4A97f20B22BB4042'
   global.lowcContract = new ethers.Contract(lowcAddress, lowcAbi, global.provider)
 
   // update infomation after get contract!!!
@@ -504,7 +504,7 @@ async function withdrawLowb(amount) {
 
 async function getGroupNumber () {
   try {
-    const groupNumber = await global.lowcContract.groupIds()
+    const groupNumber = await global.lowcContract.serialCurrentGroup(1)
     for (let i=0; i<groupNumber; i++) {
       let nftInfo = {}
       const testFile = () => import("./assets/loserpunk/" + (i+1) + ".json")
@@ -512,7 +512,7 @@ async function getGroupNumber () {
       nftInfo["name"] = (await testFile())["name"]
       nftInfo["description"] = (await testFile())["description"]
       nftInfo["circulation"] = (await testFile())["circulation"]
-      nftInfo["image"] = (await testFile())["imageName"]
+      nftInfo["image"] = await global.lowcContract.tokenURI(i+1)
       nftInfo["startId"] = (await testFile())["startId"]
       nftInfo["features"] = (await testFile())["features"]
       nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(i+1)

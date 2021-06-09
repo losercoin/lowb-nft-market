@@ -3,7 +3,7 @@
     <div class="container" style="margin-bottom: 24px;">
       <div class="row" style=' margin-left: 0px; margin-right: 0px;'>
         <div class="col-md-12 col-xs-12" style="background-color: #638596;">
-          <img :src="require('../assets/'+$store.state.nftInfos[groupId-1].image)" style='max-height: 312px; max-width: 312px; margin-top: 50px;' class="img-responsive center-block"/>
+          <img :src="$store.state.nftInfos[groupId-1].image" style='max-height: 312px; max-width: 312px; margin-top: 50px;' class="img-responsive center-block"/>
         </div>
       </div>
     </div>

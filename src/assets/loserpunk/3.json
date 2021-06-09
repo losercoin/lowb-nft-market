@@ -2,9 +2,9 @@
     "name": "LoserPunk 003",
     "description": "Volunteer always know things ahead of low king.",
     "image": "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/2/25/Mjolnir.png",
-    "imageName": "LOSER666/LOSER (3).png",
+    "imageName": "https://ipfs.io/ipfs/QmQax9La6KjbFp4qbjwL2ucYCazZcVr9jSYuhrqgsDMpwb",
     "strength": 100,
-    "circulation": 10,
-    "startId": 5,
+    "circulation": 1,
+    "startId": 3,
     "features": ["normal"]
 }

@@ -40,7 +40,7 @@
       <div v-for="nft in $store.state.myNfts" :key="nft.tokenId" class="col-sm-3">
         <b-card
           :title="$store.state.nftInfos[nft.groupId-1].name"
-          :img-src="require('../assets/'+$store.state.nftInfos[nft.groupId-1].image)"
+          :img-src="$store.state.nftInfos[nft.groupId-1].image"
           img-alt="Image"
           img-top
           tag="article"
