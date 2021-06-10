@@ -16,20 +16,7 @@
 
 <script>
 export default {
-  data: function() {
-    return {
-      cards: [],
-    };
-  },
-  created () {
-    this.increment()
-  },
-  methods: {
-    increment() {
-      this.$store.dispatch('incrementAsync')
-      console.log(this.$store.state.count)
-    }
-  }
+
 }
 </script>
 

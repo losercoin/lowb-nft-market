@@ -7,7 +7,7 @@
         </router-link>
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><router-link to="/lowb-market/about" class="nav-link px-2 link-dark">About</router-link></li>
+          <li><router-link to="/lowb-market/about" class="nav-link px-2 link-dark">{{ $t("lang.about") }}</router-link></li>
         </ul>
 
         <div v-if="!$store.state.isMetaMaskInstalled">
@@ -25,7 +25,8 @@
               {{$store.getters.abbr_account}} | {{$store.getters.bnb_balance}} BNB
             </template>
             <b-dropdown-item><router-link to="/lowb-market/my-nfts" class="nav-link px-2 link-dark">View My NFTs</router-link></b-dropdown-item>
-            <b-dropdown-item><a href="#" v-on:click="sign_out" class="nav-link px-2 link-dark">Sign out</a></b-dropdown-item>
+            <b-dropdown-item><a href="#" v-on:click="$store.commit('setModal', true)" class="nav-link px-2 link-dark">{{ $t("lang.setLanguage") }}</a></b-dropdown-item>
+            <b-dropdown-item><a href="#" v-on:click="sign_out" class="nav-link px-2 link-dark">{{ $t("lang.signOut") }}</a></b-dropdown-item>
           </b-dropdown>
         </div>
       </div>

@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import VueRouter from 'vue-router'
 import { ethers } from "ethers";
+import VueI18n from 'vue-i18n';
 
 const App = () => import("./App.vue");
 const About = () => import("./components/About.vue");
@@ -11,8 +12,8 @@ const MyNFTs = () => import("./components/MyNFTs.vue");
 const TokenDetail = () => import("./components/LoserPunkDetail.vue");
 const NewTokenDetail = () => import("./components/NewTokenDetail.vue");
 
-
 Vue.use(Vuex)
+Vue.use(VueI18n)
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
@@ -38,9 +39,19 @@ const router = new VueRouter({
   routes // (缩写) 相当于 routes: routes
 })
 
+const i18n = new VueI18n({
+  // 设置默认语言
+  locale: localStorage.getItem('locale') || 'en', //语言标识
+  messages: {
+    'zh': require('./assets/zh.js'),
+    'en': require('./assets/en.js')
+  },
+  fallbackLocale: 'en', //如果在message中找不到相应的键值将回退到原本的语言
+  formatFallbackMessages: true //如果在message中找不到相应的键值将回退到原本的语言
+})
+
 const store = new Vuex.Store({
   state: {
-    count: 0,
     isMetaMaskInstalled: false,
     chainId: 0,
     account: "",
@@ -53,7 +64,8 @@ const store = new Vuex.Store({
     itemBids: {},
     itemOffers: {},
     bidsAdmin: {},
-    eventFilters: []
+    eventFilters: [],
+    modalShow: false
   },
   getters: {
     abbr_account: state => {
@@ -124,8 +136,8 @@ const store = new Vuex.Store({
     },
   },
   mutations: {
-    increment (state) {
-      state.count++
+    setModal(state, show) {
+      state.modalShow = show
     },
     setMetaMaskInstalled (state) {
       state.isMetaMaskInstalled = true
@@ -267,6 +279,7 @@ new Vue({
   el: '#app',
   router,
   store,
+  i18n,
   render: h => h(App)
 })
 
@@ -1034,5 +1047,12 @@ if (isMetaMaskInstalled()) {
   store.commit('setMetaMaskInstalled')
 
   getContracts()
+
+  if (localStorage.getItem('locale') == null) {
+    store.commit("setModal", true)
+  }
+  else {
+    console.log(localStorage.getItem('locale'))
+  }
 
 }
