@@ -7,8 +7,8 @@ module.exports = merge(common, {
   devtool: 'source-map',
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist/lowb-market'),
-	publicPath: 'https://www.pkumozzie.cn/lowb-market/',
+    path: path.resolve(__dirname, 'dist'),
+	  publicPath: 'https://www.losernft.org/',
     clean: true,
   },
 });

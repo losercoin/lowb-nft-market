@@ -10,8 +10,8 @@ module.exports = merge(common, {
   },
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist/lowb-market'),
-    publicPath: 'http://localhost:8080/lowb-market/',
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: 'http://localhost:8080/',
     clean: true,
   },
 });

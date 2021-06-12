@@ -8,7 +8,7 @@
             <img :src="nft.image" width="144" height="144" alt="Punk 3100" class="pixelated" style="background: #638596">
           </div>
         </div>
-        <div class="m-t-10"><router-link :to="{path: '/lowb-market/token-details/'+nft.id}">#{{nft.id}}</router-link></div>
+        <div class="m-t-10"><router-link :to="{path: '/token-details/'+nft.id}">#{{nft.id}}</router-link></div>
       </div>
     </div>
   </div>

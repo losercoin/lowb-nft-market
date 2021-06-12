@@ -27,11 +27,11 @@ Vue.use(BootstrapVue)
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/lowb-market', component: AppHome },
-  { path: '/lowb-market/about', component: About },
-  { path: '/lowb-market/my-nfts', component: MyNFTs },
-  { path: '/lowb-market/token-details/:id', component: TokenDetail },
-  { path: '/lowb-market/new-token-details/:id', component: NewTokenDetail }
+  { path: '/', component: AppHome },
+  { path: '/about', component: About },
+  { path: '/my-nfts', component: MyNFTs },
+  { path: '/token-details/:id', component: TokenDetail },
+  { path: '/new-token-details/:id', component: NewTokenDetail }
 ]
 
 const router = new VueRouter({

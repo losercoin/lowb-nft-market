@@ -72,10 +72,10 @@
             </button>
           </div>
           <div v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
-            <router-link :to="{path: '/lowb-market/new-token-details/'+nft.groupId}">Details</router-link>
+            <router-link :to="{path: '/new-token-details/'+nft.groupId}">Details</router-link>
           </div>
           <div v-else>
-            <router-link :to="{path: '/lowb-market/token-details/'+nft.groupId}">Details</router-link>
+            <router-link :to="{path: '/token-details/'+nft.groupId}">Details</router-link>
           </div>
         </b-card>
       </div>
