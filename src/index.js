@@ -297,6 +297,7 @@ function handleNewChain (chainId) {
       store.dispatch('updateMyNfts')
     }
     store.dispatch('updateTotalGroup')
+    addLowbToken ()
   }
 }
 
@@ -305,6 +306,7 @@ function handleNewAccounts (accounts) {
   if(store.state.chainId == '0x61') {
     getBalance(accounts[0])
     store.dispatch('updateMyNfts')
+    addLowbToken ()
   }
 }
 
@@ -1036,6 +1038,38 @@ async function getItemOffers (groupId) {
   }
 
   store.commit('setItemOffers', {id: groupId, offerInfos: offerInfos})
+  
+}
+
+async function addLowbToken () {
+  const tokenAddress = '0x5aa1a18432aa60bad7f3057d71d3774f56cd34b8';
+  const tokenSymbol = 'LOWB';
+  const tokenDecimals = 18;
+  const tokenImage = 'https://bscscan.com/token/images/losercoin_32.png';
+
+  try {
+    // wasAdded is a boolean. Like any RPC method, an error may be thrown.
+    const wasAdded = await ethereum.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20', // Initially only supports ERC20, but eventually more!
+        options: {
+          address: tokenAddress, // The address that the token is at.
+          symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 chars.
+          decimals: tokenDecimals, // The number of decimals in the token
+          image: tokenImage, // A string url of the token logo
+        },
+      },
+    });
+
+    if (wasAdded) {
+      console.log('Thanks for your interest!');
+    } else {
+      console.log('Your loss!');
+    }
+  } catch (error) {
+    console.log(error);
+  }
   
 }
 
