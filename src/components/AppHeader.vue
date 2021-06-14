@@ -13,7 +13,7 @@
         <div v-if="!$store.state.isMetaMaskInstalled">
           <a href="https://metamask.io/download.html" class="nav-link px-2 link-dark">Click here to install MetaMask!</a>
         </div>
-        <div v-else-if="$store.state.chainId != '0x61'"> <!-- '0x38' --> 
+        <div v-else-if="$store.state.chainId != $store.state.CHAIN_ID">
           <a href="#" v-on:click="switch_network" class="nav-link px-2 link-dark">Connect to Binance Smart Chain</a>
         </div>
         <div v-else-if="$store.state.account == ''">

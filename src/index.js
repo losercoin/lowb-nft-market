@@ -5,6 +5,8 @@ import VueRouter from 'vue-router'
 import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
 
+import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS } from "./const/index.js"
+
 const App = () => import("./App.vue");
 const About = () => import("./components/About.vue");
 const AppHome = () => import("./components/Loser666.vue");
@@ -66,7 +68,8 @@ const store = new Vuex.Store({
     itemTransactions: {},
     bidsAdmin: {},
     eventFilters: [],
-    modalShow: false
+    modalShow: false,
+    CHAIN_ID: chainInfo.chainId
   },
   getters: {
     abbr_account: state => {
@@ -295,7 +298,7 @@ const isMetaMaskInstalled = () => {
 
 function handleNewChain (chainId) {
   store.commit('setChainId', chainId)
-  if(chainId == '0x61') {
+  if(chainId == chainInfo.chainId) {
     if (store.state.account != '') {
       getBalance(store.state.account)
       store.dispatch('updateMyNfts')
@@ -307,7 +310,7 @@ function handleNewChain (chainId) {
 
 function handleNewAccounts (accounts) {
   store.commit('setAccount', accounts[0])
-  if(store.state.chainId == '0x61') {
+  if(store.state.chainId == chainInfo.chainId) {
     getBalance(accounts[0])
     store.dispatch('updateMyNfts')
     addLowbToken ()
@@ -335,13 +338,14 @@ async function switchToBinanceSmartChain () {
     await ethereum.request({ 
       method: 'wallet_addEthereumChain', 
       params: [{ 
-        chainId: '0x61', //'0x38', 
+        chainId: chainInfo.chainId, //'0x38', 
         chainName: 'BSC Testnet', //'Binance Smart Chain', 
         nativeCurrency: { name: 'BNBT', symbol: 'BNBT', decimals: 18 }, 
         rpcUrls: ['https://data-seed-prebsc-1-s2.binance.org:8545/'], //['https://bsc-dataseed.binance.org/'], 
         blockExplorerUrls: ['https://testnet.bscscan.com'] //['https://bscscan.com/'] 
       }] 
     })
+    window.location.reload()
   } catch (err) {
     console.error(err)
   }
@@ -366,7 +370,7 @@ async function getBalance (account) {
     const bnbBalance = await global.provider.getBalance(account)
     const lowbBalance = await global.lowbContract.balanceOf(account)
     const lowbMarketBalance = await global.marketContract.pendingWithdrawals(account)
-    const approvedBalance = await global.lowbContract.allowance(account, global.marketAddress)
+    const approvedBalance = await global.lowbContract.allowance(account, MARKET_CONTRACT_ADDRESS)
     store.commit('setBalance', {
       bnbBalance: bnbBalance,
       lowbBalance: lowbBalance,
@@ -381,18 +385,15 @@ async function getBalance (account) {
 async function getContracts () {
   const lowbFile = () => import("./assets/ERC20Template.json")
   const lowbAbi = (await lowbFile())['abi']
-  const lowbAddress = '0x5aa1a18432aa60bad7f3057d71d3774f56cd34b8'
-  global.lowbContract = new ethers.Contract(lowbAddress, lowbAbi, global.provider)
+  global.lowbContract = new ethers.Contract(LOWB_TOKEN_ADDRESS, lowbAbi, global.provider)
 
   const marketFile = () => import("./assets/LowbMarket.json")
   const marketAbi = (await marketFile())['abi']
-  global.marketAddress = '0xbB82bb854A0Ad088796ed39eB67F0F49781dc9A2'
-  global.marketContract = new ethers.Contract(marketAddress, marketAbi, global.provider)
+  global.marketContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, marketAbi, global.provider)
 
   const lowcFile = () => import("./assets/MyCollectible.json")
   const lowcAbi = (await lowcFile())['abi']
-  const lowcAddress = '0xe031188b0895afd3f3c32b2bf27fbd1ab9e8c9ea'
-  global.lowcContract = new ethers.Contract(lowcAddress, lowcAbi, global.provider)
+  global.lowcContract = new ethers.Contract(LOWC_TOKEN_ADDRESS, lowcAbi, global.provider)
 
   // update infomation after get contract!!!
 
@@ -409,7 +410,7 @@ async function approveLowb(amount) {
   if (amount > 0) {
     const lowbWithSigner = global.lowbContract.connect(global.signer);
     const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
-    await lowbWithSigner.approve(global.marketAddress, amount_in_wei);
+    await lowbWithSigner.approve(MARKET_CONTRACT_ADDRESS, amount_in_wei);
   }
 
   const filter = global.lowbContract.filters.Approval(store.state.account, null)
@@ -570,7 +571,7 @@ async function getMyNfts () {
         store.commit('setNftInfos', {id: groupId-1, info: nftInfo})
       }
       const getApproved = await global.lowcContract.getApproved(tokenId)
-      const isApproved = (getApproved.toLowerCase() == global.marketAddress.toLowerCase())
+      const isApproved = (getApproved.toLowerCase() == MARKET_CONTRACT_ADDRESS.toLowerCase())
       const myNft = {tokenId: tokenId, groupId: groupId, isApproved: isApproved}
       store.commit('setMyNfts', {id: i, myNft: myNft})
     }
@@ -665,7 +666,7 @@ async function buyItem (id, groupId, amount) {
 async function approveBid (tokenId, groupId) {
   if (tokenId > 0) {
     const lowcWithSigner = global.lowcContract.connect(global.signer);
-    await lowcWithSigner.approve(global.marketAddress, tokenId)
+    await lowcWithSigner.approve(MARKET_CONTRACT_ADDRESS, tokenId)
   }
 
   const filter = global.lowcContract.filters.Approval(null, null, Number(tokenId))
@@ -1010,7 +1011,7 @@ async function getItemBids (groupId) {
   if (store.state.nftInfos[groupId-1].currentSupply < store.state.nftInfos[groupId-1].circulation) {
     bidAdmin["address"] = await global.lowcContract.ownerOf(store.state.nftInfos[groupId-1].startId)
     const getApproved = await global.lowcContract.getApproved(store.state.nftInfos[groupId-1].startId)
-    bidAdmin["isApproved"] = (getApproved.toLowerCase() == global.marketAddress.toLowerCase())
+    bidAdmin["isApproved"] = (getApproved.toLowerCase() == MARKET_CONTRACT_ADDRESS.toLowerCase())
   }
   store.commit('setBidsAdmin', {id: groupId, bidAdmin: bidAdmin})
   
@@ -1100,10 +1101,10 @@ async function addLowbToken () {
     return
   }
 
-  const tokenAddress = '0x5aa1a18432aa60bad7f3057d71d3774f56cd34b8';
-  const tokenSymbol = 'LOWB';
-  const tokenDecimals = 18;
-  const tokenImage = 'https://bscscan.com/token/images/losercoin_32.png';
+  const tokenAddress = LOWB_TOKEN_ADDRESS
+  const tokenSymbol = 'LOWB'
+  const tokenDecimals = 18
+  const tokenImage = 'https://bscscan.com/token/images/losercoin_32.png'
 
   try {
     // wasAdded is a boolean. Like any RPC method, an error may be thrown.
@@ -1134,7 +1135,7 @@ async function addLowbToken () {
 
 if (isMetaMaskInstalled()) {
 
-  global.provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
+  global.provider = new ethers.providers.Web3Provider(window.ethereum)
   global.signer = global.provider.getSigner()
   console.log('Access the decentralized web!')
   store.commit('setMetaMaskInstalled')

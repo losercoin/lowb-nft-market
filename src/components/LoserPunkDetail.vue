@@ -21,17 +21,35 @@
 
                 <div class='row'>
                     <div class='col-md-4'>
-                        <a href="#">Stringy Hair</a>
+                        <a href="#">皇冠</a>
                         <br>
                         <b>463</b> punks have this.
                     </div>
                     <div class='col-md-4'>
-                        <a href="#">Earring</a>
+                        <a href="#">红发</a>
                         <br>
                         <b>2459</b> punks have this.
                     </div>
                     <div class='col-md-4'>
-                        <a href="#">Cigarette</a>
+                        <a href="#">络腮胡（咖啡）</a>
+                        <br>
+                        <b>961</b> punks have this.
+                    </div>
+                </div>
+
+                <div class='row'>
+                    <div class='col-md-4'>
+                        <a href="#">粗框眼镜</a>
+                        <br>
+                        <b>463</b> punks have this.
+                    </div>
+                    <div class='col-md-4'>
+                        <a href="#">绿T</a>
+                        <br>
+                        <b>2459</b> punks have this.
+                    </div>
+                    <div class='col-md-4'>
+                        <a href="#">普通鼻子</a>
                         <br>
                         <b>961</b> punks have this.
                     </div>
