@@ -7,6 +7,7 @@ import VueI18n from 'vue-i18n';
 
 import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS } from "./const/index.js"
 
+
 const App = () => import("./App.vue");
 const About = () => import("./components/About.vue");
 const AppHome = () => import("./components/Loser666.vue");
@@ -66,6 +67,7 @@ const store = new Vuex.Store({
     itemBids: {},
     itemOffers: {},
     itemTransactions: {},
+    lastBlock: 0,
     bidsAdmin: {},
     eventFilters: [],
     modalShow: false,
@@ -187,7 +189,8 @@ const store = new Vuex.Store({
     },
     setItemTransactions (state, payload) {
       Vue.set(state.itemTransactions, payload.id, payload.transactions)
-      console.log(`set ${ payload.id }'s transactions`)
+      state.lastBlock = payload.lastBlock
+      console.log(`set ${ payload.id }'s transactions (block ${ payload.lastBlock })`)
     },
     setBidsAdmin (state, payload) {
       Vue.set(state.bidsAdmin, payload.id, payload.bidAdmin)
@@ -1056,43 +1059,28 @@ async function getItemHistory (groupId) {
   const id = store.state.nftInfos[groupId-1].startId
   let infos = []
 
-  let filter = global.lowcContract.filters.Transfer('0x0000000000000000000000000000000000000000', null, id)
-  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
-    console.log(`#${ id } publish event registered`)
-  }
-  else {
-    store.commit("addFilter", filter)
-    // List all transaction that mint this token
-    const transaction =  await global.lowcContract.queryFilter(filter)
-    const info = transaction[0].args
-    infos.push({
-      from: info.from, 
-      to: info.to, value: 0, 
-      block: transaction[0].blockNumber, 
-      hash: transaction[0].transactionHash
-    })
-  }
-  filter = global.marketContract.filters.ItemBought(id)
-  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
-    console.log(`#${ id } bought event registered`)
-  }
-  else {
-    store.commit("addFilter", filter)
-    // List all transaction that offered this token
-    const transaction =  await global.marketContract.queryFilter(filter)
-    for (let i=0; i<transaction.length; i++) {
-      const info = transaction[i].args
-      infos.push({
-        from: info.fromAddress, 
-        to: info.toAddress, 
-        value: info.value, 
-        block: transaction[i].blockNumber, 
-        hash: transaction[i].transactionHash
-      })
-    }
-  }
+  const transferFile = () => import("./assets/LowcEventTest.json")
+  const transferEvent = (await transferFile())['Transfer']
+  let transaction = transferEvent.filter(item => item.args.tokenId == id)
+
+  const info = transaction[0].args
+  infos.push({
+    from: info.from, 
+    to: info.to, 
+    value: 0, 
+    block: transaction[0].blockNumber, 
+    hash: transaction[0].transactionHash
+  })
+
+  const itemBoughtFile = () => import("./assets/MarketEventTest.json")
+  const itemBoughtEvent = (await itemBoughtFile())['ItemBought']
+  const blockNumner = (await itemBoughtFile())['blockNumber']
+  transaction = itemBoughtEvent.filter(item => item.itemId == id)
+  console.log(itemBoughtEvent)
+  console.log(transaction)
+  infos.push.apply(infos, transaction)
   
-  store.commit('setItemTransactions', {id: groupId, transactions: infos})
+  store.commit('setItemTransactions', {id: groupId, transactions: infos, lastBlock: blockNumner})
 
 }
 

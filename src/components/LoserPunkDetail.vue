@@ -171,11 +171,12 @@
                 <th scope="row">{{txn.block}}</th>
                 <td>{{txn.from.slice(0,8)}}</td>
                 <td>{{txn.to.slice(0,8)}}</td>
-                <td>{{txn.value/1e18}}</td>
+                <td>{{txn.value}}</td>
                 <td><a :href="'https://testnet.bscscan.com/tx/'+txn.hash">{{txn.hash.slice(0,12)}}</a></td>
               </tr>
             </tbody>
           </table>
+          (当前同步至区块： {{$store.state.lastBlock}})
         </div>
       </div>
     </div>
