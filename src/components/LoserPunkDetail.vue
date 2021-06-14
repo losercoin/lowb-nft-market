@@ -41,8 +41,9 @@
       <br>
       <div class='row detail-row'>
         <div class='col-md-10 col-md-offset-1'>
-          <h3>Owners</h3>
+          <h3>Status</h3>
           <div>This punk is currently owned by address <a href="#">0xcf8401</a>.</div>
+          <div>This royalty <a href="#">2.5%</a> for each trading.</div>
         </div>
       </div>
       <br>
@@ -133,6 +134,32 @@
           </div>
         </div>
       </div>
+      <br>
+      <div class='row detail-row'>
+        <div class='col-md-10 col-md-offset-1'>
+          <h3>Transaction History</h3>
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Block</th>
+                <th scope="col">From</th>
+                <th scope="col">To</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Txn</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="txn in $store.state.itemTransactions[groupId]" :key="txn.block">
+                <th scope="row">{{txn.block}}</th>
+                <td>{{txn.from.slice(0,8)}}</td>
+                <td>{{txn.to.slice(0,8)}}</td>
+                <td>{{txn.value/1e18}}</td>
+                <td><a :href="'https://testnet.bscscan.com/tx/'+txn.hash">{{txn.hash.slice(0,12)}}</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
     
   </div>
@@ -148,8 +175,7 @@
     },
     created () {
       this.$store.commit('setItemBids', {id: this.groupId, bids: []})
-      this.$store.dispatch('updateBids', this.groupId)
-      this.$store.dispatch('updateOffers', this.groupId)
+      this.$store.dispatch('updateItemInfos', this.groupId)
     },
     methods: {
       correct_toBid: function () {
