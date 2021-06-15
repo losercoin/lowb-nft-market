@@ -1,5 +1,5 @@
 <template>
-    <header class="p-3 mb-3 border-bottom">
+    <header class="p-3 mb-3 border">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
         <router-link to="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
           <icon-base width="40" height="40" icon-name="lowb"><icon-lowb /></icon-base> 
@@ -7,7 +7,7 @@
         </router-link>
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><router-link to="/about" class="nav-link px-2 link-dark">{{ $t("lang.about") }}</router-link></li>
+          <li><router-link to="/about" class="nav-link px-2 link-dark" style="color:white;">{{ $t("lang.about") }}</router-link></li>
         </ul>
 
         <div v-if="!$store.state.isMetaMaskInstalled">
@@ -58,3 +58,10 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .fs-4{
+    margin-left:5px; color:#fff
+  }
+
+</style>

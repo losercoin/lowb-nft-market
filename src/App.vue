@@ -1,6 +1,6 @@
 <template>
-  <div id="app" class="container">
-    <app-header />
+  <div id="app" class="container-fluid">
+    <app-header class="header" :style="{'position': ps,'transform':tran}"/>
     <!-- 路由出口 -->
     <!-- 路由匹配到的组件将渲染在这里 -->
     <router-view></router-view>
@@ -20,6 +20,24 @@ export default {
   components: {
     AppHeader
   },
+  data(){
+    return {
+      ps:'fixed',
+      tran:'translate(-50%,0)'
+    }
+  },
+  watch:{
+    $route(){
+      // console.log(this.$route.path);
+      if(this.$route.path=='/'){
+        this.ps='fixed'
+        this.tran='translate(-50%,0)'
+      }else{
+        this.ps='static'
+        this.tran=''
+      }
+    }
+  },
   methods: {
     choose(language) {
       localStorage.setItem("locale", language)
@@ -29,3 +47,20 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+  #app{
+    margin: 0;
+    padding: 0;
+    .header{
+      margin: 0 auto;;
+      width: 70%;
+      max-width: 1200px;
+      top: 0;
+      left: 50%;
+      z-index: 10;
+      background-color: rgba(11, 20, 38,0.8);
+      border-radius: 0 0 20px 20px;
+    }
+  }
+</style>
