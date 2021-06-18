@@ -11,10 +11,11 @@
       <div class='row'>
         <div class="col-md-10 col-md-offset-1 col-xs-12" style='margin-top: 20px;'>
           <h1 style="margin-top: 0px; margin-bottom: 5px;">{{$store.state.nftInfos[groupId-1].name}}</h1>
-          <h4 style="margin-top: 0px;">One of <b>3840</b> <a href="#">Female</a> punks.</h4>
+          <h4 v-if="groupId==1" style="margin-top: 0px;">The <b>only one</b> <a href="#">Loser King</a>.</h4>
+          <h4 v-else style="margin-top: 0px;">One of <b>666</b> <a href="#">Loser</a> punks.</h4>
         </div>
       </div>
-      <br>
+      <!-- <br>
       <div class='row detail-row'>
         <div class='col-md-10 col-md-offset-1'>
             <h3>Accessories</h3>
@@ -55,12 +56,13 @@
                     </div>
                 </div>
         </div>
-      </div>
+      </div> -->
       <br>
       <div class='row detail-row'>
         <div class='col-md-10 col-md-offset-1'>
           <h3>Status</h3>
-          <div>This punk is currently owned by address <a href="#">0xcf8401</a>.</div>
+          <div>This punk is currently owned by address <a href="#">{{$store.getters.owner(groupId)}}</a>.</div>
+          <div>This punk is published by <a href="#">Official Publisher</a>.</div>
           <div>This royalty <a href="#">2.5%</a> for each trading.</div>
         </div>
       </div>

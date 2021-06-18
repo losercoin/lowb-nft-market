@@ -15,24 +15,14 @@
         @sliding-end="onSlideEnd"
       >
         <b-carousel-slide
-          caption="第一个banner"
-          text="第一个banner的描述"
-          img-src="https://img2.baidu.com/it/u=3767017447,3027799514&fm=26&fmt=auto&gp=0.jpg"
+          caption="Loser Punks 666"
+          text="A homage to cryptopunks,  the first 'Non-Fungible Token' on Ethereum"
+          :img-src="require('../assets/loserpunk.jpg')"
         ></b-carousel-slide>
         <b-carousel-slide
-          caption="第二个banner"
-          text="第二个banner的描述"
-          img-src="https://img2.baidu.com/it/u=3270371325,1488241176&fm=26&fmt=auto&gp=0.jpg"
-        ></b-carousel-slide>
-        <b-carousel-slide
-          caption="第三个banner"
-          text="第三个banner的描述"
-          img-src="https://img1.baidu.com/it/u=3582888920,4096818954&fm=26&fmt=auto&gp=0.jpg"
-        ></b-carousel-slide>
-        <b-carousel-slide
-          caption="第四个banner"
-          text="第四个banner的描述"
-          img-src="https://img2.baidu.com/it/u=3767017447,3027799514&fm=26&fmt=auto&gp=0.jpg"
+          caption="Future NFT is planning"
+          text="Stay tuned!"
+          :img-src="require('../assets/future.jpg')"
         ></b-carousel-slide>
       </b-carousel>
 
@@ -54,12 +44,15 @@
             img-top
             tag="article"
           >
-            <b-card-text>
+            <!-- <b-card-text>
               {{nft.description}}
-            </b-card-text>
+            </b-card-text> -->
 
             <!-- <b-button href="#" variant="primary">Go somewhere</b-button> -->
-            <div class="m-t-10"><router-link :to="{path: '/token-details/'+nft.id}">Go: #{{nft.id}} details</router-link></div>
+            <div class="m-t-10">
+              <router-link :to="{path: '/token-details/'+nft.id}">Go: #{{nft.id}} details</router-link>
+              <span class="badge rounded-pill bg-secondary" v-if="nft.price > 0">{{nft.price/1e18}} lowb</span>
+            </div>
           </b-card>
         </div>
       </div>

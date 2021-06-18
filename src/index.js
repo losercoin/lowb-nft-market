@@ -5,7 +5,7 @@ import VueRouter from 'vue-router'
 import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
 
-import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS } from "./const/index.js"
+import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS } from "./const/index.js"
 
 
 const App = () => import("./App.vue");
@@ -64,6 +64,7 @@ const store = new Vuex.Store({
     approvedBalance: 0,
     nftInfos: [],
     myNfts: [],
+    itemsOwner: {},
     itemBids: {},
     itemOffers: {},
     itemTransactions: {},
@@ -93,6 +94,15 @@ const store = new Vuex.Store({
     lowb_market_balance: state => {
       let number = state.lowbMarketBalance / 1e18;
       return number.toFixed(0)
+    },
+    owner: (state) => (id) =>  {
+      const owner = state.itemsOwner[id]
+      if (owner == null)
+        return ""
+      if (owner.toLowerCase() == ADMIN_ADDRESS.toLowerCase())
+        return owner.slice(0,8)+"(offical repo)"
+      else 
+        return owner.slice(0,8)
     },
     my_bid: (state) => (id) =>  {
       return state.itemBids[id].find(bid => bid.maker.toLowerCase() == store.state.account.toLowerCase())
@@ -178,6 +188,10 @@ const store = new Vuex.Store({
         Vue.set(state.myNfts, payload.id, payload.myNft)
         console.log("set my NFTs: ", payload.id)
       }
+    },
+    setItemsOwner (state, payload) {
+      state.itemsOwner[payload.id] = payload.owner
+      console.log(`set ${ payload.id }'s owner: `, payload.owner)
     },
     setItemOffers (state, payload) {
       Vue.set(state.itemOffers, payload.id, payload.offerInfos)
@@ -540,7 +554,7 @@ async function getGroupNumber () {
       nftInfo["startId"] = loserpunk["startId"]
       nftInfo["features"] = ["cool", "dark"]
       nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(i+1)
-      nftInfo["price"] = await global.marketContract.newTokenOffer(i+1)
+      nftInfo["price"] = (await global.marketContract.itemsOfferedForSale(i+1))["minValue"]
       store.commit('setNftInfos', {id: i, info: nftInfo})
     }
   } catch (err) {
@@ -1035,7 +1049,7 @@ async function getItemBids (groupId) {
 }
 
 async function getItemOffers (groupId) {
-  if (global.marketContract == null) {
+  if (global.marketContract == null || global.lowcContract == null) {
     await getContracts()
   }
 
@@ -1045,6 +1059,8 @@ async function getItemOffers (groupId) {
     if (offerInfo.isForSale) {
       offerInfos.push(offerInfo)
     }
+    let owner = await global.lowcContract.ownerOf(i)
+    store.commit('setItemsOwner', {id: i, owner: owner})
   }
 
   store.commit('setItemOffers', {id: groupId, offerInfos: offerInfos})
