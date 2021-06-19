@@ -9,7 +9,8 @@ import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, LOWC_TOKEN_ADDR
 
 
 const App = () => import("./App.vue");
-const About = () => import("./components/About.vue");
+const About_zh = () => import("./components/About_zh.vue");
+const About_en = () => import("./components/About_en.vue");
 const AppHome = () => import("./components/Loser666.vue");
 const MyNFTs = () => import("./components/MyNFTs.vue");
 const TokenDetail = () => import("./components/LoserPunkDetail.vue");
@@ -31,7 +32,8 @@ Vue.use(VueRouter)
 
 const routes = [
   { path: '/', component: AppHome },
-  { path: '/about', component: About },
+  { path: '/about-zh', component: About_zh },
+  { path: '/about-en', component: About_en },
   { path: '/my-nfts', component: MyNFTs },
   { path: '/token-details/:id', component: TokenDetail },
   { path: '/new-token-details/:id', component: NewTokenDetail }

@@ -7,7 +7,7 @@
         </router-link>
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><router-link to="/about" class="nav-link px-2 link-dark" style="color:white;">{{ $t("lang.about") }}</router-link></li>
+          <li><router-link :to="'/about-'+$root.$i18n.locale" class="nav-link px-2 link-dark" style="color:white;">{{ $t("lang.about") }}</router-link></li>
         </ul>
 
         <div v-if="!$store.state.isMetaMaskInstalled">
