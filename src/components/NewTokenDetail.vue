@@ -8,35 +8,35 @@
           </b-col>
           <b-col md="8">
             <b-card-body :title="$store.state.nftInfos[groupId-1].name">
-              <p>group id: #{{groupId}}  In progress: {{$store.state.nftInfos[groupId-1].currentSupply}}/{{$store.state.nftInfos[groupId-1].circulation}}</p>
-              <p>Details: {{$store.state.nftInfos[$route.params.id-1].description}}</p>
+              <p>{{ $t("lang.groupId") }}: #{{groupId}}  {{ $t("lang.inProgress") }}: {{$store.state.nftInfos[groupId-1].currentSupply}}/{{$store.state.nftInfos[groupId-1].circulation}}</p>
+              <p>{{ $t("lang.details") }}: {{$store.state.nftInfos[$route.params.id-1].description}}</p>
               <br>
               <div v-if="$store.state.bidsAdmin[groupId].address.toLowerCase() == $store.state.account.toLowerCase()">
-                <h4>Public Sale</h4>
+                <h4>{{ $t("lang.publicSale") }}</h4>
                 <div class="input-group mb-3">
                   <input type="number" class="form-control" placeholder="0" @keyup="correct_sellPrice" v-model="sellPrice">
                   <span class="input-group-text">lowb</span>
-                  <button v-if="!$store.state.bidsAdmin[groupId].isApproved" class="btn btn-primary" type="button" v-on:click="approve">Approve</button>
-                  <button v-else class="btn btn-primary active" type="button" v-on:click="startSale" :disabled="sellPrice<=0">Start Sale</button>
+                  <button v-if="!$store.state.bidsAdmin[groupId].isApproved" class="btn btn-primary" type="button" v-on:click="approve">{{ $t("lang.approve") }}</button>
+                  <button v-else class="btn btn-primary active" type="button" v-on:click="startSale" :disabled="sellPrice<=0">{{ $t("lang.startSale") }}</button>
                 </div>
               </div>
               <div v-if="$store.getters.my_bid(groupId) != null">
-                <h4>Your bid</h4>
-                <p>You bid {{$store.getters.my_bid(groupId).price}} lowb for this item. <a href="#" @click="withdraw">[Withdraw]</a></p>
+                <h4>{{ $t("lang.yourBid") }}</h4>
+                <p>{{ $t("lang.youbid") }} {{$store.getters.my_bid(groupId).price}} {{ $t("lang.lowbForThisItem") }} <a href="#" @click="withdraw">[{{ $t("lang.withdraw") }}]</a></p>
               </div>
               <div v-else>
-                <h4>Place a bid</h4>
-                <p>Your lowb market balance: {{$store.getters.lowb_market_balance}} lowb</p>
+                <h4>{{ $t("lang.placeaBid") }}</h4>
+                <p>{{ $t("lang.yourLowbMarketBalance") }}: {{$store.getters.lowb_market_balance}} lowb</p>
                 <div class="input-group mb-3">
                   <input type="number" class="form-control" placeholder="0" @keyup="correct_toBid" v-model="toBid">
                   <span class="input-group-text">lowb</span>
-                  <button class="btn btn-primary" type="button" id="button-addon2" @click="bid" :disabled="toBid<=0||$store.state.lowbMarketBalance<toBid*1e18">Bid</button>
+                  <button class="btn btn-primary" type="button" id="button-addon2" @click="bid" :disabled="toBid<=0||$store.state.lowbMarketBalance<toBid*1e18">{{ $t("lang.bid") }}</button>
                 </div>
               </div>
-              <div>Market Summary</div>
+              <div>{{ $t("lang.marketSummary") }}</div>
               <hr class="mt-1 mb-2">
-              <p>Total Bidders: {{$store.state.itemBids[groupId].length}}</p>
-              <p>Top Bid: {{$store.getters.max_bid(groupId)}} lowb</p>
+              <p>{{ $t("lang.totalBidders") }}: {{$store.state.itemBids[groupId].length}}</p>
+              <p>{{ $t("lang.topBid") }}: {{$store.getters.max_bid(groupId)}} LOWB</p>
               <br>
             </b-card-body>
           </b-col>
@@ -45,21 +45,21 @@
     </div>
     <br>
     <div v-if="$store.state.nftInfos[groupId-1].price > 0">
-      <h2>On Sale</h2>
-        <p>You can buy this item with {{$store.state.nftInfos[groupId-1].price/1e18}} lowb.   
-          <button class="btn btn-primary me-md-2" type="button" @click="approveBuy" :disabled="$store.state.nftInfos[groupId-1].price <= $store.state.approvedBalance">Approve</button>
-          <button class="btn btn-primary me-md-2" type="button" @click="buy" :disabled="$store.state.nftInfos[groupId-1].price > $store.state.approvedBalance">Buy</button>
+      <h2>{{ $t("lang.onSale") }}</h2>
+        <p>{{ $t("lang.youCanBuyThisItemWith") }} {{$store.state.nftInfos[groupId-1].price/1e18}} LOWB.
+          <button class="btn btn-primary me-md-2" type="button" @click="approveBuy" :disabled="$store.state.nftInfos[groupId-1].price <= $store.state.approvedBalance">{{ $t("lang.approve") }}</button>
+          <button class="btn btn-primary me-md-2" type="button" @click="buy" :disabled="$store.state.nftInfos[groupId-1].price > $store.state.approvedBalance">{{ $t("lang.buy") }}</button>
         </p>
       </div>
-    <h2>Open Bids</h2>
+    <h2>{{ $t("lang.openBids") }}</h2>
     <table class="table table-hover">
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Maker</th>
-          <th scope="col">Taker</th>
-          <th scope="col">Price</th>
-          <th scope="col">Action</th>
+          <th scope="col">{{ $t("lang.maker") }}</th>
+          <th scope="col">{{ $t("lang.taker") }}</th>
+          <th scope="col">{{ $t("lang.price") }}</th>
+          <th scope="col">{{ $t("lang.action") }}</th>
         </tr>
       </thead>
       <tbody>
@@ -68,9 +68,9 @@
           <td>{{bid.maker}}</td>
           <td>{{bid.taker}}</td>
           <td>{{bid.price}}</td>
-          <td v-if="$store.state.bidsAdmin[groupId].address.toLowerCase() != $store.state.account.toLowerCase()">N/A</td>
-          <td v-else-if="$store.state.bidsAdmin[groupId].isApproved"><a href="#" @click="accept(bid.maker)">[Accept]</a></td>
-          <td v-else><a href="#" @click="approve">[Approve]</a></td>
+          <td v-if="$store.state.bidsAdmin[groupId].address.toLowerCase() != $store.state.account.toLowerCase()">{{ $t("lang.none") }}</td>
+          <td v-else-if="$store.state.bidsAdmin[groupId].isApproved"><a href="#" @click="accept(bid.maker)">[{{ $t("lang.accept") }}]</a></td>
+          <td v-else><a href="#" @click="approve">[{{ $t("lang.approve") }}]</a></td>
         </tr>
       </tbody>
     </table>

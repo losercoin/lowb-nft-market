@@ -11,8 +11,8 @@
       <div class='row'>
         <div class="col-md-10 col-md-offset-1 col-xs-12" style='margin-top: 20px;'>
           <h1 style="margin-top: 0px; margin-bottom: 5px;">{{$store.state.nftInfos[groupId-1].name}}</h1>
-          <h4 v-if="groupId==1" style="margin-top: 0px;">The <b>only one</b> <a href="#">Loser King</a>.</h4>
-          <h4 v-else style="margin-top: 0px;">One of <b>666</b> <a href="#">Loser</a> punks.</h4>
+          <h4 v-if="groupId==1" style="margin-top: 0px;"><b>{{ $t("lang.onlyOne") }}</b> <a href="#">{{ $t("lang.loserKing") }}</a>.</h4>
+          <h4 v-else style="margin-top: 0px;"> {{ $t("lang.oneOf") }} <b>666</b> <a href="#">Loser</a> punks.</h4>
         </div>
       </div>
       <!-- <br>
@@ -60,59 +60,59 @@
       <br>
       <div class='row detail-row'>
         <div class='col-md-10 col-md-offset-1'>
-          <h3>Status</h3>
-          <div>This punk is currently owned by address <a href="#">{{$store.getters.owner(groupId)}}</a>.</div>
-          <div>This punk is published by <a href="#">Official Publisher</a>.</div>
-          <div>This royalty <a href="#">2.5%</a> for each trading.</div>
+          <h3>{{ $t("lang.status") }}</h3>
+          <div>{{ $t("lang.thisPunkisCurrentlyOwnedbyAddress") }} <a href="#">{{$store.getters.owner(groupId)}}</a>.</div>
+          <div>{{ $t("lang.thisPunkisPublishedby") }} <a href="#">{{ $t("lang.officialPublisher") }}</a>.</div>
+          <div>{{ $t("lang.thisRoyalty") }} <a href="#">2.5%</a> {{ $t("lang.forEachTrading") }}</div>
         </div>
       </div>
       <br>
       <div class='row detail-row'>
         <div class='col-md-10 col-md-offset-1'>
-          <h3>Open Offers</h3>
+          <h3>{{ $t("lang.openOffers") }}</h3>
           <table class="table table-hover" v-if="$store.state.itemOffers[groupId] && $store.state.itemOffers[groupId].length > 0">
             <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Maker</th>
-                <th scope="col">Taker</th>
-                <th scope="col">Price</th>
-                <th scope="col">Action</th>
+                <th scope="col">{{ $t("lang.maker") }}</th>
+                <th scope="col">{{ $t("lang.taker") }}</th>
+                <th scope="col">{{ $t("lang.price") }}</th>
+                <th scope="col">{{ $t("lang.action") }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="offer in $store.state.itemOffers[groupId]" :key="Number(offer.itemId)" >
                 <th scope="row">#{{offer.itemId}}</th>
                 <td>{{offer.seller}}</td>
-                <td>Anyone</td>
+                <td>{{ $t("lang.anyone") }}</td>
                 <td>{{offer.minValue/1e18}}</td>
                 <td>
                   <div v-if="offer.seller.toLowerCase() == $store.state.account.toLowerCase()">
-                    <a href="#" @click="withdrawOffer(offer.itemId)">[Withdraw]</a>
+                    <a href="#" @click="withdrawOffer(offer.itemId)">[{{ $t("lang.withdraw") }}]</a>
                   </div>
                   <div v-else>
-                    <a href="#" @click="approveLowb(offer.minValue/1e18)" v-if="offer.minValue > $store.state.approvedBalance">[Approve lowb to buy]</a>
-                    <a href="#" @click="buy(offer.itemId, offer.minValue/1e18)" v-else>[Buy]</a>
+                    <a href="#" @click="approveLowb(offer.minValue/1e18)" v-if="offer.minValue > $store.state.approvedBalance">[{{ $t("lang.approveLowbtoBuy") }}]</a>
+                    <a href="#" @click="buy(offer.itemId, offer.minValue/1e18)" v-else>[{{ $t("lang.buy") }}]</a>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
-          <div v-else>This punk has not been listed for sale by its owner.</div>
+          <div v-else>{{ $t("lang.thisPunkhasnotbeenListedForSalebyItsOwner") }}</div>
         </div>
       </div>
       <br>
       <div class='row detail-row'>
         <div class='col-md-10 col-md-offset-1'>
-          <h3>Open Bids</h3>
+          <h3>{{ $t("lang.openBids") }}</h3>
           <table class="table table-hover"  v-if="$store.state.itemBids[groupId] && $store.state.itemBids[groupId].length > 0">
             <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Maker</th>
-                <th scope="col">Taker</th>
-                <th scope="col">Price</th>
-                <th scope="col">Action</th>
+                <th scope="col">{{ $t("lang.maker") }}</th>
+                <th scope="col">{{ $t("lang.taker") }}</th>
+                <th scope="col">{{ $t("lang.price") }}</th>
+                <th scope="col">{{ $t("lang.action") }}</th>
               </tr>
             </thead>
             <tbody>
@@ -123,33 +123,33 @@
                 <td>{{bid.price}}</td>
                 <td>
                   <div v-if="$store.getters.my_group_tokens(groupId).isNull">
-                    N/A
+                    {{ $t("lang.none") }}
                   </div>
                   <div v-else>
-                    Approve: <div><b-button pill variant="outline-success" @click="approve(token)" v-for="token in $store.getters.my_group_tokens(groupId).toApprove" :key="token">{{token}}</b-button></div>
-                    Accept: <div><b-button pill variant="outline-success" @click="accept(token, bid.maker)" v-for="token in $store.getters.my_group_tokens(groupId).toAccept" :key="token">{{token}}</b-button></div>
+                    {{ $t("lang.approve") }}<div><b-button pill variant="outline-success" @click="approve(token)" v-for="token in $store.getters.my_group_tokens(groupId).toApprove" :key="token">{{token}}</b-button></div>
+                    {{ $t("lang.accept") }} <div><b-button pill variant="outline-success" @click="accept(token, bid.maker)" v-for="token in $store.getters.my_group_tokens(groupId).toAccept" :key="token">{{token}}</b-button></div>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
-          <div v-else>There are currently no bids on this punk.</div>
+          <div v-else>{{ $t("lang.thereAreCurrentlyNoBidsonThisPunk") }}</div>
         </div>
       </div>
       <br>
       <div class='row detail-row'>
         <div class='col-md-10 col-md-offset-1'>
           <div v-if="$store.getters.my_bid(groupId) != null">
-            <h3>Your bid</h3>
-            <p>You bid {{$store.getters.my_bid(groupId).price}} lowb for this item. <a href="#" @click="withdrawBid">[Withdraw]</a></p>
+            <h3>{{ $t("lang.yourBid") }}</h3>
+            <p>{{ $t("lang.youbid") }} {{$store.getters.my_bid(groupId).price}} {{ $t("lang.lowbForThisItem") }} <a href="#" @click="withdrawBid">[{{ $t("lang.withdraw") }}]</a></p>
           </div>
           <div v-else>
-            <h3>Place a bid</h3>
-            <p>Your lowb market balance: {{$store.getters.lowb_market_balance}} lowb</p>
+            <h3>{{ $t("lang.placeaBid") }}</h3>
+            <p>{{ $t("lang.yourLowbMarketBalance") }}: {{$store.getters.lowb_market_balance}} lowb</p>
             <div class="input-group mb-3">
               <input type="number" class="form-control" placeholder="0" @keyup="correct_toBid" v-model="toBid">
               <span class="input-group-text">lowb</span>
-              <button class="btn btn-primary" type="button" id="button-addon2" @click="bid" :disabled="toBid<=0||$store.state.lowbMarketBalance<toBid*1e18">Bid</button>
+              <button class="btn btn-primary" type="button" id="button-addon2" @click="bid" :disabled="toBid<=0||$store.state.lowbMarketBalance<toBid*1e18">{{ $t("lang.bid") }}</button>
             </div>
           </div>
         </div>
@@ -157,15 +157,15 @@
       <br>
       <div class='row detail-row'>
         <div class='col-md-10 col-md-offset-1'>
-          <h3>Transaction History</h3>
+          <h3>{{ $t("lang.transactionHistory") }}</h3>
           <table class="table table-hover">
             <thead>
               <tr>
-                <th scope="col">Block</th>
-                <th scope="col">From</th>
-                <th scope="col">To</th>
-                <th scope="col">Amount</th>
-                <th scope="col">Txn</th>
+                <th scope="col">{{ $t("lang.block") }}</th>
+                <th scope="col">{{ $t("lang.from") }}</th>
+                <th scope="col">{{ $t("lang.to") }}</th>
+                <th scope="col">{{ $t("lang.amount") }}</th>
+                <th scope="col">{{ $t("lang.txn") }}</th>
               </tr>
             </thead>
             <tbody>
@@ -178,7 +178,7 @@
               </tr>
             </tbody>
           </table>
-          (当前同步至区块： {{$store.state.lastBlock}})
+          ({{ $t("lang.currentlySyncedTotheBlock") }}： {{$store.state.lastBlock}})
         </div>
       </div>
     </div>

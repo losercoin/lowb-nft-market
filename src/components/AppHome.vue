@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Series 1</h1>
+    <h1>{{ $t("lang.series1") }}</h1>
     <div class="row">
       <div v-for="nft in $store.state.nftInfos" :key="nft.id" class="col-sm-3">
         <b-card
@@ -13,16 +13,16 @@
           class="mb-2"
         >
           <b-card-text>
-            <h6 class="card-subtitle mb-2 text-muted">Circulation: {{nft.currentSupply}}/{{nft.circulation}}</h6>
+            <h6 class="card-subtitle mb-2 text-muted">{{ $t("lang.circulation") }}{{nft.currentSupply}}/{{nft.circulation}}</h6>
             <span class="badge rounded-pill bg-primary" v-for="feature in nft.features" :key="feature">{{feature}}</span>
-            <span class="badge rounded-pill bg-success" v-if="nft.currentSupply<nft.circulation">new</span>
+            <span class="badge rounded-pill bg-success" v-if="nft.currentSupply<nft.circulation">{{ $t("lang.new") }}</span>
             <span class="badge rounded-pill bg-secondary" v-if="nft.currentSupply<nft.circulation && nft.price>0">{{nft.price/1e18}} lowb</span>
           </b-card-text>
           <div v-if="nft.currentSupply<nft.circulation">
-            <router-link :to="{path: '/lowb-market/new-token-details/'+nft.id}">Details</router-link>
+            <router-link :to="{path: '/lowb-market/new-token-details/'+nft.id}">{{ $t("lang.details") }}</router-link>
           </div>
           <div v-else>
-            <router-link :to="{path: '/lowb-market/token-details/'+nft.id}">Details</router-link>
+            <router-link :to="{path: '/lowb-market/token-details/'+nft.id}">{{ $t("lang.details") }}</router-link>
           </div>
         </b-card>
       </div>

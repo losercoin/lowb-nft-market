@@ -7,6 +7,8 @@
         v-model="slide"
         :interval="4000"
         controls fade
+        :label-next="this.$t('lang.labelNext')"
+        :label-prev="this.$t('lang.labelPrev')"
         background="#ababab"
         img-width="1024"
         img-height="480"
@@ -16,12 +18,12 @@
       >
         <b-carousel-slide
           caption="Loser Punks 666"
-          text="A homage to cryptopunks,  the first 'Non-Fungible Token' on Ethereum"
+          :text="this.$t('lang.aHomageToCryptopunksTheFirstNonFungibleTokenonEthereum') "
           :img-src="require('../assets/loserpunk.jpg')"
         ></b-carousel-slide>
         <b-carousel-slide
-          caption="Future NFT is planning"
-          text="Stay tuned!"
+          :caption="this.$t('lang.futureNFTIsPlanning') "
+          :text="this.$t('lang.stayTuned') "
           :img-src="require('../assets/future.jpg')"
         ></b-carousel-slide>
       </b-carousel>
@@ -50,7 +52,7 @@
 
             <!-- <b-button href="#" variant="primary">Go somewhere</b-button> -->
             <div class="m-t-10">
-              <router-link :to="{path: '/token-details/'+nft.id}">Go: #{{nft.id}} details</router-link>
+              <router-link :to="{path: '/token-details/'+nft.id}">{{ $t("lang.go") }} #{{nft.id}} {{ $t("lang.details") }}</router-link>
               <span class="badge rounded-pill bg-secondary" v-if="nft.price > 0">{{nft.price/1e18}} lowb</span>
             </div>
           </b-card>
@@ -69,11 +71,11 @@
         </div>
       </div> -->
       <div class="row" v-else>
-        <p>Connect to the BSC chain to view all published punks!</p>
+        <p>{{ $t("lang.connectTotheBSCChaintoViewAllPublishedPunks") }}</p>
       </div>
     </div>
     <div v-else>
-      <p>Install MetaMask first!</p>
+      <p>{{ $t("lang.installMetaMaskFirst") }}</p>
     </div>
   </div>
 </template>

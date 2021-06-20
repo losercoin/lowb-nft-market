@@ -8,26 +8,26 @@
           </b-col>
           <b-col md="8">
             <b-card-body :title="$store.state.nftInfos[groupId-1].name">
-              <p>group id: #{{groupId}}  Circulation: {{$store.state.nftInfos[groupId-1].circulation}}</p>
-              <p>Details: {{$store.state.nftInfos[$route.params.id-1].description}}</p>
+              <p>{{ $t("lang.groupId") }}: #{{groupId}}  {{ $t("lang.circulation") }}: {{$store.state.nftInfos[groupId-1].circulation}}</p>
+              <p>{{ $t("lang.details") }}: {{$store.state.nftInfos[$route.params.id-1].description}}</p>
               <br>
               <div v-if="$store.getters.my_bid(groupId) != null">
-                <h4>Your bid</h4>
-                <p>You bid {{$store.getters.my_bid(groupId).price}} lowb for this item. <a href="#" @click="withdrawBid">[Withdraw]</a></p>
+                <h4>{{ $t("lang.yourBid") }}</h4>
+                <p>{{ $t("lang.youbid") }} {{$store.getters.my_bid(groupId).price}} {{ $t("lang.lowbForThisItem") }} <a href="#" @click="withdrawBid">[{{ $t("lang.withdraw") }}]</a></p>
               </div>
               <div v-else>
-                <h4>Place a bid</h4>
-                <p>Your lowb market balance: {{$store.getters.lowb_market_balance}} lowb</p>
+                <h4>{{ $t("lang.设置出价") }}:</h4>
+                <p>{{ $t("lang.yourLowbMarketBalance") }}: {{$store.getters.lowb_market_balance}} lowb</p>
                 <div class="input-group mb-3">
                   <input type="number" class="form-control" placeholder="0" @keyup="correct_toBid" v-model="toBid">
                   <span class="input-group-text">lowb</span>
-                  <button class="btn btn-primary" type="button" id="button-addon2" @click="bid" :disabled="toBid<=0||$store.state.lowbMarketBalance<toBid*1e18">Bid</button>
+                  <button class="btn btn-primary" type="button" id="button-addon2" @click="bid" :disabled="toBid<=0||$store.state.lowbMarketBalance<toBid*1e18">{{ $t("lang.bid") }}</button>
                 </div>
               </div>
-              <div>Market Summary</div>
+              <div>{{ $t("lang.marketSummary") }}</div>
               <hr class="mt-1 mb-2">
-              <p>Lowest Sale Price: {{$store.getters.min_price(groupId)}} lowb</p>
-              <p>Top Bid: {{$store.getters.max_bid(groupId)}} lowb</p>
+              <p>{{ $t("lang.lowestSalePrice") }}: {{$store.getters.min_price(groupId)}} lowb</p>
+              <p>{{ $t("lang.topBid") }}: {{$store.getters.max_bid(groupId)}} lowb</p>
               <br>
             </b-card-body>
           </b-col>
@@ -35,30 +35,30 @@
       </b-card>
     </div>
     <br>
-    <h2>Open Offers</h2>
+    <h2>{{ $t("lang.openOffers") }}</h2>
     <table class="table table-hover">
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Maker</th>
-          <th scope="col">Taker</th>
-          <th scope="col">Price</th>
-          <th scope="col">Action</th>
+          <th scope="col">{{ $t("lang.maker") }}</th>
+          <th scope="col">{{ $t("lang.taker") }}</th>
+          <th scope="col">{{ $t("lang.price") }}</th>
+          <th scope="col">{{ $t("lang.action") }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="offer in $store.state.itemOffers[groupId]" :key="Number(offer.itemId)" >
           <th scope="row">#{{offer.itemId}}</th>
           <td>{{offer.seller}}</td>
-          <td>Anyone</td>
+          <td>{{ $t("lang.anyone") }}</td>
           <td>{{offer.minValue/1e18}}</td>
           <td>
             <div v-if="offer.seller.toLowerCase() == $store.state.account.toLowerCase()">
-              <a href="#" @click="withdrawOffer(offer.itemId)">[Withdraw]</a>
+              <a href="#" @click="withdrawOffer(offer.itemId)">[{{ $t("lang.withdraw") }}]</a>
             </div>
             <div v-else>
-              <a href="#" @click="approveLowb(offer.minValue/1e18)" v-if="offer.minValue > $store.state.approvedBalance">[Approve lowb to buy]</a>
-              <a href="#" @click="buy(offer.itemId, offer.minValue/1e18)" v-else>[Buy]</a>
+              <a href="#" @click="approveLowb(offer.minValue/1e18)" v-if="offer.minValue > $store.state.approvedBalance">[{{ $t("lang.approveLowbtoBuy") }}]</a>
+              <a href="#" @click="buy(offer.itemId, offer.minValue/1e18)" v-else>[{{ $t("lang.buy") }}]</a>
             </div>
           </td>
         </tr>
@@ -66,15 +66,15 @@
     </table>
 
 
-    <h2>Open Bids</h2>
+    <h2>{{ $t("lang.openBids") }}</h2>
     <table class="table table-hover">
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Maker</th>
-          <th scope="col">Taker</th>
-          <th scope="col">Price</th>
-          <th scope="col">Action</th>
+          <th scope="col">{{ $t("lang.maker") }}</th>
+          <th scope="col">{{ $t("lang.taker") }}</th>
+          <th scope="col">{{ $t("lang.price") }}</th>
+          <th scope="col">{{ $t("lang.action") }}</th>
         </tr>
       </thead>
       <tbody>
@@ -85,11 +85,11 @@
           <td>{{bid.price}}</td>
           <td>
             <div v-if="$store.getters.my_group_tokens(groupId).isNull">
-              N/A
+              {{ $t("lang.none") }}
             </div>
             <div v-else>
-              Approve: <div><b-button pill variant="outline-success" @click="approve(token)" v-for="token in $store.getters.my_group_tokens(groupId).toApprove" :key="token">{{token}}</b-button></div>
-              Accept: <div><b-button pill variant="outline-success" @click="accept(token, bid.maker)" v-for="token in $store.getters.my_group_tokens(groupId).toAccept" :key="token">{{token}}</b-button></div>
+              {{ $t("lang.approve") }}: <div><b-button pill variant="outline-success" @click="approve(token)" v-for="token in $store.getters.my_group_tokens(groupId).toApprove" :key="token">{{token}}</b-button></div>
+              {{ $t("lang.accept") }}: <div><b-button pill variant="outline-success" @click="accept(token, bid.maker)" v-for="token in $store.getters.my_group_tokens(groupId).toAccept" :key="token">{{token}}</b-button></div>
             </div>
           </td>
         </tr>

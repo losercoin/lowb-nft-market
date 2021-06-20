@@ -3,39 +3,39 @@
     <div class="shadow px-5">
       <div class="row">
         <div class="col-6">
-          <div class="css-cogtoi">Your BSC Wallet address</div>
+          <div class="css-cogtoi">{{ $t("lang.yourBSCWalletAddress") }}</div>
           <div class="css-94onap">{{$store.state.account}}</div>
         </div>
         <div class="col">
-          <div class="css-cogtoi">Lowb Balance</div>
-          <div class="css-94onap">{{$store.getters.lowb_balance}} lowb</div>
+          <div class="css-cogtoi">{{ $t("lang.lowbBalance") }}:</div>
+          <div class="css-94onap">{{$store.getters.lowb_balance}} LOWB</div>
         </div>
         <div class="col">
-          <div class="css-cogtoi">Lowb Market Balance</div>
-          <div class="css-94onap">{{$store.getters.lowb_market_balance}} lowb</div>
+          <div class="css-cogtoi">{{ $t("lang.lowbMarketBalance") }}:</div>
+          <div class="css-94onap">{{$store.getters.lowb_market_balance}} LOWB</div>
         </div>
       </div>
       <br>
       <div class="row">
-        <h4>Deposit and Withdraw</h4>
+        <h4>{{ $t("lang.depositAndWithdraw") }}</h4>
         <div class="input-group mb-3 col">
           <input type="number" class="form-control" @keyup="correct_toDeposit" v-model="toDeposit">
           <span class="input-group-text" >lowb</span>
-          <button class="btn btn-primary" type="button" v-on:click="approve">Approve</button>
-          <button class="btn btn-primary active" type="button" v-on:click="deposit" :disabled="toDeposit<=0||$store.state.approvedBalance<toDeposit*1e18">Deposit</button>
+          <button class="btn btn-primary" type="button" v-on:click="approve">{{ $t("lang.approve") }}</button>
+          <button class="btn btn-primary active" type="button" v-on:click="deposit" :disabled="toDeposit<=0||$store.state.approvedBalance<toDeposit*1e18">{{ $t("lang.deposit") }}</button>
         </div>
         <div class="input-group mb-3 col">
           <input type="number" class="form-control" @keyup="correct_toWithdraw" v-model="toWithdraw">
           <span class="input-group-text">lowb</span>
-          <button class="btn btn-primary active" type="button" id="button-addon2" v-on:click="withdraw">Withdraw</button>
+          <button class="btn btn-primary active" type="button" id="button-addon2" v-on:click="withdraw">{{ $t("lang.withdraw") }}</button>
         </div>
       </div>
       <br>
-      <p>go to <a href="https://testnet.binance.org/faucet-smart">Testnet Funds</a> to get more BNB</p>
-      <p>You can <button @click = "claim">claim</button> 10k LOWB, then refresh the webpage after confirmed</p>
+      <p>{{ $t("lang.goTo") }}<a href="https://testnet.binance.org/faucet-smart">Testnet Funds</a> {{ $t("lang.toGetMoreBNB") }}</p>
+      <p>{{ $t("lang.youCan") }} <button @click = "claim">{{ $t("lang.claim") }}</button> {{ $t("lang.TenKLOWBThenRefreshtheWebpageAfterConfirmed") }}</p>
     </div>
     <br>
-    <h2>NFTs Owned</h2>
+    <h2>{{ $t("lang.NFTsOwned") }}</h2>
     <div class="row">
       <div v-for="nft in $store.state.myNfts" :key="nft.tokenId" class="col-sm-3">
         <b-card
@@ -48,8 +48,8 @@
           class="mb-2"
         >
           <h6 class="card-subtitle mb-2 text-muted">
-            <div v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">#{{nft.tokenId}}  [New]</div>
-            <div v-else>#{{nft.tokenId}}  Circulation: {{$store.state.nftInfos[nft.groupId-1].circulation}}</div>
+            <div v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">#{{nft.tokenId}}  [{{ $t("lang.new") }}]</div>
+            <div v-else>#{{nft.tokenId}}  {{ $t("lang.circulation") }}: {{$store.state.nftInfos[nft.groupId-1].circulation}}</div>
           </h6>
           <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="0" v-model="toOffer[nft.tokenId]" @keyup="correct_toOffer(nft.tokenId)">
@@ -61,21 +61,21 @@
               type="button" 
               v-on:click="approveNft(nft.tokenId, nft.groupId)" 
               :disabled="nft.isApproved || $store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
-              Approve
+              {{ $t("lang.approve") }}
             </button>
             <button 
               class="btn btn-primary active" 
               type="button" 
               v-on:click="offer(nft.tokenId, nft.groupId)" 
               :disabled="toOffer[nft.tokenId] <= 0 || !nft.isApproved || $store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
-              Offer
+              {{ $t("lang.offer") }}
             </button>
           </div>
           <div v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
-            <router-link :to="{path: '/new-token-details/'+nft.groupId}">Details</router-link>
+            <router-link :to="{path: '/new-token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
           </div>
           <div v-else>
-            <router-link :to="{path: '/token-details/'+nft.groupId}">Details</router-link>
+            <router-link :to="{path: '/token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
           </div>
         </b-card>
       </div>
