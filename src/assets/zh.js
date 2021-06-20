@@ -7,7 +7,7 @@ export const lang = {
     clickHeretoInstallMetaMask:'请点击这里进行安装MetaMask!',
     connecttoBinanceSmartChain:'请将连接网络切换为币安智能链！',
     connectWallet:'请连接你的钱包！',
-    viewMyNFTs:'查看持有的NFTs',
+    viewMyNFTs:'查看持有的NFT',
     //AppHome.vue 部分
     series1:"系列一",
     circulation:'发行量: ',

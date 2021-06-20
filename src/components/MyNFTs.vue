@@ -31,8 +31,10 @@
         </div>
       </div>
       <br>
-      <p>{{ $t("lang.goTo") }}<a href="https://testnet.binance.org/faucet-smart">Testnet Funds</a> {{ $t("lang.toGetMoreBNB") }}</p>
-      <p>{{ $t("lang.youCan") }} <button @click = "claim">{{ $t("lang.claim") }}</button> {{ $t("lang.TenKLOWBThenRefreshtheWebpageAfterConfirmed") }}</p>
+      <div v-if="$store.state.chainId == '0x61'">
+        <p>{{ $t("lang.goTo") }}<a href="https://testnet.binance.org/faucet-smart">Testnet Funds</a> {{ $t("lang.toGetMoreBNB") }}</p>
+        <p>{{ $t("lang.youCan") }} <button @click = "claim">{{ $t("lang.claim") }}</button> {{ $t("lang.TenKLOWBThenRefreshtheWebpageAfterConfirmed") }}</p>
+      </div>
     </div>
     <br>
     <h2>{{ $t("lang.NFTsOwned") }}</h2>

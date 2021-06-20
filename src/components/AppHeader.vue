@@ -7,17 +7,17 @@
         </router-link>
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><router-link :to="'/about-'+$root.$i18n.locale" class="nav-link px-2 link-dark" style="color:white;">{{ $t("lang.about") }}</router-link></li>
+          <li><router-link :to="'/about-'+$root.$i18n.locale" class="nav-link px-2 fs-4" style="color:white;">{{ $t("lang.about") }}</router-link></li>
         </ul>
 
         <div v-if="!$store.state.isMetaMaskInstalled">
-          <a href="https://metamask.io/download.html" class="nav-link px-2 link-dark">{{ $t("lang.clickHeretoInstallMetaMask") }}</a>
+          <a href="https://metamask.io/download.html" class="nav-link px-2 fs-4">{{ $t("lang.clickHeretoInstallMetaMask") }}</a>
         </div>
         <div v-else-if="$store.state.chainId != $store.state.CHAIN_ID">
-          <a href="#" v-on:click="switch_network" class="nav-link px-2 link-dark">{{ $t("lang.connecttoBinanceSmartChain") }}</a>
+          <a href="#" v-on:click="switch_network" class="nav-link px-2 fs-4">{{ $t("lang.connecttoBinanceSmartChain") }}</a>
         </div>
         <div v-else-if="$store.state.account == ''">
-          <a href="#" v-on:click="connect_wallet" class="nav-link px-2 link-dark">{{ $t("lang.connectWallet") }}</a>
+          <a href="#" v-on:click="connect_wallet" class="nav-link px-2 fs-4">{{ $t("lang.connectWallet") }}</a>
         </div>
         <div v-else>
           <b-dropdown size="lg"  variant="link" toggle-class="text-decoration-none" right>

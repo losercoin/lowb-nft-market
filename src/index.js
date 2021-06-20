@@ -552,7 +552,7 @@ async function getGroupNumber () {
       nftInfo["name"] = loserpunk["name"]
       nftInfo["description"] = "This is our first nft. Make loser Great again!!!"
       nftInfo["circulation"] = loserpunk["circulation"]
-      nftInfo["image"] = "https://ipfs.io/ipfs/" + loserpunk["hash"]
+      nftInfo["image"] = "https://www.losernft.org/ipfs/" + loserpunk["hash"]
       nftInfo["startId"] = loserpunk["startId"]
       nftInfo["features"] = ["cool", "dark"]
       nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(i+1)
@@ -582,7 +582,7 @@ async function getMyNfts () {
         nftInfo["name"] = loserpunk["name"]
         nftInfo["description"] = "This is our first nft. Make loser Great again!!!"
         nftInfo["circulation"] = loserpunk["circulation"]
-        nftInfo["image"] = "https://ipfs.io/ipfs/" + loserpunk["hash"]
+        nftInfo["image"] = "https://www.losernft.org/ipfs/" + loserpunk["hash"]
         nftInfo["startId"] = loserpunk["startId"]
         nftInfo["features"] = ["cool", "dark"]
         nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(groupId)
@@ -1079,7 +1079,7 @@ async function getItemHistory (groupId) {
 
   const transferFile = () => import("./assets/LowcEventTest.json")
   const transferEvent = (await transferFile())['Transfer']
-  let transaction = transferEvent.filter(item => item.args.tokenId == id)
+  let transaction = transferEvent.filter(item => item.returnValues.tokenId == id)
 
   const info = transaction[0].args
   infos.push({

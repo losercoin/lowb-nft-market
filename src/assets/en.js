@@ -75,7 +75,7 @@ export const lang = {
     youCan:'You can',
     claim:'claim',
     TenKLOWBThenRefreshtheWebpageAfterConfirmed:'10k LOWB, then refresh the webpage after confirmed',
-    NFTsOwned:'你已经拥有的NFTs:',
+    NFTsOwned:'Your NFTs',
     offer:'Offer',
     //NewTokenDetail.vue 部分
     groupId:'group id',

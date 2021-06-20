@@ -174,7 +174,7 @@
                 <td>{{txn.from.slice(0,8)}}</td>
                 <td>{{txn.to.slice(0,8)}}</td>
                 <td>{{txn.value}}</td>
-                <td><a :href="'https://testnet.bscscan.com/tx/'+txn.hash">{{txn.hash.slice(0,12)}}</a></td>
+                <td><a :href="baseUrl+txn.hash">{{txn.hash.slice(0,12)}}</a></td>
               </tr>
             </tbody>
           </table>
@@ -190,6 +190,7 @@
   export default {
     data() {
       return {
+        baseUrl: "",
         groupId: this.$route.params.id,
         toBid: 0,
       }
@@ -197,6 +198,12 @@
     created () {
       this.$store.commit('setItemBids', {id: this.groupId, bids: []})
       this.$store.dispatch('updateItemInfos', this.groupId)
+      if (this.$store.state.chainId == '0x61') {
+        this.baseUrl = "https://testnet.bscscan.com/tx/"
+      }
+      else {
+        this.baseUrl = "https://bscscan.com/tx/"
+      }
     },
     methods: {
       correct_toBid: function () {
