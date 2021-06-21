@@ -38,7 +38,7 @@
       <h3 class="title">Loser Punks 666</h3>
       <!-- low列表开始 -->
       <div class="list" v-if="$store.state.chainId == $store.state.CHAIN_ID">
-        <div v-for="nft in $store.state.nftInfos" :key="nft.id" class="item">
+        <div v-for="nft in nowData" :key="nft.id" class="item">
           <b-card
             :title="nft.name"
             :img-src="nft.image"
@@ -73,6 +73,9 @@
       <div class="row" v-else>
         <p>{{ $t("lang.connectTotheBSCChaintoViewAllPublishedPunks") }}</p>
       </div>
+      <!-- 分页组件 -->
+      <b-pagination per-page="12" v-model="currentPage" :total-rows="rows" @change="page" align="right"></b-pagination>
+      <!-- 分页组件 -->
     </div>
     <div v-else>
       <p>{{ $t("lang.installMetaMaskFirst") }}</p>
@@ -85,7 +88,26 @@ export default {
     data() {
       return {
         slide: 0,
-        sliding: null
+        sliding: null,
+        data:[],
+        nowData:[],
+        rows: 0,
+        currentPage: 1
+      }
+    },
+    mounted (){
+      this.data = this.$store.state.nftInfos;
+    },
+    watch: {
+      'data.length': {
+        handler(newValue, oldValue) {
+          this.rows = newValue;
+          if (newValue == 12) {
+            this.page(1);
+          }else if(newValue > 12){
+            this.page(this.currentPage);
+          }
+        }
       }
     },
     methods: {
@@ -94,6 +116,9 @@ export default {
       },
       onSlideEnd(slide) {
         this.sliding = false
+      },
+      page(page){
+        this.nowData = [...this.data].slice((page-1)*12,page*12);
       }
     }
 }
