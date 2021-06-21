@@ -555,7 +555,7 @@ async function getGroupNumber () {
       nftInfo["image"] = "https://www.losernft.org/ipfs/" + loserpunk["hash"]
       nftInfo["startId"] = loserpunk["startId"]
       nftInfo["features"] = ["cool", "dark"]
-      nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(i+1)
+      nftInfo["currentSupply"] = 1 // await global.lowcContract.groupCurrentSupply(i+1)
       nftInfo["price"] = (await global.marketContract.itemsOfferedForSale(i+1))["minValue"]
       store.commit('setNftInfos', {id: i, info: nftInfo})
     }
