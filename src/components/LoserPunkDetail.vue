@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="$store.state.nftInfos[groupId-1]">
     <div class="container" style="margin-bottom: 24px;">
       <div class="row" style=' margin-left: 0px; margin-right: 0px;'>
         <div class="col-md-12 col-xs-12" style="background-color: #638596;">
@@ -196,7 +196,9 @@
       }
     },
     created () {
+      //this.$store.commit('setItemOffers', {id: this.groupId, offerInfos: []})
       this.$store.commit('setItemBids', {id: this.groupId, bids: []})
+      //this.$store.commit('setItemTransactions', {id: this.groupId, transactions: []})
       this.$store.dispatch('updateItemInfos', this.groupId)
       if (this.$store.state.chainId == '0x61') {
         this.baseUrl = "https://testnet.bscscan.com/tx/"

@@ -260,9 +260,7 @@ const store = new Vuex.Store({
       getMyNfts()
     },
     updateItemInfos ({}, groupId) {
-      getItemBids(groupId)
-      getItemOffers(groupId)
-      getItemHistory(groupId)
+      updateItemInfos(groupId)
     },
     approveGroupBid ({ state }, groupId) {
       const id = state.nftInfos[groupId-1].startId
@@ -401,7 +399,7 @@ async function getBalance (account) {
   }
 }
 
-async function getContracts () {
+async function getContracts (firstTime = true) {
   const lowbFile = () => import("./assets/ERC20Template.json")
   const lowbAbi = (await lowbFile())['abi']
   global.lowbContract = new ethers.Contract(LOWB_TOKEN_ADDRESS, lowbAbi, global.provider)
@@ -414,14 +412,19 @@ async function getContracts () {
   const lowcAbi = (await lowcFile())['abi']
   global.lowcContract = new ethers.Contract(LOWC_TOKEN_ADDRESS, lowcAbi, global.provider)
 
-  // update infomation after get contract!!!
+  const testFile = () => import("./assets/loserpunk.json")
+  global.loserpunk = (await testFile())
 
-  ethereum.autoRefreshOnNetworkChange = false
-  store.dispatch('updateChainId')
-  store.dispatch('updateAccounts')
+  if (firstTime) {
+    // update infomation after get contract!!!
 
-  ethereum.on('chainChanged', handleNewChain)
-  ethereum.on('accountsChanged', handleNewAccounts)
+    ethereum.autoRefreshOnNetworkChange = false
+    store.dispatch('updateChainId')
+    store.dispatch('updateAccounts')
+
+    ethereum.on('chainChanged', handleNewChain)
+    ethereum.on('accountsChanged', handleNewAccounts)
+  }
 
 }
 
@@ -541,23 +544,27 @@ async function withdrawLowb(amount) {
   
 }
 
+async function getNftInfo (groupId, update=true) {
+  if (store.state.nftInfos[groupId-1] == null || update) {
+    let nftInfo = {}
+    nftInfo["id"] = groupId
+    nftInfo["name"] = global.loserpunk[groupId-1]["name"]
+    nftInfo["description"] = "This is our first nft. Make loser Great again!!!"
+    nftInfo["circulation"] = global.loserpunk[groupId-1]["circulation"]
+    nftInfo["image"] = "https://www.losernft.org/ipfs/" + global.loserpunk[groupId-1]["hash"]
+    nftInfo["startId"] = global.loserpunk[groupId-1]["startId"]
+    nftInfo["features"] = ["cool", "dark"]
+    nftInfo["currentSupply"] = 1 //await global.lowcContract.groupCurrentSupply(groupId)
+    nftInfo["price"] = 0 //await global.marketContract.newTokenOffer(groupId)
+    store.commit('setNftInfos', {id: groupId-1, info: nftInfo})
+  }
+}
+
 async function getGroupNumber () {
   try {
     const groupNumber = await global.lowcContract.serialCurrentGroup(1)
-    const testFile = () => import("./assets/loserpunk.json")
     for (let i=0; i<groupNumber; i++) {
-      const loserpunk = (await testFile())[i]
-      let nftInfo = {}
-      nftInfo["id"] = i+1
-      nftInfo["name"] = loserpunk["name"]
-      nftInfo["description"] = "This is our first nft. Make loser Great again!!!"
-      nftInfo["circulation"] = loserpunk["circulation"]
-      nftInfo["image"] = "https://www.losernft.org/ipfs/" + loserpunk["hash"]
-      nftInfo["startId"] = loserpunk["startId"]
-      nftInfo["features"] = ["cool", "dark"]
-      nftInfo["currentSupply"] = 1 // await global.lowcContract.groupCurrentSupply(i+1)
-      nftInfo["price"] = (await global.marketContract.itemsOfferedForSale(i+1))["minValue"]
-      store.commit('setNftInfos', {id: i, info: nftInfo})
+      await getNftInfo(i+1)
     }
   } catch (err) {
     console.error(err)
@@ -571,24 +578,10 @@ async function getMyNfts () {
       store.commit('setMyNfts', {id: 0, myNft: null})
     }
     const lowcNumber = await global.lowcContract.balanceOf(store.state.account)
-    const testFile = () => import("./assets/loserpunk.json")
     for (let i=0; i<lowcNumber; i++) {
       const tokenId = (await global.lowcContract.tokenOfOwnerByIndex(store.state.account, i)).toString()
       const groupId = (await global.lowcContract.groupOf(tokenId)).toString()
-      if (store.state.nftInfos[groupId-1] == null) {
-        let nftInfo = {}
-        const loserpunk = (await testFile())[groupId-1]
-        nftInfo["id"] = groupId
-        nftInfo["name"] = loserpunk["name"]
-        nftInfo["description"] = "This is our first nft. Make loser Great again!!!"
-        nftInfo["circulation"] = loserpunk["circulation"]
-        nftInfo["image"] = "https://www.losernft.org/ipfs/" + loserpunk["hash"]
-        nftInfo["startId"] = loserpunk["startId"]
-        nftInfo["features"] = ["cool", "dark"]
-        nftInfo["currentSupply"] = await global.lowcContract.groupCurrentSupply(groupId)
-        nftInfo["price"] = await global.marketContract.newTokenOffer(i+1)
-        store.commit('setNftInfos', {id: groupId-1, info: nftInfo})
-      }
+      await getNftInfo(groupId, false)
       const getApproved = await global.lowcContract.getApproved(tokenId)
       const isApproved = (getApproved.toLowerCase() == MARKET_CONTRACT_ADDRESS.toLowerCase())
       const myNft = {tokenId: tokenId, groupId: groupId, isApproved: isApproved}
@@ -1021,9 +1014,6 @@ async function withdrawOffer (id, groupId) {
 }
 
 async function getItemBids (groupId) {
-  if (global.marketContract == null) {
-    await getContracts()
-  }
 
   let bidAdmin = {}
   //console.log(store.state.nftInfos[groupId].currentSupply, store.state.nftInfos[groupId].circulation)
@@ -1051,10 +1041,6 @@ async function getItemBids (groupId) {
 }
 
 async function getItemOffers (groupId) {
-  if (global.marketContract == null || global.lowcContract == null) {
-    await getContracts()
-  }
-
   let offerInfos = []
   for (let i=store.state.nftInfos[groupId-1].startId; i<store.state.nftInfos[groupId-1].startId+Number(store.state.nftInfos[groupId-1].currentSupply); i++) {
     let offerInfo = await global.marketContract.itemsOfferedForSale(i)
@@ -1070,9 +1056,6 @@ async function getItemOffers (groupId) {
 }
 
 async function getItemHistory (groupId) {
-  if (global.marketContract == null || global.lowcContract == null) {
-    await getContracts()
-  }
 
   const id = store.state.nftInfos[groupId-1].startId
   let infos = []
@@ -1100,6 +1083,17 @@ async function getItemHistory (groupId) {
   
   store.commit('setItemTransactions', {id: groupId, transactions: infos, lastBlock: blockNumner})
 
+}
+
+async function updateItemInfos (groupId) {
+  if (global.marketContract == null || global.lowcContract == null) {
+    await getContracts(false)
+  }
+  await getNftInfo(groupId, false)
+  console.log('1:', store.state.nftInfos[groupId-1])
+  getItemBids(groupId)
+  getItemOffers(groupId)
+  getItemHistory(groupId)
 }
 
 async function addLowbToken () {
@@ -1138,6 +1132,7 @@ async function addLowbToken () {
   }
   
 }
+
 
 if (isMetaMaskInstalled()) {
 
