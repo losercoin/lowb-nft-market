@@ -4,10 +4,10 @@ export const lang = {
     about: '关于',
     //AppHeader.vue 部分
     lowbNFTMarket:'LOWB NFT 交易市场',
-    clickHeretoInstallMetaMask:'请点击这里进行安装MetaMask!',
-    connecttoBinanceSmartChain:'请将连接网络切换为币安智能链！',
-    connectWallet:'请连接你的钱包！',
-    viewMyNFTs:'查看持有的NFT',
+    clickHeretoInstallMetaMask:'请点击这里安装MetaMask!',
+    connecttoBinanceSmartChain:'请将网络设置为币安智能链！',
+    connectWallet:'请连接您的钱包！',
+    viewMyNFTs:'我的资产',
     //AppHome.vue 部分
     series1:"系列一",
     circulation:'发行量: ',
@@ -19,7 +19,7 @@ export const lang = {
     go:'查看: ',
     connectTotheBSCChaintoViewAllPublishedPunks:'请连接到币安智能链以了解所有已经发行的Punks！',
     installMetaMaskFirst:'请先进行安装MetaMask!',
-    aHomageToCryptopunksTheFirstNonFungibleTokenonEthereum:'让我们向加密Punks致敬，这是以太坊上的第一个‘不可替代的代币 ’',
+    aHomageToCryptopunksTheFirstNonFungibleTokenonEthereum:'让我们向加密Punks致敬，这是以太坊上的第一个NFT系列',
     futureNFTIsPlanning:'接下来的 NFT 正在规划中...',
     stayTuned:'敬请关注!',
 
