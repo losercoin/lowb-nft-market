@@ -10,7 +10,8 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'LOWB NFT Market',
-      template: './public/index.html'
+      template: './public/index.html',
+      favicon: './src/assets/favicon.ico'
     }),
     new VueLoaderPlugin(),
     new CssMinimizerPlugin(),
@@ -32,7 +33,7 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
       {
-        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        test: /\.(png|svg|jpg|jpeg|gif|ico)$/i,
         type: 'asset/resource',
       },
     ],

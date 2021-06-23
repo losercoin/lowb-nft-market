@@ -35,7 +35,9 @@
     </div>
     <!-- boot轮播图结束 -->
     <div v-if="$store.state.isMetaMaskInstalled" class="low-list">
-      <h3 class="title">Loser Punks 666</h3>
+      <h3 class="title" style="display: inline-block;">Loser Punks 666</h3>
+      <a style="display: inline-block; margin-left: 12px;" v-if="$root.$i18n.locale=='zh'" href="https://www.losernft.org/loser_punk_zh.jpg">竞拍规则</a>
+      <a style="display: inline-block; margin-left: 12px;" v-else href="https://www.losernft.org/loser_punk_en.jpg">auction rules</a>
       <!-- low列表开始 -->
       <div class="list" v-if="$store.state.chainId == $store.state.CHAIN_ID">
         <div v-for="nft in nowData" :key="nft.id" class="item">
@@ -74,7 +76,7 @@
         <p>{{ $t("lang.connectTotheBSCChaintoViewAllPublishedPunks") }}</p>
       </div>
       <!-- 分页组件 -->
-      <b-pagination per-page="12" v-model="currentPage" :total-rows="rows" @change="page" align="right"></b-pagination>
+      <b-pagination per-page="12" v-model="$store.state.punkPage" :total-rows="rows" @change="page" align="right"></b-pagination>
       <!-- 分页组件 -->
     </div>
     <div v-else>
@@ -91,8 +93,7 @@ export default {
         sliding: null,
         data:[],
         nowData:[],
-        rows: 0,
-        currentPage: 1
+        rows: 0
       }
     },
     mounted (){
@@ -105,7 +106,7 @@ export default {
           if (newValue == 12) {
             this.page(1);
           }else if(newValue > 12){
-            this.page(this.currentPage);
+            this.page(this.$store.state.punkPage);
           }
         }
       }
@@ -119,6 +120,7 @@ export default {
       },
       page(page){
         this.nowData = [...this.data].slice((page-1)*12,page*12);
+        this.$store.commit('setPunkPage', page)
       }
     }
 }

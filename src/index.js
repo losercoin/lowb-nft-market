@@ -64,6 +64,7 @@ const store = new Vuex.Store({
     lowbBalance: 0,
     lowbMarketBalance: 0,
     approvedBalance: 0,
+    punkPage: 1,
     nftInfos: [],
     myNfts: [],
     itemsOwner: {},
@@ -109,18 +110,20 @@ const store = new Vuex.Store({
     my_bid: (state) => (id) =>  {
       return state.itemBids[id].find(bid => bid.maker.toLowerCase() == store.state.account.toLowerCase())
     },
-    max_bid: (state) => (id) =>  {
-      if (state.itemBids[id].length == 0) {
-        return 0
+    bid_winner: (state) => (id) =>  {
+      if ( state.itemBids[id] == null || state.itemBids[id].length == 0) {
+        return '0x0'
       }
       else {
         let max = state.itemBids[id][0].price
+        let winner = state.itemBids[id][0].maker
         for (let i = 1; i < state.itemBids[id].length; i++) {
-          if (state.itemBids[id][i].price>max) {
+          if (state.itemBids[id][i].price>=max) {
             max = state.itemBids[id][i].price
+            winner = state.itemBids[id][i].maker
           }
         }
-        return max
+        return winner
       }
     },
     min_price: (state) => (id) =>  {
@@ -227,6 +230,10 @@ const store = new Vuex.Store({
     addFilter (state, filter) {
       state.eventFilters.push(filter)
       console.log("register new event!")
+    },
+    setPunkPage (state, page) {
+      state.punkPage = page
+      console.log("set punk page: ", page)
     }
   },
   actions: {

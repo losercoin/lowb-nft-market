@@ -32,15 +32,15 @@ const mainChainInfo = {
   blockExplorerUrls: ['https://bscscan.com/']
 };
 
-
+/*
 export const chainInfo = testChainInfo;
 export const LOWB_TOKEN_ADDRESS = LOWB_TOKEN_ADDRESS_TEST;
 export const MARKET_CONTRACT_ADDRESS = MARKET_CONTRACT_ADDRESS_TEST;
 export const LOWC_TOKEN_ADDRESS = LOWC_TOKEN_ADDRESS_TEST;
 export const ADMIN_ADDRESS = ADMIN_ADDRESS_TEST;
 export const LOWC_CONTRACT_ADDRESS = LOWC_CONTRACT_ADDRESS_TEST;
+*/
 
-/*
 export const chainInfo = mainChainInfo;
 export const LOWB_TOKEN_ADDRESS = LOWB_TOKEN_ADDRESS_MAIN;
 export const MARKET_CONTRACT_ADDRESS = MARKET_CONTRACT_ADDRESS_MAIN;
@@ -48,4 +48,3 @@ export const LOWC_TOKEN_ADDRESS = LOWC_TOKEN_ADDRESS_MAIN;
 export const ADMIN_ADDRESS = ADMIN_ADDRESS_MAIN;
 export const LOWC_CONTRACT_ADDRESS = LOWC_CONTRACT_ADDRESS_MAIN;
 
-*/

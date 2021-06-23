@@ -116,11 +116,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="bid in $store.state.itemBids[groupId]" :key="bid.index">
+              <tr v-for="bid in $store.state.itemBids[groupId]" :key="bid.index" :class="bid.maker==$store.getters.bid_winner(groupId)? 'table-primary':'table-light'">
                 <th scope="row">{{bid.index}}</th>
                 <td>{{bid.maker}}</td>
                 <td>{{bid.taker}}</td>
-                <td>{{bid.price}}</td>
+                <td>{{Math.round(bid.price)}}</td>
                 <td>
                   <div v-if="$store.getters.my_group_tokens(groupId).isNull">
                     {{ $t("lang.none") }}
@@ -141,7 +141,7 @@
         <div class='col-md-10 col-md-offset-1'>
           <div v-if="$store.getters.my_bid(groupId) != null">
             <h3>{{ $t("lang.yourBid") }}</h3>
-            <p>{{ $t("lang.youbid") }} {{$store.getters.my_bid(groupId).price}} {{ $t("lang.lowbForThisItem") }} <a href="#" @click="withdrawBid">[{{ $t("lang.withdraw") }}]</a></p>
+            <p>{{ $t("lang.youbid") }} {{Math.round($store.getters.my_bid(groupId).price)}} {{ $t("lang.lowbForThisItem") }} <a href="#" @click="withdrawBid">[{{ $t("lang.withdraw") }}]</a></p>
           </div>
           <div v-else>
             <h3>{{ $t("lang.placeaBid") }}</h3>
