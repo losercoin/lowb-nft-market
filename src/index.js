@@ -1097,10 +1097,17 @@ async function updateItemInfos (groupId) {
     await getContracts(false)
   }
   await getNftInfo(groupId, false)
-  console.log('1:', store.state.nftInfos[groupId-1])
-  getItemBids(groupId)
-  getItemOffers(groupId)
-  getItemHistory(groupId)
+
+  //clearTimeout(this.timer);  //清除延迟执行
+ 
+  const timer = setTimeout(()=>{   //设置延迟执行
+    console.log('1:', store.state.nftInfos[groupId-1])
+    getItemBids(groupId)
+    getItemOffers(groupId)
+    getItemHistory(groupId)
+  },300);
+
+  
 }
 
 async function addLowbToken () {
