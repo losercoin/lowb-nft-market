@@ -26,6 +26,10 @@ export const lang = {
     labelNext:'后一页',
     labelPrev:'前一页',
 
+    all: '全部',
+    myBids: '我的出价',
+    loading: '查询中...',
+
     //LoserPunkDetail.vue 部分
     onlyOne:'仅此一个',
     loserKing:'Loser 国王',

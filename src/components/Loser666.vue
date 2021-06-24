@@ -38,46 +38,54 @@
       <h3 class="title" style="display: inline-block;">Loser Punks 666</h3>
       <a style="display: inline-block; margin-left: 12px;" v-if="$root.$i18n.locale=='zh'" href="https://www.losernft.org/loser_punk_zh.jpg">竞拍规则</a>
       <a style="display: inline-block; margin-left: 12px;" v-else href="https://www.losernft.org/loser_punk_en.jpg">auction rules</a>
-      <!-- low列表开始 -->
-      <div class="list" v-if="$store.state.chainId == $store.state.CHAIN_ID">
-        <div v-for="nft in nowData" :key="nft.id" class="item">
-          <b-card
-            :title="nft.name"
-            :img-src="nft.image"
-            img-alt="Image"
-            img-top
-            tag="article"
-          >
-            <!-- <b-card-text>
-              {{nft.description}}
-            </b-card-text> -->
+      <br>
 
-            <!-- <b-button href="#" variant="primary">Go somewhere</b-button> -->
-            <div class="m-t-10">
-              <router-link :to="{path: '/token-details/'+nft.id}">{{ $t("lang.go") }} #{{nft.id}} {{ $t("lang.details") }}</router-link>
-              <span class="badge rounded-pill bg-secondary" v-if="nft.price > 0">{{nft.price/1e18}} lowb</span>
+      <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+        <input type="radio" class="btn-check" name="btnradio" id="all" autocomplete="off" checked>
+        <label class="btn btn-outline-primary" for="all" v-on:click="filter_punks('all')">{{ $t("lang.all") }}</label>
+
+        <input type="radio" class="btn-check" name="btnradio" id="my_bids" autocomplete="off">
+        <label class="btn btn-outline-primary" for="my_bids" v-on:click="filter_punks('my_bids')">{{ $t("lang.myBids") }}</label>
+      </div>
+      <!-- low列表开始 -->
+      <div v-if="$store.state.chainId == $store.state.CHAIN_ID">
+        <div v-if="$store.state.loserPunkState!='idle'">
+          <br>
+          <p>{{$t("lang.loading")}} {{this.$store.state.loserPunkState}}/{{this.$store.state.nftInfos.length}}</p>
+        </div>
+        <div v-else>
+          <div class="list">
+            <div v-for="nft in nowData" :key="nft.id" class="item">
+              <b-card
+                :title="nft.name"
+                :img-src="nft.image"
+                img-alt="Image"
+                img-top
+                tag="article"
+             >
+                <!-- <b-card-text>
+                  {{nft.description}}
+                </b-card-text> -->
+
+                <!-- <b-button href="#" variant="primary">Go somewhere</b-button> -->
+                <div class="m-t-10">
+                  <router-link :to="{path: '/token-details/'+nft.id}">{{ $t("lang.go") }} #{{nft.id}} {{ $t("lang.details") }}</router-link>
+                  <span class="badge rounded-pill bg-secondary" v-if="nft.price > 0">{{nft.price/1e18}} lowb</span>
+                </div>
+              </b-card>
             </div>
-          </b-card>
+          </div>
+          <!-- 分页组件 -->
+          <b-pagination per-page="12" v-model="$store.state.punkPage" :total-rows="rows" @change="page" align="right"></b-pagination>
+          <!-- 分页组件 -->
         </div>
       </div>
       <!-- low列表结束 -->
 
-      <!-- <div class="row" v-if="$store.state.chainId == $store.state.CHAIN_ID">
-        <div v-for="nft in $store.state.nftInfos" :key="nft.id" class="col-md-2 col-sm-3 col-xs-6 container-punk-event-large">
-          <div class="punk-image-container">
-            <div>
-              <img :src="nft.image" width="144" height="144" alt="Punk 3100" class="pixelated" style="background: #638596">
-            </div>
-          </div>
-          <div class="m-t-10"><router-link :to="{path: '/token-details/'+nft.id}">#{{nft.id}}</router-link></div>
-        </div>
-      </div> -->
       <div class="row" v-else>
         <p>{{ $t("lang.connectTotheBSCChaintoViewAllPublishedPunks") }}</p>
       </div>
-      <!-- 分页组件 -->
-      <b-pagination per-page="12" v-model="$store.state.punkPage" :total-rows="rows" @change="page" align="right"></b-pagination>
-      <!-- 分页组件 -->
+      
     </div>
     <div v-else>
       <p>{{ $t("lang.installMetaMaskFirst") }}</p>
@@ -93,20 +101,31 @@ export default {
         sliding: null,
         data:[],
         nowData:[],
-        rows: 0
+        rows: 0,
+        mode: 'all'
       }
     },
     mounted (){
-      this.data = this.$store.state.nftInfos;
+      this.data = this.$store.getters.loser_punks('all');
     },
     watch: {
       'data.length': {
         handler(newValue, oldValue) {
           this.rows = newValue;
-          if (newValue == 12) {
+          if (newValue <= 12) {
             this.page(1);
           }else if(newValue > 12){
             this.page(this.$store.state.punkPage);
+          }
+        }
+      },
+      '$store.state.loserPunkState': {
+        handler(newValue, oldValue) {
+          console.log(newValue, oldValue)
+          if (newValue == 'idle') {
+            this.data = this.$store.getters.loser_punks(this.mode);
+            this.$store.commit('setPunkPage', 1)
+            //this.page(1)
           }
         }
       }
@@ -121,6 +140,10 @@ export default {
       page(page){
         this.nowData = [...this.data].slice((page-1)*12,page*12);
         this.$store.commit('setPunkPage', page)
+      },
+      filter_punks(filter){
+        this.mode = filter
+        this.$store.dispatch('filterPunks', filter)
       }
     }
 }

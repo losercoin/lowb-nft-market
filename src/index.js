@@ -65,6 +65,7 @@ const store = new Vuex.Store({
     lowbMarketBalance: 0,
     approvedBalance: 0,
     punkPage: 1,
+    loserPunkState: 'idle',
     nftInfos: [],
     myNfts: [],
     itemsOwner: {},
@@ -109,6 +110,15 @@ const store = new Vuex.Store({
     },
     my_bid: (state) => (id) =>  {
       return state.itemBids[id].find(bid => bid.maker.toLowerCase() == store.state.account.toLowerCase())
+    },
+    loser_punks: (state) => (filter) => {
+      if (filter == 'my_bids') {
+        console.log("show my bids!")
+        return state.nftInfos.filter(info => info.hasMyBid)
+      }
+      else {
+        return state.nftInfos
+      }
     },
     bid_winner: (state) => (id) =>  {
       if ( state.itemBids[id] == null || state.itemBids[id].length == 0) {
@@ -181,7 +191,7 @@ const store = new Vuex.Store({
     setNftInfos (state, payload) {
       if (payload.id <= state.nftInfos.length) {
         Vue.set(state.nftInfos, payload.id, payload.info)
-        console.log("set group: ", payload.id)
+        console.log("set group: ", payload.id, payload.info.hasMyBid)
       }
     },
     setMyNfts (state, payload) {
@@ -233,7 +243,11 @@ const store = new Vuex.Store({
     },
     setPunkPage (state, page) {
       state.punkPage = page
-      console.log("set punk page: ", page)
+      //console.log("set punk page: ", page)
+    },
+    setLoserPunkState (state, punkState) {
+      state.loserPunkState = punkState
+      console.log("set loser punks state: ", punkState)
     }
   },
   actions: {
@@ -302,6 +316,9 @@ const store = new Vuex.Store({
     },
     buyItem ({}, payload) {
       buyItem(payload.id, payload.groupId, payload.amount)
+    },
+    filterPunks ({}, filter) {
+      filterPunks(filter)
     }
   }
 })
@@ -1101,12 +1118,27 @@ async function updateItemInfos (groupId) {
   //clearTimeout(this.timer);  //清除延迟执行
  
   const timer = setTimeout(()=>{   //设置延迟执行
-    console.log('1:', store.state.nftInfos[groupId-1])
+    //console.log('1:', store.state.nftInfos[groupId-1])
     getItemBids(groupId)
     getItemOffers(groupId)
     getItemHistory(groupId)
   },300);
+}
 
+async function filterPunks(filter) {
+  store.commit('setLoserPunkState', '?')
+  if (filter == 'my_bids') {
+    for (let i=0; i<store.state.nftInfos.length; i++) {
+      store.commit('setLoserPunkState', i+1)
+      const bid = await global.marketContract.itemBids(i+1, store.state.account)
+      let nftInfo = store.state.nftInfos[i]
+      nftInfo.hasMyBid = (bid.value > 0)
+      store.commit('setNftInfos', {id: i, info: nftInfo})
+    }
+  }
+  const timer = setTimeout(()=>{   //设置延迟执行
+    store.commit('setLoserPunkState', 'idle')
+  },100);
   
 }
 

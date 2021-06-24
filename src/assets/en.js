@@ -26,6 +26,10 @@ export const lang = {
     labelNext:'Next',
     labelPrev:'Previous',
 
+    all: 'All',
+    myBids: 'My Bids',
+    loading: 'Loading...',
+
     //LoserPunkDetail.vue 部分
     onlyOne:'Only one',
     loserKing:'Loser King',
