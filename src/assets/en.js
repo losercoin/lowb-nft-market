@@ -28,6 +28,7 @@ export const lang = {
 
     all: 'All',
     myBids: 'My Bids',
+    forSale: 'For Sale',
     loading: 'Loading...',
 
     //LoserPunkDetail.vue 部分

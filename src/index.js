@@ -113,8 +113,10 @@ const store = new Vuex.Store({
     },
     loser_punks: (state) => (filter) => {
       if (filter == 'my_bids') {
-        console.log("show my bids!")
         return state.nftInfos.filter(info => info.hasMyBid)
+      }
+      else if (filter == 'for_sale') {
+        return state.nftInfos.filter(info => info.price > 0)
       }
       else {
         return state.nftInfos
@@ -1133,6 +1135,16 @@ async function filterPunks(filter) {
       const bid = await global.marketContract.itemBids(i+1, store.state.account)
       let nftInfo = store.state.nftInfos[i]
       nftInfo.hasMyBid = (bid.value > 0)
+      store.commit('setNftInfos', {id: i, info: nftInfo})
+    }
+  }
+  else if (filter == 'for_sale') {
+    console.log('for sale')
+    for (let i=0; i<store.state.nftInfos.length; i++) {
+      store.commit('setLoserPunkState', i+1)
+      const offer = await global.marketContract.itemsOfferedForSale(i+1)
+      let nftInfo = store.state.nftInfos[i]
+      nftInfo.price = offer.minValue
       store.commit('setNftInfos', {id: i, info: nftInfo})
     }
   }

@@ -46,6 +46,9 @@
 
         <input type="radio" class="btn-check" name="btnradio" id="my_bids" autocomplete="off">
         <label class="btn btn-outline-primary" for="my_bids" v-on:click="filter_punks('my_bids')">{{ $t("lang.myBids") }}</label>
+
+        <input type="radio" class="btn-check" name="btnradio" id="for_sale" autocomplete="off">
+        <label class="btn btn-outline-primary" for="for_sale" v-on:click="filter_punks('for_sale')">{{ $t("lang.forSale") }}</label>
       </div>
       <!-- low列表开始 -->
       <div v-if="$store.state.chainId == $store.state.CHAIN_ID">
@@ -121,7 +124,7 @@ export default {
       },
       '$store.state.loserPunkState': {
         handler(newValue, oldValue) {
-          console.log(newValue, oldValue)
+          //console.log(newValue, oldValue)
           if (newValue == 'idle') {
             this.data = this.$store.getters.loser_punks(this.mode);
             this.$store.commit('setPunkPage', 1)

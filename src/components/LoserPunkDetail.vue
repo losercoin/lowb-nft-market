@@ -85,7 +85,7 @@
                 <th scope="row">#{{offer.itemId}}</th>
                 <td>{{offer.seller}}</td>
                 <td>{{ $t("lang.anyone") }}</td>
-                <td>{{offer.minValue/1e18}}</td>
+                <td>{{Math.round(offer.minValue/1e18)}}</td>
                 <td>
                   <div v-if="offer.seller.toLowerCase() == $store.state.account.toLowerCase()">
                     <a href="#" @click="withdrawOffer(offer.itemId)">[{{ $t("lang.withdraw") }}]</a>
@@ -173,7 +173,7 @@
                 <th scope="row">{{txn.block}}</th>
                 <td>{{txn.from.slice(0,8)}}</td>
                 <td>{{txn.to.slice(0,8)}}</td>
-                <td>{{txn.value}}</td>
+                <td>{{Math.round(txn.value)}}</td>
                 <td><a :href="baseUrl+txn.hash">{{txn.hash.slice(0,12)}}</a></td>
               </tr>
             </tbody>
