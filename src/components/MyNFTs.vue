@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div class="shadow px-5">
       <div class="row">
         <div class="col-6">
@@ -73,12 +73,15 @@
               {{ $t("lang.offer") }}
             </button>
           </div>
-          <div v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
-            <router-link :to="{path: '/new-token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
+          <div class="css-lvpxlc">
+            <div class="css-2x3sd8" v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
+              <router-link :to="{path: '/new-token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
+            </div>
+            <div class="css-2x3sd8" v-else>
+              <router-link :to="{path: '/token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
+            </div>
           </div>
-          <div v-else>
-            <router-link :to="{path: '/token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
-          </div>
+          
         </b-card>
       </div>
     </div>
@@ -181,5 +184,29 @@ export default {
     word-break: break-word;
     font-size: 18px;
     line-height: 26px;
+}
+.css-lvpxlc {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    padding: 5px 10px 10px;
+}
+.css-2x3sd8 {
+    flex: 1 1 0%;
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    height: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: rgba(227, 230, 238, 0.5);
+    border-radius: 4px;
+    cursor: pointer;
+}
+a {
+    color: rgb(0, 0, 0);
+    text-decoration: none;
 }
 </style>

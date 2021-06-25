@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
 
 import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS } from "./const/index.js"
-
+import peopleInfo from './const/people.json'
 
 const App = () => import("./App.vue");
 const About_zh = () => import("./components/About_zh.vue");
@@ -101,12 +101,22 @@ const store = new Vuex.Store({
     },
     owner: (state) => (id) =>  {
       const owner = state.itemsOwner[id]
+      let ownerInfo = {address: "", name: ""}
       if (owner == null)
-        return ""
-      if (owner.toLowerCase() == ADMIN_ADDRESS.toLowerCase())
-        return owner.slice(0,8)+"(offical repo)"
-      else 
-        return owner.slice(0,8)
+        return ownerInfo
+      ownerInfo.address = owner
+      if (owner.toLowerCase() == ADMIN_ADDRESS.toLowerCase()) {
+        if (i18n.locale=='zh')
+          ownerInfo.name = "(官方仓库)"
+        else
+          ownerInfo.name = "(Offical Store)"
+      }
+      else {
+        const vip = peopleInfo.find(people => people.address.toLowerCase() == owner.toLowerCase())
+        if (vip)
+          ownerInfo.name = '(' + vip.name + ')'
+      }
+      return ownerInfo
     },
     my_bid: (state) => (id) =>  {
       return state.itemBids[id].find(bid => bid.maker.toLowerCase() == store.state.account.toLowerCase())
@@ -1103,7 +1113,7 @@ async function getItemHistory (groupId) {
   const itemBoughtEvent = (await itemBoughtFile())['ItemBought']
   const blockNumner = (await itemBoughtFile())['blockNumber']
   transaction = itemBoughtEvent.filter(item => item.itemId == id)
-  console.log(itemBoughtEvent)
+  //console.log(itemBoughtEvent)
   console.log(transaction)
   infos.push.apply(infos, transaction)
   

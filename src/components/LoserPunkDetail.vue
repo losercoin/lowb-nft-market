@@ -61,7 +61,10 @@
       <div class='row detail-row'>
         <div class='col-md-10 col-md-offset-1'>
           <h3>{{ $t("lang.status") }}</h3>
-          <div>{{ $t("lang.thisPunkisCurrentlyOwnedbyAddress") }} <a href="#">{{$store.getters.owner(groupId)}}</a>.</div>
+          <div>{{ $t("lang.thisPunkisCurrentlyOwnedbyAddress") }} 
+            <a :href="'https://bscscan.com/address/'+$store.getters.owner(groupId).address">{{$store.getters.owner(groupId).address.slice(0,8)}} {{$store.getters.owner(groupId).name}}
+            </a>.
+          </div>
           <div>{{ $t("lang.thisPunkisPublishedby") }} <a href="#">{{ $t("lang.officialPublisher") }}</a>.</div>
           <div>{{ $t("lang.thisRoyalty") }} <a href="#">2.5%</a> {{ $t("lang.forEachTrading") }}</div>
         </div>
