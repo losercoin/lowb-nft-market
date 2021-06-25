@@ -36,8 +36,14 @@
     <!-- boot轮播图结束 -->
     <div v-if="$store.state.isMetaMaskInstalled" class="low-list">
       <h3 class="title" style="display: inline-block;">Loser Punks 666</h3>
-      <a style="display: inline-block; margin-left: 12px;" v-if="$root.$i18n.locale=='zh'" href="https://www.losernft.org/loser_punk_zh.jpg">竞拍规则</a>
-      <a style="display: inline-block; margin-left: 12px;" v-else href="https://www.losernft.org/loser_punk_en.jpg">auction rules</a>
+      <div style="display: inline-block;" v-if="$root.$i18n.locale=='zh'">
+        <a style="margin-left: 12px;" href="https://www.losernft.org/loser_punk_zh.jpg">竞拍规则</a>
+        <a style="margin-left: 12px;" href="https://view.officeapps.live.com/op/view.aspx?src=https://losernft.org/auction_100.xlsx">竞拍数据</a>
+      </div>
+      <div style="display: inline-block;" v-else>
+        <a style="margin-left: 12px;" href="https://www.losernft.org/loser_punk_en.jpg">auction rules</a>
+        <a style="margin-left: 12px;" href="https://view.officeapps.live.com/op/view.aspx?src=https://losernft.org/auction_100.xlsx">auction data</a>
+      </div>
       <br>
 
       <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
