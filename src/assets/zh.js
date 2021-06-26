@@ -29,6 +29,7 @@ export const lang = {
     all: '全部',
     myBids: '我的出价',
     forSale: '公开出售',
+    preSale: '预售',
     loading: '查询中...',
 
     //LoserPunkDetail.vue 部分

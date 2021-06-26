@@ -128,6 +128,9 @@ const store = new Vuex.Store({
       else if (filter == 'for_sale') {
         return state.nftInfos.filter(info => info.price > 0)
       }
+      else if (filter == 'pre_sale') {
+        return state.nftInfos.filter(info => info.startId > 100 && info.startId <= 200)
+      }
       else {
         return state.nftInfos
       }
@@ -203,7 +206,7 @@ const store = new Vuex.Store({
     setNftInfos (state, payload) {
       if (payload.id <= state.nftInfos.length) {
         Vue.set(state.nftInfos, payload.id, payload.info)
-        console.log("set group: ", payload.id, payload.info.hasMyBid)
+        console.log("set group: ", payload.id, payload.info.owner)
       }
     },
     setMyNfts (state, payload) {
@@ -1149,7 +1152,6 @@ async function filterPunks(filter) {
     }
   }
   else if (filter == 'for_sale') {
-    console.log('for sale')
     for (let i=0; i<store.state.nftInfos.length; i++) {
       store.commit('setLoserPunkState', i+1)
       const offer = await global.marketContract.itemsOfferedForSale(i+1)
@@ -1158,6 +1160,15 @@ async function filterPunks(filter) {
       store.commit('setNftInfos', {id: i, info: nftInfo})
     }
   }
+  /*else if (filter == 'pre_sale') {
+    for (let i=0; i<store.state.nftInfos.length; i++) {
+      store.commit('setLoserPunkState', i+1)
+      const owner = await global.lowcContract.ownerOf(store.state.nftInfos[i].startId)
+      let nftInfo = store.state.nftInfos[i]
+      nftInfo.owner = owner
+      store.commit('setNftInfos', {id: i, info: nftInfo})
+    }
+  }*/
   const timer = setTimeout(()=>{   //设置延迟执行
     store.commit('setLoserPunkState', 'idle')
   },100);

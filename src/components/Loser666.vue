@@ -55,6 +55,9 @@
 
         <input type="radio" class="btn-check" name="btnradio" id="for_sale" autocomplete="off">
         <label class="btn btn-outline-primary" for="for_sale" v-on:click="filter_punks('for_sale')">{{ $t("lang.forSale") }}</label>
+
+        <input type="radio" class="btn-check" name="btnradio" id="pre_sale" autocomplete="off">
+        <label class="btn btn-outline-primary" for="pre_sale" v-on:click="filter_punks('pre_sale')">{{ $t("lang.preSale") }}</label>
       </div>
       <!-- low列表开始 -->
       <div v-if="$store.state.chainId == $store.state.CHAIN_ID">
@@ -85,7 +88,13 @@
             </div>
           </div>
           <!-- 分页组件 -->
+          
           <b-pagination per-page="12" v-model="$store.state.punkPage" :total-rows="rows" @change="page" align="right"></b-pagination>
+          <p align="right">
+          <input type="number" style="width:50px;" v-model="goPage">
+          <button class="btn btn-outline-primary" type="button" id="button-addon2" v-on:click="go_page">Go</button>
+          </p>
+
           <!-- 分页组件 -->
         </div>
       </div>
@@ -111,6 +120,7 @@ export default {
         data:[],
         nowData:[],
         rows: 0,
+        goPage: 1,
         mode: 'all'
       }
     },
@@ -149,10 +159,15 @@ export default {
       page(page){
         this.nowData = [...this.data].slice((page-1)*12,page*12);
         this.$store.commit('setPunkPage', page)
+        this.goPage = page
       },
       filter_punks(filter){
         this.mode = filter
         this.$store.dispatch('filterPunks', filter)
+      },
+      go_page(){
+        if (this.goPage >= 1 && this.goPage < this.data.length/12+1)
+        this.page(Math.floor(this.goPage))
       }
     }
 }
