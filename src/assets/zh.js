@@ -4,7 +4,7 @@ export const lang = {
     about: '关于',
     //AppHeader.vue 部分
     lowbNFTMarket:'LOWB NFT 交易市场',
-    clickHeretoInstallMetaMask:'请点击这里安装MetaMask!',
+    clickHeretoInstallMetaMask:'未探测到钱包',
     connecttoBinanceSmartChain:'请将网络设置为币安智能链！',
     connectWallet:'请连接您的钱包！',
     viewMyNFTs:'我的资产',

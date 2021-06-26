@@ -4,7 +4,7 @@ export const lang = {
     about: 'About',
     //AppHeader.vue 部分
     lowbNFTMarket:'Lowb NFT Market',
-    clickHeretoInstallMetaMask:'Click here to install MetaMask!',
+    clickHeretoInstallMetaMask:'Wallet not found',
     connecttoBinanceSmartChain:'Connect to Binance Smart Chain',
     connectWallet:'Connect Wallet',
     viewMyNFTs:'My Assets',

@@ -57,7 +57,7 @@ const i18n = new VueI18n({
 
 const store = new Vuex.Store({
   state: {
-    isMetaMaskInstalled: false,
+    isWalletInstalled: false,
     chainId: 0,
     account: "",
     bnbBalance: 0,
@@ -185,8 +185,8 @@ const store = new Vuex.Store({
     setModal(state, show) {
       state.modalShow = show
     },
-    setMetaMaskInstalled (state) {
-      state.isMetaMaskInstalled = true
+    setWalletInstalled (state) {
+      state.isWalletInstalled = true
     },
     setChainId (state, id) {
       state.chainId = id
@@ -347,9 +347,10 @@ new Vue({
 })
 
 
-const isMetaMaskInstalled = () => {
+const isWalletInstalled = () => {
   const { ethereum } = window
-  return Boolean(ethereum && ethereum.isMetaMask)
+  //console.log('MetaMask', ethereum.isMetaMask)
+  return Boolean(ethereum)
 }
 
 function handleNewChain (chainId) {
@@ -454,7 +455,7 @@ async function getContracts (firstTime = true) {
   const testFile = () => import("./assets/loserpunk.json")
   global.loserpunk = (await testFile())
 
-  if (firstTime) {
+  if (firstTime && store.state.isWalletInstalled) {
     // update infomation after get contract!!!
 
     ethereum.autoRefreshOnNetworkChange = false
@@ -463,6 +464,9 @@ async function getContracts (firstTime = true) {
 
     ethereum.on('chainChanged', handleNewChain)
     ethereum.on('accountsChanged', handleNewAccounts)
+  }
+  else {
+    handleNewChain('0x38')
   }
 
 }
@@ -1213,20 +1217,25 @@ async function addLowbToken () {
 }
 
 
-if (isMetaMaskInstalled()) {
+if (isWalletInstalled()) {
 
   global.provider = new ethers.providers.Web3Provider(window.ethereum)
   global.signer = global.provider.getSigner()
   console.log('Access the decentralized web!')
-  store.commit('setMetaMaskInstalled')
+  store.commit('setWalletInstalled')
+  
+}
+else {
+  global.provider = new ethers.providers.JsonRpcProvider("https://bsc-dataseed.binance.org");
+  //const block = await provider.getBlockNumber()
+  console.log('block', provider.getBlockNumber())
+}
 
-  getContracts()
+getContracts()
 
-  if (localStorage.getItem('locale') == null) {
-    store.commit("setModal", true)
-  }
-  else {
-    console.log(localStorage.getItem('locale'))
-  }
-
+if (localStorage.getItem('locale') == null) {
+  store.commit("setModal", true)
+}
+else {
+  console.log(localStorage.getItem('locale'))
 }

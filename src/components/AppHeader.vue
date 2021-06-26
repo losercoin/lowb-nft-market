@@ -10,8 +10,8 @@
           <li><router-link :to="'/about-'+$root.$i18n.locale" class="nav-link px-2 fs-4" style="color:white;">{{ $t("lang.about") }}</router-link></li>
         </ul>
 
-        <div v-if="!$store.state.isMetaMaskInstalled">
-          <a href="https://metamask.io/download.html" class="nav-link px-2 fs-4">{{ $t("lang.clickHeretoInstallMetaMask") }}</a>
+        <div v-if="!$store.state.isWalletInstalled">
+          <a href="#" class="nav-link px-2 fs-4">{{ $t("lang.clickHeretoInstallMetaMask") }}</a>
         </div>
         <div v-else-if="$store.state.chainId != $store.state.CHAIN_ID">
           <a href="#" v-on:click="switch_network" class="nav-link px-2 fs-4">{{ $t("lang.connecttoBinanceSmartChain") }}</a>

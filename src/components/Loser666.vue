@@ -34,7 +34,7 @@
       </p> -->
     </div>
     <!-- boot轮播图结束 -->
-    <div v-if="$store.state.isMetaMaskInstalled" class="low-list">
+    <div class="low-list" v-if="$store.state.chainId == $store.state.CHAIN_ID">
       <h3 class="title" style="display: inline-block;">Loser Punks 666</h3>
       <div style="display: inline-block;" v-if="$root.$i18n.locale=='zh'">
         <a style="margin-left: 12px;" href="https://www.losernft.org/loser_punk_zh.jpg">竞拍规则</a>
@@ -60,7 +60,7 @@
         <label class="btn btn-outline-primary" for="pre_sale" v-on:click="filter_punks('pre_sale')">{{ $t("lang.preSale") }}</label>
       </div>
       <!-- low列表开始 -->
-      <div v-if="$store.state.chainId == $store.state.CHAIN_ID">
+      <div>
         <div v-if="$store.state.loserPunkState!='idle'">
           <br>
           <p>{{$t("lang.loading")}} {{this.$store.state.loserPunkState}}/{{this.$store.state.nftInfos.length}}</p>
@@ -91,7 +91,7 @@
           
           <b-pagination per-page="12" v-model="$store.state.punkPage" :total-rows="rows" @change="page" align="right"></b-pagination>
           <p align="right">
-          <input type="number" style="width:50px;" v-model="goPage">
+          <input type="number" style="width:50px;" v-model="goPage" @keydown="go_page">
           <button class="btn btn-outline-primary" type="button" id="button-addon2" v-on:click="go_page">Go</button>
           </p>
 
@@ -100,14 +100,12 @@
       </div>
       <!-- low列表结束 -->
 
-      <div class="row" v-else>
-        <p>{{ $t("lang.connectTotheBSCChaintoViewAllPublishedPunks") }}</p>
-      </div>
-      
     </div>
-    <div v-else>
-      <p>{{ $t("lang.installMetaMaskFirst") }}</p>
+
+    <div class="row" v-else>
+      <p>{{ $t("lang.connectTotheBSCChaintoViewAllPublishedPunks") }}</p>
     </div>
+
   </div>
 </template>
 
