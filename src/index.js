@@ -5,7 +5,7 @@ import VueRouter from 'vue-router'
 import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
 
-import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS } from "./const/index.js"
+import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS } from "./const/index.js"
 import peopleInfo from './const/people.json'
 
 const App = () => import("./App.vue");
@@ -448,6 +448,10 @@ async function getContracts (firstTime = true) {
   const marketAbi = (await marketFile())['abi']
   global.marketContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, marketAbi, global.provider)
 
+  const helperFile = () => import("./assets/LowbMarketHelper.json")
+  const helperAbi = (await helperFile())['abi']
+  global.helperContract = new ethers.Contract(HELPER_CONTRACT_ADDRESS, helperAbi, global.provider)
+
   const lowcFile = () => import("./assets/MyCollectible.json")
   const lowcAbi = (await lowcFile())['abi']
   global.lowcContract = new ethers.Contract(LOWC_TOKEN_ADDRESS, lowcAbi, global.provider)
@@ -466,7 +470,7 @@ async function getContracts (firstTime = true) {
     ethereum.on('accountsChanged', handleNewAccounts)
   }
   else {
-    handleNewChain('0x38')
+    handleNewChain(chainInfo.chainId)
   }
 
 }
@@ -1147,20 +1151,18 @@ async function updateItemInfos (groupId) {
 async function filterPunks(filter) {
   store.commit('setLoserPunkState', '?')
   if (filter == 'my_bids') {
+    const bids = await global.helperContract.getBidsOf(store.state.account, 1, store.state.nftInfos.length)
     for (let i=0; i<store.state.nftInfos.length; i++) {
-      store.commit('setLoserPunkState', i+1)
-      const bid = await global.marketContract.itemBids(i+1, store.state.account)
       let nftInfo = store.state.nftInfos[i]
-      nftInfo.hasMyBid = (bid.value > 0)
+      nftInfo.hasMyBid = (bids[i].value > 0)
       store.commit('setNftInfos', {id: i, info: nftInfo})
     }
   }
   else if (filter == 'for_sale') {
+    const offers = await global.helperContract.getOffers(1, store.state.nftInfos.length)
     for (let i=0; i<store.state.nftInfos.length; i++) {
-      store.commit('setLoserPunkState', i+1)
-      const offer = await global.marketContract.itemsOfferedForSale(i+1)
       let nftInfo = store.state.nftInfos[i]
-      nftInfo.price = offer.minValue
+      nftInfo.price = offers[i].minValue
       store.commit('setNftInfos', {id: i, info: nftInfo})
     }
   }
@@ -1226,7 +1228,7 @@ if (isWalletInstalled()) {
   
 }
 else {
-  global.provider = new ethers.providers.JsonRpcProvider("https://bsc-dataseed.binance.org");
+  global.provider = new ethers.providers.JsonRpcProvider(chainInfo.rpcUrls[0]);
   //const block = await provider.getBlockNumber()
   console.log('block', provider.getBlockNumber())
 }
