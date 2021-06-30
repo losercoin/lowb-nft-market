@@ -84,6 +84,8 @@ export const lang = {
     NFTsOwned:'我的NFT收藏',
     offer:'报价出售',
     myBids: '我的出价',
+    noNFTs: '您当前还未拥有Loser NFT',
+    noBids: '未查询到您当前的出价信息',
     //NewTokenDetail.vue 部分
     groupId:'组ID',
     inProgress:'进行中',

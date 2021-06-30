@@ -84,6 +84,8 @@ export const lang = {
     NFTsOwned:'My NFTs',
     offer:'Offer',
     myBids: 'My Bids',
+    noNFTs: 'Loser NFTs not found',
+    noBids: 'Bids not found',
     //NewTokenDetail.vue 部分
     groupId:'group id',
     inProgress:'In progress',

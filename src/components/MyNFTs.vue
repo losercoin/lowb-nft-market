@@ -86,7 +86,7 @@
       </div>
     </div>
     <div class="row" v-if="$store.state.myNfts.length==0">
-      <br><p>您当前还未拥有Loser NFT</p>
+      <br><p>{{ $t("lang.noNFTs") }}</p>
     </div>
     <br><br><br>
     <h2>{{ $t("lang.myBids") }}</h2>
@@ -109,7 +109,7 @@
     </div>
     <br>
     <div class="row" v-if="$store.getters.loser_punks('my_bids').length==0">
-      <p>未查询到您当前的出价信息</p>
+      <p>{{ $t("lang.noBids") }}</p>
     </div>
   </div>
 </template>
