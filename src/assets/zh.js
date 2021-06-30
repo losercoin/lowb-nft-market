@@ -27,7 +27,7 @@ export const lang = {
     labelPrev:'前一页',
 
     all: '全部',
-    myBids: '我的出价',
+    allBids: '全部出价',
     forSale: '公开出售',
     preSale: '预售',
     loading: '查询中...',
@@ -81,8 +81,9 @@ export const lang = {
     youCan:'你可以',
     claim:'申请',
     TenKLOWBThenRefreshtheWebpageAfterConfirmed:'10k LOWB, 在操作被确认后，请重新刷新页面。',
-    NFTsOwned:'您的NFT收藏',
+    NFTsOwned:'我的NFT收藏',
     offer:'报价出售',
+    myBids: '我的出价',
     //NewTokenDetail.vue 部分
     groupId:'组ID',
     inProgress:'进行中',

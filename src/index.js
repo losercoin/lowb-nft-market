@@ -125,6 +125,9 @@ const store = new Vuex.Store({
       if (filter == 'my_bids') {
         return state.nftInfos.filter(info => info.hasMyBid)
       }
+      else if (filter == 'all_bids') {
+        return state.nftInfos.filter(info => info.bids > 0)
+      }
       else if (filter == 'for_sale') {
         return state.nftInfos.filter(info => info.price > 0)
       }
@@ -206,7 +209,7 @@ const store = new Vuex.Store({
     setNftInfos (state, payload) {
       if (payload.id <= state.nftInfos.length) {
         Vue.set(state.nftInfos, payload.id, payload.info)
-        console.log("set group: ", payload.id, payload.info.owner)
+        console.log("set group: ", payload.id, payload.info.bids)
       }
     },
     setMyNfts (state, payload) {
@@ -627,7 +630,7 @@ async function getMyNfts () {
     const lowcNumber = await global.lowcContract.balanceOf(store.state.account)
     for (let i=0; i<lowcNumber; i++) {
       const tokenId = (await global.lowcContract.tokenOfOwnerByIndex(store.state.account, i)).toString()
-      const groupId = (await global.lowcContract.groupOf(tokenId)).toString()
+      const groupId = tokenId//(await global.lowcContract.groupOf(tokenId)).toString()
       await getNftInfo(groupId, false)
       const getApproved = await global.lowcContract.getApproved(tokenId)
       const isApproved = (getApproved.toLowerCase() == MARKET_CONTRACT_ADDRESS.toLowerCase())
@@ -1155,6 +1158,14 @@ async function filterPunks(filter) {
     for (let i=0; i<store.state.nftInfos.length; i++) {
       let nftInfo = store.state.nftInfos[i]
       nftInfo.hasMyBid = (bids[i].value > 0)
+      store.commit('setNftInfos', {id: i, info: nftInfo})
+    }
+  }
+  else if (filter == 'all_bids') {
+    const bids = await global.helperContract.getHighestBids(1, store.state.nftInfos.length)
+    for (let i=0; i<store.state.nftInfos.length; i++) {
+      let nftInfo = store.state.nftInfos[i]
+      nftInfo.bids = bids[i].value
       store.commit('setNftInfos', {id: i, info: nftInfo})
     }
   }

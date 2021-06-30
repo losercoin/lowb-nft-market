@@ -85,6 +85,32 @@
         </b-card>
       </div>
     </div>
+    <div class="row" v-if="$store.state.myNfts.length==0">
+      <br><p>您当前还未拥有Loser NFT</p>
+    </div>
+    <br><br><br>
+    <h2>{{ $t("lang.myBids") }}</h2>
+    <div class="row">
+      <div v-for="nft in $store.getters.loser_punks('my_bids')" :key="nft.id"  class="col-sm-3">
+        <b-card
+          :title="nft.name"
+          :img-src="nft.image"
+          img-alt="Image"
+          img-top
+          tag="article"
+          style="max-width: 20rem;"
+          class="mb-2"
+        >
+          <div class="m-t-10">
+            <router-link :to="{path: '/token-details/'+nft.id}">{{ $t("lang.go") }} #{{nft.id}} {{ $t("lang.details") }}</router-link>
+          </div>
+        </b-card>
+      </div>
+    </div>
+    <br>
+    <div class="row" v-if="$store.getters.loser_punks('my_bids').length==0">
+      <p>未查询到您当前的出价信息</p>
+    </div>
   </div>
 </template>
 
@@ -102,6 +128,7 @@ export default {
   },
   created () {
     console.log(this.$store.state.approvedBalance, this.toDeposit)
+    this.$store.dispatch('filterPunks', 'my_bids')
   },
   methods: {
     correct_toDeposit: function () {
@@ -206,7 +233,8 @@ export default {
     cursor: pointer;
 }
 a {
-    color: rgb(0, 0, 0);
+    color: #ff04b4;
     text-decoration: none;
+    font-weight: 700;
 }
 </style>

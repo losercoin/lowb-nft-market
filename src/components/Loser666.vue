@@ -50,8 +50,8 @@
         <input type="radio" class="btn-check" name="btnradio" id="all" autocomplete="off" checked>
         <label class="btn btn-outline-primary" for="all" v-on:click="filter_punks('all')">{{ $t("lang.all") }}</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="my_bids" autocomplete="off">
-        <label class="btn btn-outline-primary" for="my_bids" v-on:click="filter_punks('my_bids')">{{ $t("lang.myBids") }}</label>
+        <input type="radio" class="btn-check" name="btnradio" id="all_bids" autocomplete="off">
+        <label class="btn btn-outline-primary" for="all_bids" v-on:click="filter_punks('all_bids')">{{ $t("lang.allBids") }}</label>
 
         <input type="radio" class="btn-check" name="btnradio" id="for_sale" autocomplete="off">
         <label class="btn btn-outline-primary" for="for_sale" v-on:click="filter_punks('for_sale')">{{ $t("lang.forSale") }}</label>
@@ -82,7 +82,8 @@
                 <!-- <b-button href="#" variant="primary">Go somewhere</b-button> -->
                 <div class="m-t-10">
                   <router-link :to="{path: '/token-details/'+nft.id}">{{ $t("lang.go") }} #{{nft.id}} {{ $t("lang.details") }}</router-link>
-                  <span class="badge rounded-pill bg-secondary" v-if="nft.price > 0">{{nft.price/1e18}} lowb</span>
+                  <span class="badge rounded-pill bg-success" v-if="nft.price > 0">{{Math.round(nft.price/1e18)}} lowb</span>
+                  <span class="badge rounded-pill bg-info" v-else-if="nft.bids > 0">{{Math.round(nft.bids/1e18)}} lowb</span>
                 </div>
               </b-card>
             </div>

@@ -27,7 +27,7 @@ export const lang = {
     labelPrev:'Previous',
 
     all: 'All',
-    myBids: 'My Bids',
+    allBids: 'All Bids',
     forSale: 'For Sale',
     preSale: 'Presale',
     loading: 'Loading...',
@@ -81,8 +81,9 @@ export const lang = {
     youCan:'You can',
     claim:'claim',
     TenKLOWBThenRefreshtheWebpageAfterConfirmed:'10k LOWB, then refresh the webpage after confirmed',
-    NFTsOwned:'Your NFTs',
+    NFTsOwned:'My NFTs',
     offer:'Offer',
+    myBids: 'My Bids',
     //NewTokenDetail.vue 部分
     groupId:'group id',
     inProgress:'In progress',
