@@ -65,6 +65,7 @@ const store = new Vuex.Store({
     lowbMarketBalance: 0,
     approvedBalance: 0,
     punkPage: 1,
+    punkMode: 'all',
     loserPunkState: 'idle',
     nftInfos: [],
     myNfts: [],
@@ -129,10 +130,14 @@ const store = new Vuex.Store({
         return state.nftInfos.filter(info => info.bids > 0)
       }
       else if (filter == 'for_sale') {
-        return state.nftInfos.filter(info => info.price > 0)
+        let offers = state.nftInfos.filter(info => info.price > 0)
+        offers.sort(function(a,b){
+          return a.price - b.price
+        })
+        return offers
       }
       else if (filter == 'pre_sale') {
-        return state.nftInfos.filter(info => info.startId > 100 && info.startId <= 200)
+        return state.nftInfos.filter(info => info.startId > 235 && info.startId <= 300)
       }
       else {
         return state.nftInfos
@@ -262,6 +267,9 @@ const store = new Vuex.Store({
     setPunkPage (state, page) {
       state.punkPage = page
       //console.log("set punk page: ", page)
+    },
+    setPunkMode (state, mode) {
+      state.punkMode = mode
     },
     setLoserPunkState (state, punkState) {
       state.loserPunkState = punkState

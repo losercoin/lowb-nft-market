@@ -47,17 +47,17 @@
       <br>
 
       <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-        <input type="radio" class="btn-check" name="btnradio" id="all" autocomplete="off" checked>
+        <input type="radio" class="btn-check" name="btnradio" id="all" autocomplete="off" :checked="$store.state.punkMode=='all'">
         <label class="btn btn-outline-primary" for="all" v-on:click="filter_punks('all')">{{ $t("lang.all") }}</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="all_bids" autocomplete="off">
+        <input type="radio" class="btn-check" name="btnradio" id="all_bids" autocomplete="off" :checked="$store.state.punkMode=='all_bids'">
         <label class="btn btn-outline-primary" for="all_bids" v-on:click="filter_punks('all_bids')">{{ $t("lang.allBids") }}</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="for_sale" autocomplete="off">
+        <input type="radio" class="btn-check" name="btnradio" id="for_sale" autocomplete="off" :checked="$store.state.punkMode=='for_sale'">
         <label class="btn btn-outline-primary" for="for_sale" v-on:click="filter_punks('for_sale')">{{ $t("lang.forSale") }}</label>
-
-        <input type="radio" class="btn-check" name="btnradio" id="pre_sale" autocomplete="off">
-        <label class="btn btn-outline-primary" for="pre_sale" v-on:click="filter_punks('pre_sale')">{{ $t("lang.preSale") }}</label>
+<!--
+        <input type="radio" class="btn-check" name="btnradio" id="pre_sale" autocomplete="off" :checked="$store.state.punkMode=='pre_sale'">
+        <label class="btn btn-outline-primary" for="pre_sale" v-on:click="filter_punks('pre_sale')">{{ $t("lang.preSale") }}</label>-->
       </div>
       <!-- low列表开始 -->
       <div>
@@ -119,12 +119,11 @@ export default {
         data:[],
         nowData:[],
         rows: 0,
-        goPage: 1,
-        mode: 'all'
+        goPage: 1
       }
     },
     mounted (){
-      this.data = this.$store.getters.loser_punks('all');
+      this.data = this.$store.getters.loser_punks(this.$store.state.punkMode);
     },
     watch: {
       'data.length': {
@@ -141,7 +140,7 @@ export default {
         handler(newValue, oldValue) {
           //console.log(newValue, oldValue)
           if (newValue == 'idle') {
-            this.data = this.$store.getters.loser_punks(this.mode);
+            this.data = this.$store.getters.loser_punks(this.$store.state.punkMode);
             this.$store.commit('setPunkPage', 1)
             //this.page(1)
           }
@@ -161,7 +160,7 @@ export default {
         this.goPage = page
       },
       filter_punks(filter){
-        this.mode = filter
+        this.$store.commit('setPunkMode', filter)
         this.$store.dispatch('filterPunks', filter)
       },
       go_page(){
