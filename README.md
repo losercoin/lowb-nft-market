@@ -1,5 +1,5 @@
 # lowb-nft-market
-NFT market for $Lowb
+NFT market for $Lowb on matic chain
 
 ## Project setup
 ```
