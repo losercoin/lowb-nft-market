@@ -5,12 +5,13 @@ import VueRouter from 'vue-router'
 import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
 
-import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS } from "./const/index.js"
+import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, WALLET_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, LOTTERY_ADDRESS, ADMIN_ADDRESS } from "./const/index.js"
 import peopleInfo from './const/people.json'
 
 const App = () => import("./App.vue");
 const About_zh = () => import("./components/About_zh.vue");
 const About_en = () => import("./components/About_en.vue");
+const Lottery = () => import("./components/Lottery.vue");
 const AppHome = () => import("./components/Loser666.vue");
 const MyNFTs = () => import("./components/MyNFTs.vue");
 const TokenDetail = () => import("./components/LoserPunkDetail.vue");
@@ -34,6 +35,7 @@ const routes = [
   { path: '/', component: AppHome },
   { path: '/about-zh', component: About_zh },
   { path: '/about-en', component: About_en },
+  { path: '/lottery', component: Lottery },
   { path: '/my-nfts', component: MyNFTs },
   { path: '/token-details/:id', component: TokenDetail },
   { path: '/new-token-details/:id', component: NewTokenDetail }
@@ -437,13 +439,13 @@ async function getBalance (account) {
   try {
     const bnbBalance = await global.provider.getBalance(account)
     const lowbBalance = await global.lowbContract.balanceOf(account)
-    const lowbMarketBalance = await global.marketContract.pendingWithdrawals(account)
-    const approvedBalance = await global.lowbContract.allowance(account, MARKET_CONTRACT_ADDRESS)
+    const lowbMarketBalance = await global.walletContract.balanceOf(account)
+    const approvedBalance = await global.lowbContract.allowance(account, WALLET_CONTRACT_ADDRESS)
     store.commit('setBalance', {
       bnbBalance: bnbBalance,
       lowbBalance: lowbBalance,
       lowbMarketBalance: lowbMarketBalance,
-      approvedBalance: approvedBalance
+      approvedBalance: approvedBalance,
     })
   } catch (err) {
     console.error(err)
@@ -459,13 +461,17 @@ async function getContracts (firstTime = true) {
   const marketAbi = (await marketFile())['abi']
   global.marketContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, marketAbi, global.provider)
 
-  const helperFile = () => import("./assets/LowbMarketHelper.json")
-  const helperAbi = (await helperFile())['abi']
-  global.helperContract = new ethers.Contract(HELPER_CONTRACT_ADDRESS, helperAbi, global.provider)
+  const walletFile = () => import("./assets/LowbMaticWallet.json")
+  const walletAbi = (await walletFile())['abi']
+  global.walletContract = new ethers.Contract(WALLET_CONTRACT_ADDRESS, walletAbi, global.provider)
 
-  const lowcFile = () => import("./assets/MyCollectible.json")
+  const lowcFile = () => import("./assets/Creature.json")
   const lowcAbi = (await lowcFile())['abi']
   global.lowcContract = new ethers.Contract(LOWC_TOKEN_ADDRESS, lowcAbi, global.provider)
+  
+  const lotteryFile = () => import("./assets/LowbLottery.json")
+  const lotteryAbi = (await lotteryFile())['abi']
+  global.lotteryContract = new ethers.Contract(LOTTERY_ADDRESS, lotteryAbi, global.provider)
 
   const testFile = () => import("./assets/loserpunk.json")
   global.loserpunk = (await testFile())
@@ -490,7 +496,7 @@ async function approveLowb(amount) {
   if (amount > 0) {
     const lowbWithSigner = global.lowbContract.connect(global.signer);
     const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
-    await lowbWithSigner.approve(MARKET_CONTRACT_ADDRESS, amount_in_wei);
+    await lowbWithSigner.approve(WALLET_CONTRACT_ADDRESS, amount_in_wei);
   }
 
   const filter = global.lowbContract.filters.Approval(store.state.account, null)
@@ -529,9 +535,9 @@ async function approveLowb(amount) {
 
 async function depositLowb(amount) {
   if (amount > 0) {
-    const marketWithSigner = global.marketContract.connect(global.signer);
+    const walletWithSigner = global.walletContract.connect(global.signer);
     const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
-    await marketWithSigner.deposit(amount_in_wei);
+    await walletWithSigner.deposit(amount_in_wei);
   }
 
   const filter = global.lowbContract.filters.Transfer(store.state.account, null)
@@ -566,9 +572,9 @@ async function depositLowb(amount) {
 
 async function withdrawLowb(amount) {
   if (amount > 0) {
-    const marketWithSigner = global.marketContract.connect(global.signer);
+    const walletWithSigner = global.walletContract.connect(global.signer);
     const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
-    await marketWithSigner.withdraw(amount_in_wei);
+    await walletWithSigner.withdraw(amount_in_wei);
   }
 
   const filter = global.lowbContract.filters.Transfer(null, store.state.account)
@@ -603,26 +609,26 @@ async function withdrawLowb(amount) {
 }
 
 async function getNftInfo (groupId, update=true) {
-  if (store.state.nftInfos[groupId-1] == null || update) {
+  if (store.state.nftInfos[groupId] == null || update) {
     let nftInfo = {}
     nftInfo["id"] = groupId
-    nftInfo["name"] = global.loserpunk[groupId-1]["name"]
+    nftInfo["name"] = global.loserpunk[groupId]["name"]
     nftInfo["description"] = "This is our first nft. Make loser Great again!!!"
-    nftInfo["circulation"] = global.loserpunk[groupId-1]["circulation"]
-    nftInfo["image"] = "https://www.losernft.org/ipfs/" + global.loserpunk[groupId-1]["hash"]
-    nftInfo["startId"] = global.loserpunk[groupId-1]["startId"]
+    nftInfo["circulation"] = global.loserpunk[groupId]["circulation"]
+    nftInfo["image"] = "https://www.losernft.org/ipfs/" + global.loserpunk[groupId]["hash"]
+    nftInfo["startId"] = global.loserpunk[groupId]["startId"]
     nftInfo["features"] = ["cool", "dark"]
     nftInfo["currentSupply"] = 1 //await global.lowcContract.groupCurrentSupply(groupId)
     nftInfo["price"] = 0 //await global.marketContract.newTokenOffer(groupId)
-    store.commit('setNftInfos', {id: groupId-1, info: nftInfo})
+    store.commit('setNftInfos', {id: groupId, info: nftInfo})
   }
 }
 
 async function getGroupNumber () {
   try {
-    const groupNumber = await global.lowcContract.serialCurrentGroup(1)
+    const groupNumber = await global.lowcContract.totalSupply()
     for (let i=0; i<groupNumber; i++) {
-      await getNftInfo(i+1)
+      await getNftInfo(i)
     }
   } catch (err) {
     console.error(err)
@@ -694,20 +700,20 @@ async function buyNewItem (id, amount) {
 }
 
 async function buyItem (id, groupId, amount) {
-  if (id > 0 && amount > 0) {
+  if (amount > 0) {
     const marketWithSigner = global.marketContract.connect(global.signer);
     const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
-    await marketWithSigner.buyItem(id, amount_in_wei);
+    await marketWithSigner.buyItem(LOWC_TOKEN_ADDRESS, id, amount_in_wei);
   }
   
-  const filter = global.marketContract.filters.ItemBought(null, null, null, store.state.account)
+  const filter = global.marketContract.filters.ItemBought(LOWC_TOKEN_ADDRESS)
   if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
     console.log("buy item event registered")
   }
   else {
     store.commit("addFilter", filter)
     // Receive an event when ANY transfer occurs
-    global.marketContract.on(filter, async (itemId, value, fromAddress, toAddress, event) => {
+    global.marketContract.on(filter, async (addr, itemId, value, fromAddress, toAddress, event) => {
       console.log(`$I buy a token #${ itemId } with ${ value } lowb from ${ fromAddress }`);
       // The event object contains the verbatim log data, the
       // EventFragment and functions to fetch the block,
@@ -734,10 +740,9 @@ async function buyItem (id, groupId, amount) {
 }
 
 async function approveBid (tokenId, groupId) {
-  if (tokenId > 0) {
-    const lowcWithSigner = global.lowcContract.connect(global.signer);
-    await lowcWithSigner.approve(MARKET_CONTRACT_ADDRESS, tokenId)
-  }
+  const lowcWithSigner = global.lowcContract.connect(global.signer);
+  await lowcWithSigner.approve(MARKET_CONTRACT_ADDRESS, tokenId)
+
 
   const filter = global.lowcContract.filters.Approval(null, null, Number(tokenId))
   if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
@@ -762,15 +767,9 @@ async function approveBid (tokenId, groupId) {
           lowbMarketBalance: lowbMarketBalance,
           approvedBalance: approvedBalance
         })
-        if (store.state.nftInfos[groupId-1].currentSupply<store.state.nftInfos[groupId-1].circulation) {
-          let bidAdmin = {address: store.state.account, isApproved: true}
-          store.commit('setBidsAdmin', {id: groupId, bidAdmin: bidAdmin})
-        }
-        else {
-          for (let i=0; i<store.state.myNfts.length; i++) {
-            if (store.state.myNfts[i].tokenId == tokenId) {
-              store.commit('setMyNfts', {id: i, myNft: {tokenId: tokenId, groupId: groupId, isApproved: true}})
-            }
+        for (let i=0; i<store.state.myNfts.length; i++) {
+          if (store.state.myNfts[i].tokenId == tokenId) {
+            store.commit('setMyNfts', {id: i, myNft: {tokenId: tokenId, groupId: groupId, isApproved: true}})
           }
         }
       } 
@@ -824,20 +823,20 @@ async function startSale (id, amount) {
 }
 
 async function offerItem (id, groupId, amount) {
-  if (id > 0 && amount > 0) {
+  if (amount > 0) {
     const marketWithSigner = global.marketContract.connect(global.signer);
     const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
-    await marketWithSigner.offerItemForSale(id, amount_in_wei);
+    await marketWithSigner.offerItemForSale(LOWC_TOKEN_ADDRESS, id, amount_in_wei);
   }
   
-  const filter = global.marketContract.filters.ItemOffered(Number(id))
+  const filter = global.marketContract.filters.ItemOffered(LOWC_TOKEN_ADDRESS, Number(id))
   if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
     console.log("offer item event registered")
   }
   else {
     store.commit("addFilter", filter)
     // Receive an event when ANY transfer occurs
-    global.marketContract.on(filter, async (itemId, minValue, toAddress, event) => {
+    global.marketContract.on(filter, async (addr, itemId, minValue, toAddress, event) => {
       console.log(`I offer item ${ itemId} with ${ minValue/1e18 } lowb for sale`);
       // The event object contains the verbatim log data, the
       // EventFragment and functions to fetch the block,
@@ -908,19 +907,19 @@ async function acceptNewBid (id, bidder) {
 }
 
 async function acceptBid (id, groupId, bidder) {
-  if (id > 0) {
-    const marketWithSigner = global.marketContract.connect(global.signer);
-    await marketWithSigner.acceptBid(id, bidder);
-  }
 
-  const filter = global.marketContract.filters.ItemBought(null, null, store.state.account)
+  const marketWithSigner = global.marketContract.connect(global.signer);
+  await marketWithSigner.acceptBid(LOWC_TOKEN_ADDRESS, id, bidder);
+
+
+  const filter = global.marketContract.filters.ItemBought(LOWC_TOKEN_ADDRESS)
   if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
     console.log("accept bid event registered")
   }
   else {
     store.commit("addFilter", filter)
     // Receive an event when ANY transfer occurs
-    global.marketContract.on(filter, async (itemId, value, fromAddress, toAddress, event) => {
+    global.marketContract.on(filter, async (addr, itemId, value, fromAddress, toAddress, event) => {
       console.log(`${ toAddress } bought a token #${ itemId } with ${ value/1e18 } lowb from ${ fromAddress }`);
       // The event object contains the verbatim log data, the
       // EventFragment and functions to fetch the block,
@@ -928,7 +927,7 @@ async function acceptBid (id, groupId, bidder) {
       try {
         const bnbBalance = await global.provider.getBalance(store.state.account)
         const lowbBalance = store.state.lowbBalance
-        const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+        const lowbMarketBalance = await global.walletContract.balanceOf(store.state.account)
         const approvedBalance = store.state.approvedBalance
         store.commit('setBalance', {
           bnbBalance: bnbBalance,
@@ -954,20 +953,20 @@ async function acceptBid (id, groupId, bidder) {
 }
 
 async function enterBid (id, amount) {
-  if (id > 0 && amount > 0) {
+  if (amount > 0) {
     const marketWithSigner = global.marketContract.connect(global.signer);
     const amount_in_wei = ethers.utils.parseUnits(amount.toString(), 18);
-    await marketWithSigner.enterBid(id, amount_in_wei);
+    await marketWithSigner.enterBid(LOWC_TOKEN_ADDRESS, id, amount_in_wei);
   }
   
-  const filter = global.marketContract.filters.NewBidEntered(null, null, store.state.account)
+  const filter = global.marketContract.filters.NewBidEntered(LOWC_TOKEN_ADDRESS, null, null, store.state.account)
   if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
     console.log("enter bid event registered")
   }
   else {
     store.commit("addFilter", filter)
     // Receive an event when ANY transfer occurs
-    global.marketContract.on(filter, async (groupId, value, fromAddress, event) => {
+    global.marketContract.on(filter, async (addr, groupId, value, fromAddress, event) => {
       console.log(`I bid ${ value/1e18 } lowb to group ${ groupId}`);
       // The event object contains the verbatim log data, the
       // EventFragment and functions to fetch the block,
@@ -975,7 +974,7 @@ async function enterBid (id, amount) {
       try {
         const bnbBalance = await global.provider.getBalance(store.state.account)
         const lowbBalance = store.state.lowbBalance
-        const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+        const lowbMarketBalance = store.state.lowbMarketBalance - Number(value)
         const approvedBalance = store.state.approvedBalance
         store.commit('setBalance', {
           bnbBalance: bnbBalance,
@@ -994,19 +993,19 @@ async function enterBid (id, amount) {
 }
 
 async function withdrawBid (id) {
-  if (id > 0) {
-    const marketWithSigner = global.marketContract.connect(global.signer);
-    await marketWithSigner.withdrawBid(id);
-  }
 
-  const filter = global.marketContract.filters.BidWithdrawn(null, null, store.state.account)
+  const marketWithSigner = global.marketContract.connect(global.signer);
+  await marketWithSigner.withdrawBid(LOWC_TOKEN_ADDRESS, id);
+
+
+  const filter = global.marketContract.filters.BidWithdrawn(LOWC_TOKEN_ADDRESS, null, null, store.state.account)
   if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
     console.log("withdraw bid event registered")
   }
   else {
     store.commit("addFilter", filter)
     // Receive an event when ANY transfer occurs
-    global.marketContract.on(filter, async (itemId, value, fromAddress, event) => {
+    global.marketContract.on(filter, async (addr, itemId, value, fromAddress, event) => {
       console.log(`I withdraw the bid to group ${ itemId}`);
       // The event object contains the verbatim log data, the
       // EventFragment and functions to fetch the block,
@@ -1014,7 +1013,7 @@ async function withdrawBid (id) {
       try {
         const bnbBalance = await global.provider.getBalance(store.state.account)
         const lowbBalance = store.state.lowbBalance
-        const lowbMarketBalance = await global.marketContract.pendingWithdrawals(store.state.account)
+        const lowbMarketBalance = store.state.lowbMarketBalance + Number(value)
         const approvedBalance = store.state.approvedBalance
         store.commit('setBalance', {
           bnbBalance: bnbBalance,
@@ -1074,21 +1073,15 @@ async function withdrawOffer (id, groupId) {
 async function getItemBids (groupId) {
 
   let bidAdmin = {}
-  //console.log(store.state.nftInfos[groupId].currentSupply, store.state.nftInfos[groupId].circulation)
-  if (store.state.nftInfos[groupId-1].currentSupply < store.state.nftInfos[groupId-1].circulation) {
-    bidAdmin["address"] = await global.lowcContract.ownerOf(store.state.nftInfos[groupId-1].startId)
-    const getApproved = await global.lowcContract.getApproved(store.state.nftInfos[groupId-1].startId)
-    bidAdmin["isApproved"] = (getApproved.toLowerCase() == MARKET_CONTRACT_ADDRESS.toLowerCase())
-  }
   store.commit('setBidsAdmin', {id: groupId, bidAdmin: bidAdmin})
   
-  let bidInfo = await global.marketContract.itemBids(groupId, '0x0000000000000000000000000000000000000000')
+  let bidInfo = await global.marketContract.itemBids(LOWC_TOKEN_ADDRESS, groupId, '0x0000000000000000000000000000000000000000')
   let bids = []
   while (bidInfo.nextBidder != '0x0000000000000000000000000000000000000000') {
     let bid = {}
     bid["maker"] = bidInfo.nextBidder
     bid["taker"] = 'anyone'
-    bidInfo = await global.marketContract.itemBids(groupId, bidInfo.nextBidder)
+    bidInfo = await global.marketContract.itemBids(LOWC_TOKEN_ADDRESS, groupId, bidInfo.nextBidder)
     bid["price"] = bidInfo.value/1e18
     bid["index"] = bids.length + 1
     bids.push(bid)
@@ -1100,14 +1093,12 @@ async function getItemBids (groupId) {
 
 async function getItemOffers (groupId) {
   let offerInfos = []
-  for (let i=store.state.nftInfos[groupId-1].startId; i<store.state.nftInfos[groupId-1].startId+Number(store.state.nftInfos[groupId-1].currentSupply); i++) {
-    let offerInfo = await global.marketContract.itemsOfferedForSale(i)
-    if (offerInfo.isForSale) {
-      offerInfos.push(offerInfo)
-    }
-    let owner = await global.lowcContract.ownerOf(i)
-    store.commit('setItemsOwner', {id: i, owner: owner})
+  let offerInfo = await global.marketContract.itemsOfferedForSale(LOWC_TOKEN_ADDRESS, groupId)
+  if (offerInfo.isForSale) {
+    offerInfos.push(offerInfo)
   }
+  let owner = await global.lowcContract.ownerOf(groupId)
+  store.commit('setItemsOwner', {id: groupId, owner: owner})
 
   store.commit('setItemOffers', {id: groupId, offerInfos: offerInfos})
   
@@ -1115,7 +1106,7 @@ async function getItemOffers (groupId) {
 
 async function getItemHistory (groupId) {
 
-  const id = store.state.nftInfos[groupId-1].startId
+  const id = store.state.nftInfos[groupId].startId
   let infos = []
 
   const transferFile = () => import("./assets/LowcEventTest.json")
@@ -1162,7 +1153,7 @@ async function updateItemInfos (groupId) {
 async function filterPunks(filter) {
   store.commit('setLoserPunkState', '?')
   if (filter == 'my_bids') {
-    const bids = await global.helperContract.getBidsOf(store.state.account, 1, store.state.nftInfos.length)
+    const bids = await global.marketContract.getBidsOf(LOWC_TOKEN_ADDRESS, store.state.account, 0, store.state.nftInfos.length-1)
     for (let i=0; i<store.state.nftInfos.length; i++) {
       let nftInfo = store.state.nftInfos[i]
       nftInfo.hasMyBid = (bids[i].value > 0)
@@ -1170,7 +1161,7 @@ async function filterPunks(filter) {
     }
   }
   else if (filter == 'all_bids') {
-    const bids = await global.helperContract.getHighestBids(1, store.state.nftInfos.length)
+    const bids = await global.marketContract.getHighestBids(LOWC_TOKEN_ADDRESS, 0, store.state.nftInfos.length-1)
     for (let i=0; i<store.state.nftInfos.length; i++) {
       let nftInfo = store.state.nftInfos[i]
       nftInfo.bids = bids[i].value
@@ -1178,7 +1169,7 @@ async function filterPunks(filter) {
     }
   }
   else if (filter == 'for_sale') {
-    const offers = await global.helperContract.getOffers(1, store.state.nftInfos.length)
+    const offers = await global.marketContract.getOffers(LOWC_TOKEN_ADDRESS, 0, store.state.nftInfos.length-1)
     for (let i=0; i<store.state.nftInfos.length; i++) {
       let nftInfo = store.state.nftInfos[i]
       nftInfo.price = offers[i].minValue

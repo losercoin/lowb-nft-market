@@ -8,7 +8,9 @@
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li><router-link :to="'/about-'+$root.$i18n.locale" class="nav-link px-2 fs-4" style="color:white;">{{ $t("lang.about") }}</router-link></li>
+          <li><router-link to="/lottery" class="nav-link px-2 fs-4" style="color:white;">抽奖</router-link></li>
         </ul>
+        
 
         <div v-if="!$store.state.isWalletInstalled">
           <a href="#" class="nav-link px-2 fs-4">{{ $t("lang.clickHeretoInstallMetaMask") }}</a>
@@ -22,7 +24,7 @@
         <div v-else>
           <b-dropdown size="lg"  variant="link" toggle-class="text-decoration-none" right>
             <template #button-content>
-              {{$store.getters.abbr_account}} | {{$store.getters.bnb_balance}} BNB
+              {{$store.getters.abbr_account}} | {{$store.getters.bnb_balance}} MATIC
             </template>
             <b-dropdown-item><router-link to="/my-nfts" class="nav-link px-2 link-dark">{{ $t("lang.viewMyNFTs") }}</router-link></b-dropdown-item>
             <b-dropdown-item><a href="#" v-on:click="$store.commit('setModal', true)" class="nav-link px-2 link-dark">{{ $t("lang.setLanguage") }}</a></b-dropdown-item>

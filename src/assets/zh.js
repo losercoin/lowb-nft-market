@@ -49,7 +49,7 @@ export const lang = {
     action:'操作',
     anyone:'任何人',
     withdraw:'撤回',
-    approveLowbtoBuy:'授权使用LOWB购买',
+    approveLowbtoBuy:'存入LOWB购买',
     buy:'购买',
     thisPunkhasnotbeenListedForSalebyItsOwner:'此Punk还未被其持有者进行出售',
     openBids:'公开出价',

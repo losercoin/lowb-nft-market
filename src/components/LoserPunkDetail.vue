@@ -1,16 +1,16 @@
 <template>
-  <div v-if="$store.state.nftInfos[groupId-1]">
+  <div v-if="$store.state.nftInfos[groupId]">
     <div class="container" style="margin-bottom: 24px;">
       <div class="row" style=' margin-left: 0px; margin-right: 0px;'>
         <div class="col-md-12 col-xs-12" style="background-color: #638596;">
-          <img :src="$store.state.nftInfos[groupId-1].image" style='max-height: 312px; max-width: 312px; margin-top: 50px;' class="img-responsive center-block"/>
+          <img :src="$store.state.nftInfos[groupId].image" style='max-height: 312px; max-width: 312px; margin-top: 50px;' class="img-responsive center-block"/>
         </div>
       </div>
     </div>
     <div id="punkDetails" class='container text_block'>
       <div class='row'>
         <div class="col-md-10 col-md-offset-1 col-xs-12" style='margin-top: 20px;'>
-          <h1 style="margin-top: 0px; margin-bottom: 5px;">{{$store.state.nftInfos[groupId-1].name}}</h1>
+          <h1 style="margin-top: 0px; margin-bottom: 5px;">{{$store.state.nftInfos[groupId].name}}</h1>
           <h4 v-if="groupId==1" style="margin-top: 0px;"><b>{{ $t("lang.onlyOne") }}</b> <a href="#">{{ $t("lang.loserKing") }}</a>.</h4>
           <h4 v-else style="margin-top: 0px;"> {{ $t("lang.oneOf") }} <b>666</b> <a href="#">Loser</a> punks.</h4>
         </div>
@@ -94,8 +94,8 @@
                     <a href="#" @click="withdrawOffer(offer.itemId)">[{{ $t("lang.withdraw") }}]</a>
                   </div>
                   <div v-else>
-                    <a href="#" @click="approveLowb(offer.minValue/1e18)" v-if="offer.minValue > $store.state.approvedBalance">[{{ $t("lang.approveLowbtoBuy") }}]</a>
-                    <a href="#" @click="buy(offer.itemId, offer.minValue/1e18)" v-else>[{{ $t("lang.buy") }}]</a>
+                    <a href="#" v-if="offer.minValue > $store.state.lowbMarketBalance">[{{ $t("lang.approveLowbtoBuy") }}]</a>
+                    <a href="#" @click="buy(offer.itemId, offer.minValue)" v-else>[{{ $t("lang.buy") }}]</a>
                   </div>
                 </td>
               </tr>
@@ -148,7 +148,7 @@
           </div>
           <div v-else>
             <h3>{{ $t("lang.placeaBid") }}</h3>
-            <p>{{ $t("lang.yourLowbMarketBalance") }}: {{$store.getters.lowb_market_balance}} lowb</p>
+            <p>{{ $t("lang.yourLowbMarketBalance") }}: {{$store.getters.lowb_market_balance}} lowb </p>
             <div class="input-group mb-3">
               <input type="number" class="form-control" placeholder="0" @keyup="correct_toBid" v-model="toBid">
               <span class="input-group-text">lowb</span>
@@ -203,11 +203,11 @@
       this.$store.commit('setItemBids', {id: this.groupId, bids: []})
       //this.$store.commit('setItemTransactions', {id: this.groupId, transactions: []})
       this.$store.dispatch('updateItemInfos', this.groupId)
-      if (this.$store.state.chainId == '0x61') {
-        this.baseUrl = "https://testnet.bscscan.com/tx/"
+      if (this.$store.state.chainId == '0x13881') {
+        this.baseUrl = "https://mumbai.polygonscan.com/tx/"
       }
       else {
-        this.baseUrl = "https://bscscan.com/tx/"
+        this.baseUrl = "https://polygonscan.com/tx/"
       }
     },
     methods: {
@@ -247,8 +247,8 @@
         this.$store.dispatch('approveLowb', amount)
       },
       buy: function (id, amount) {
-        console.log("buy the nft")
-        this.$store.dispatch('buyItem', {id: id, groupId: this.groupId, amount: amount})
+        console.log("buy the nft: ", amount/1e18)
+        this.$store.dispatch('buyItem', {id: id, groupId: this.groupId, amount: Math.round(amount/1e18)})
       },
     }
   }

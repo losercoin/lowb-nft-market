@@ -49,7 +49,7 @@ export const lang = {
     action:'Action',
     anyone:'Anyone',
     withdraw:'Withdraw',
-    approveLowbtoBuy:'Approve lowb to buy',
+    approveLowbtoBuy:'Deposit lowb to buy',
     buy:'Buy',
     thisPunkhasnotbeenListedForSalebyItsOwner:'This punk has not been listed for sale by its owner.',
     openBids:'Open Bids',

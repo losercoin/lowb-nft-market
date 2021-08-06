@@ -12,7 +12,7 @@
         </div>
         <div class="col">
           <div class="css-cogtoi">{{ $t("lang.lowbMarketBalance") }}:</div>
-          <div class="css-94onap">{{$store.getters.lowb_market_balance}} LOWB</div>
+          <div><span class="css-94onap">{{$store.getters.lowb_market_balance}} LOWB</span></div>
         </div>
       </div>
       <br>
@@ -41,8 +41,8 @@
     <div class="row">
       <div v-for="nft in $store.state.myNfts" :key="nft.tokenId" class="col-sm-3">
         <b-card
-          :title="$store.state.nftInfos[nft.groupId-1].name"
-          :img-src="$store.state.nftInfos[nft.groupId-1].image"
+          :title="$store.state.nftInfos[nft.groupId].name"
+          :img-src="$store.state.nftInfos[nft.groupId].image"
           img-alt="Image"
           img-top
           tag="article"
@@ -50,8 +50,8 @@
           class="mb-2"
         >
           <h6 class="card-subtitle mb-2 text-muted">
-            <div v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">#{{nft.tokenId}}  [{{ $t("lang.new") }}]</div>
-            <div v-else>#{{nft.tokenId}}  {{ $t("lang.circulation") }}: {{$store.state.nftInfos[nft.groupId-1].circulation}}</div>
+            <div v-if="$store.state.nftInfos[nft.groupId].currentSupply<$store.state.nftInfos[nft.groupId].circulation">#{{nft.tokenId}}  [{{ $t("lang.new") }}]</div>
+            <div v-else>#{{nft.tokenId}}  {{ $t("lang.circulation") }}: {{$store.state.nftInfos[nft.groupId].circulation}}</div>
           </h6>
           <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="0" v-model="toOffer[nft.tokenId]" @keyup="correct_toOffer(nft.tokenId)">
@@ -62,19 +62,19 @@
               class="btn btn-primary" 
               type="button" 
               v-on:click="approveNft(nft.tokenId, nft.groupId)" 
-              :disabled="nft.isApproved || $store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
+              :disabled="nft.isApproved || $store.state.nftInfos[nft.groupId].currentSupply<$store.state.nftInfos[nft.groupId].circulation">
               {{ $t("lang.approve") }}
             </button>
             <button 
               class="btn btn-primary active" 
               type="button" 
               v-on:click="offer(nft.tokenId, nft.groupId)" 
-              :disabled="toOffer[nft.tokenId] <= 0 || !nft.isApproved || $store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
+              :disabled="toOffer[nft.tokenId] <= 0 || !nft.isApproved || $store.state.nftInfos[nft.groupId].currentSupply<$store.state.nftInfos[nft.groupId].circulation">
               {{ $t("lang.offer") }}
             </button>
           </div>
           <div class="css-lvpxlc">
-            <div class="css-2x3sd8" v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
+            <div class="css-2x3sd8" v-if="$store.state.nftInfos[nft.groupId].currentSupply<$store.state.nftInfos[nft.groupId].circulation">
               <router-link :to="{path: '/new-token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
             </div>
             <div class="css-2x3sd8" v-else>
