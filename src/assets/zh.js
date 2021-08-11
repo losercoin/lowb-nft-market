@@ -37,6 +37,7 @@ export const lang = {
     loserKing:'Loser 国王',
     oneOf:'其中之一的 ',
     status:'状态：',
+    introduction:'介绍',
     thisPunkisCurrentlyOwnedbyAddress:'该Punk目前被此地址持有',
     thisPunkisPublishedby:'该Punk由',
     officialPublisher:'官方发行',

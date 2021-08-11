@@ -37,6 +37,7 @@ export const lang = {
     loserKing:'Loser King',
     oneOf:'One of ',
     status:'Status',
+    introduction:'Intrduction',
     thisPunkisCurrentlyOwnedbyAddress:'This punk is currently owned by address',
     thisPunkisPublishedby:'This punk is published by',
     officialPublisher:'Official Publisher',

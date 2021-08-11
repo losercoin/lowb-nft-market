@@ -15,6 +15,14 @@
           <h4 v-else style="margin-top: 0px;"> {{ $t("lang.oneOf") }} <b>666</b> <a href="#">Loser</a> punks.</h4>
         </div>
       </div>
+      
+      <div class='row detail-row' v-if="$store.state.nftInfos[groupId-1].description!=''">
+        <p />
+        <div class='col-md-10 col-md-offset-1'>
+          <h3>{{ $t("lang.introduction") }}</h3>
+          <div> {{$store.state.nftInfos[groupId-1].description}} </div>
+        </div>
+      </div>
       <!-- <br>
       <div class='row detail-row'>
         <div class='col-md-10 col-md-offset-1'>
