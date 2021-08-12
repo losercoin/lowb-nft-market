@@ -315,8 +315,11 @@ const store = new Vuex.Store({
       const id = state.nftInfos[groupId-1].startId
       approveBid(id, groupId)
     },
-    approveItemBid ({}, id) {
-      approveBid(id.item, id.group)
+    approveItemBid ({}, payload) {
+      approveBid(payload.item, payload.group, payload.isTransfer)
+    },
+    lockItem ({}, tokenId) {
+      lockItem(tokenId)
     },
     acceptBid ({}, bid) {
       acceptBid(bid.id, bid.groupId, bid.bidder)
@@ -637,6 +640,7 @@ async function getGroupNumber () {
 
 async function getMyNfts () {
   try {
+    console.log("getting nft...")
     let prev_length = store.state.myNfts.length
     for (let i=0; i<prev_length; i++) {
       store.commit('setMyNfts', {id: 0, myNft: null})
@@ -648,7 +652,8 @@ async function getMyNfts () {
       await getNftInfo(groupId, false)
       const getApproved = await global.lowcContract.getApproved(tokenId)
       const isApproved = (getApproved.toLowerCase() == MARKET_CONTRACT_ADDRESS.toLowerCase())
-      const myNft = {tokenId: tokenId, groupId: groupId, isApproved: isApproved}
+      const isTransferApproved = (getApproved.toLowerCase() == WALLET_CONTRACT_ADDRESS.toLowerCase())
+      const myNft = {tokenId: tokenId, groupId: groupId, isApproved: isApproved, isTransferApproved: isTransferApproved}
       store.commit('setMyNfts', {id: i, myNft: myNft})
     }
   } catch (err) {
@@ -739,11 +744,15 @@ async function buyItem (id, groupId, amount) {
   
 }
 
-async function approveBid (tokenId, groupId) {
+async function approveBid (tokenId, groupId, isTransfer) {
   const lowcWithSigner = global.lowcContract.connect(global.signer);
-  await lowcWithSigner.approve(MARKET_CONTRACT_ADDRESS, tokenId)
-
-
+  if (isTransfer) {
+    await lowcWithSigner.approve(WALLET_CONTRACT_ADDRESS, tokenId)
+  }
+  else {
+    await lowcWithSigner.approve(MARKET_CONTRACT_ADDRESS, tokenId)
+  }
+  
   const filter = global.lowcContract.filters.Approval(null, null, Number(tokenId))
   if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
     console.log("approve bid event registered")
@@ -769,7 +778,12 @@ async function approveBid (tokenId, groupId) {
         })
         for (let i=0; i<store.state.myNfts.length; i++) {
           if (store.state.myNfts[i].tokenId == tokenId) {
-            store.commit('setMyNfts', {id: i, myNft: {tokenId: tokenId, groupId: groupId, isApproved: true}})
+            if(isTransfer) {
+              store.commit('setMyNfts', {id: i, myNft: {tokenId: tokenId, groupId: groupId, isApproved: false, isTransferApproved: true}})
+            }
+            else {
+              store.commit('setMyNfts', {id: i, myNft: {tokenId: tokenId, groupId: groupId, isApproved: true, isTransferApproved: false}})
+            }
           }
         }
       } 
@@ -906,6 +920,50 @@ async function acceptNewBid (id, bidder) {
 
 }
 
+
+async function lockItem (tokenId) {
+
+  const walletWithSigner = global.walletContract.connect(global.signer);
+  await walletWithSigner.lockNFT(LOWC_TOKEN_ADDRESS, tokenId);
+
+
+  const filter = global.walletContract.filters.NFTLocked(LOWC_TOKEN_ADDRESS)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("nft locked event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.marketContract.on(filter, async (addr, user, tokenId, event) => {
+      console.log(`${ user } lock a token #${ tokenId } `);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = store.state.lowbMarketBalance
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        for (let i=0; i<store.state.myNfts.length; i++) {
+          if (store.state.myNfts[i].tokenId == tokenId) {
+            store.commit('setMyNfts', {id: i, myNft: null})
+          }
+        }
+        getItemOffers(tokenId)
+      } 
+      catch (err) {
+        console.error(err)
+      }
+    });
+  }
+}
+
 async function acceptBid (id, groupId, bidder) {
 
   const marketWithSigner = global.marketContract.connect(global.signer);
@@ -948,8 +1006,6 @@ async function acceptBid (id, groupId, bidder) {
       }
     });
   }
-  
-
 }
 
 async function enterBid (id, amount) {

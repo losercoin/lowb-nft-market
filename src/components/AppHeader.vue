@@ -8,7 +8,7 @@
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li><router-link :to="'/about-'+$root.$i18n.locale" class="nav-link px-2 fs-4" style="color:white;">{{ $t("lang.about") }}</router-link></li>
-          <li><router-link to="/lottery" class="nav-link px-2 fs-4" style="color:white;">抽奖</router-link></li>
+          <li><router-link to="/lottery" class="nav-link px-2 fs-4" style="color:white;">{{ $t("lang.lottery") }}</router-link></li>
         </ul>
         
 

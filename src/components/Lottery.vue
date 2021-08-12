@@ -2,36 +2,36 @@
   <div class="container align-middle">
     <ul class="list-group list-group-horizontal">
       <li class="list-group-item">No.{{roundInfo.id}}</li>
-      <li class="list-group-item list-group-item-primary">奖池大小： {{Math.round(roundInfo.pool/1e18)}}</li>
-      <li class="list-group-item list-group-item-warning">作弊费： {{roundInfo.cheatFee/1e18+1000}}</li>
-      <li class="list-group-item list-group-item-info">可开奖区块： {{Number(roundInfo.block)+2400}}</li>
-      <li class="list-group-item list-group-item-success" v-if="currentBlock>=Number(roundInfo.block)+2400">当前区块： {{currentBlock}}</li>
-      <li class="list-group-item list-group-item-dark" v-else>当前区块： {{currentBlock}}</li>
+      <li class="list-group-item list-group-item-primary">{{ $t("lang.poolSize") }}: {{Math.round(roundInfo.pool/1e18)}}</li>
+      <li class="list-group-item list-group-item-warning">{{ $t("lang.cheatFee") }}: {{roundInfo.cheatFee/1e18+1000}}</li>
+      <li class="list-group-item list-group-item-info">{{ $t("lang.drawBlock") }}: {{Number(roundInfo.block)+2400}}</li>
+      <li class="list-group-item list-group-item-success" v-if="currentBlock>=Number(roundInfo.block)+2400">{{ $t("lang.currentBlock") }}: {{currentBlock}}</li>
+      <li class="list-group-item list-group-item-dark" v-else>{{ $t("lang.currentBlock") }}: {{currentBlock}}</li>
     </ul>
     <br>
-    <h1 class="mb-2 light text-center">最新一期幸运号码</h1>
+    <h1 class="mb-2 light text-center">{{ $t("lang.latestLuckyNumber") }}</h1>
     <div class="row justify-content-center">
       <span v-for="luckyNumber in luckyNumbers" class="circle m-3" :style="luckyNumber.background">{{luckyNumber.number}}</span>
     </div>
     <br>
     <div class="mb-2 light text-center">
-      <button class="btn btn-warning" type="button" @click="cheat()">作弊 -{{roundInfo.cheatFee/1e18+1000}}lowb</button>
-      <button class="btn btn-success" type="button" @click="moveToNextRound()" v-if="currentBlock>=Number(roundInfo.block)+2400">开奖 +1000lowb</button>
-      <button class="btn btn-light" type="button" @click="getTotalRounds()">刷新</button>
+      <button class="btn btn-warning" type="button" @click="cheat()">{{ $t("lang.cheat") }} -{{roundInfo.cheatFee/1e18+1000}}lowb</button>
+      <button class="btn btn-success" type="button" @click="moveToNextRound()" v-if="currentBlock>=Number(roundInfo.block)+2400">{{ $t("lang.draw") }} +1000lowb</button>
+      <button class="btn btn-light" type="button" @click="getTotalRounds()">{{ $t("lang.refresh") }}</button>
     </div>
     <br>
     <div class="mb-2 light text-center" v-if="$store.state.myNfts.length==0">
-      你未持有任何loser punk
+      {{ $t("lang.noLoserPunk") }}
     </div>
     <div class="mb-2 light text-center" v-else-if="isWhitelist">
-      您已参与抽奖（中奖后需重新参加）
+      {{ $t("lang.youHaveParticipated") }}
     </div>
     <div class="mb-2 light text-center" v-else>
-      <button class="btn btn-primary" type="button" @click="setWhitelist()">参与抽奖</button>
+      <button class="btn btn-primary" type="button" @click="setWhitelist()">{{ $t("lang.participateLottery") }}</button>
     </div>
     <br>
     <br>
-    <h1 class="mb-2 light text-center">往期幸运号码</h1>
+    <h1 class="mb-2 light text-center">{{ $t("lang.pastLuckyNumber") }}</h1>
     <div class="d-md-block d-grid gap-2">
       <button  v-for="roundId in roundIds" @click="getLuckyNumbers(roundId, true)" type="button" class="btn btn-outline-primary">No. {{roundId}}</button>
     </div>

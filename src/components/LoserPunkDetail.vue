@@ -227,7 +227,7 @@
       },
       approve: function (token) {
         console.log("approve the nft: ", token)
-        this.$store.dispatch('approveItemBid', {item: token, group: this.groupId})
+        this.$store.dispatch('approveItemBid', {item: token, group: this.groupId, isTransfer: false})
       },
       accept: function (token, bidder) {
         console.log("accept the bid: ", token)

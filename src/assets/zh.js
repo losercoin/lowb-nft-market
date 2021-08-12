@@ -8,6 +8,7 @@ export const lang = {
     connecttoBinanceSmartChain:'请将网络设置为币安智能链！',
     connectWallet:'请连接您的钱包！',
     viewMyNFTs:'我的资产',
+    lottery:'抽奖',
     //AppHome.vue 部分
     series1:"系列一",
     circulation:'发行量: ',
@@ -83,6 +84,7 @@ export const lang = {
     TenKLOWBThenRefreshtheWebpageAfterConfirmed:'10k LOWB, 在操作被确认后，请重新刷新页面。',
     NFTsOwned:'我的NFT收藏',
     offer:'报价出售',
+    transfer:'传送到BSC',
     myBids: '我的出价',
     noNFTs: '您当前还未拥有Loser NFT',
     noBids: '未查询到您当前的出价信息',
@@ -97,7 +99,20 @@ export const lang = {
     onSale:'正在出售',
     youCanBuyThisItemWith:'你可以购买此款付',
     //TokenDetail.vue 部分
-    lowestSalePrice:'最低出价'
+    lowestSalePrice:'最低出价',
 
+    //Lottery.vue 部分
+    poolSize:'奖池大小',
+    cheatFee:'作弊费',
+    drawBlock:'可开奖区块',
+    currentBlock:'当前区块',
+    latestLuckyNumber:'最新一期幸运号码',
+    pastLuckyNumber:'往期幸运号码',
+    cheat:'作弊',
+    draw:'开奖',
+    refresh:'刷新',
+    youHaveParticipated:'您已参与抽奖（中奖后需重新参加）',
+    noLoserPunk:'你未持有任何loser punk',
+    participateLottery:'参与抽奖'
 
 }

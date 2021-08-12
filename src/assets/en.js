@@ -8,6 +8,7 @@ export const lang = {
     connecttoBinanceSmartChain:'Connect to Binance Smart Chain',
     connectWallet:'Connect Wallet',
     viewMyNFTs:'My Assets',
+    lottery:'Lottery',
     //AppHome.vue 部分
     series1:'Series 1',
     circulation:'Circulation: ',
@@ -83,6 +84,7 @@ export const lang = {
     TenKLOWBThenRefreshtheWebpageAfterConfirmed:'10k LOWB, then refresh the webpage after confirmed',
     NFTsOwned:'My NFTs',
     offer:'Offer',
+    transfer:'Transfer to BSC',
     myBids: 'My Bids',
     noNFTs: 'Loser NFTs not found',
     noBids: 'Bids not found',
@@ -97,6 +99,20 @@ export const lang = {
     onSale:'On Sale',
     youCanBuyThisItemWith:'You can buy this item with',
     //TokenDetail.vue 部分
-    lowestSalePrice:'Lowest Sale Price'
+    lowestSalePrice:'Lowest Sale Price',
+
+    //Lottery.vue 部分
+    poolSize:'pool size',
+    cheatFee:'cheating fee',
+    drawBlock:'draw block',
+    currentBlock:'current block',
+    latestLuckyNumber:'The Latest Lucky Numbers',
+    pastLuckyNumber:'The Past Lucky Numbers',
+    cheat:'cheat it',
+    draw:'draw it',
+    refresh:'refresh',
+    youHaveParticipated:'You have participated the lottery. (You will need to reparticipate it if you get rewards.)',
+    noLoserPunk:'You do not have any loser punks',
+    participateLottery:'participate the lottery'
 
 }

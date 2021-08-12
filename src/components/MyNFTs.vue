@@ -61,7 +61,7 @@
             <button 
               class="btn btn-primary" 
               type="button" 
-              v-on:click="approveNft(nft.tokenId, nft.groupId)" 
+              v-on:click="approveNft(nft.tokenId, nft.groupId, false)" 
               :disabled="nft.isApproved || $store.state.nftInfos[nft.groupId].currentSupply<$store.state.nftInfos[nft.groupId].circulation">
               {{ $t("lang.approve") }}
             </button>
@@ -71,6 +71,23 @@
               v-on:click="offer(nft.tokenId, nft.groupId)" 
               :disabled="toOffer[nft.tokenId] <= 0 || !nft.isApproved || $store.state.nftInfos[nft.groupId].currentSupply<$store.state.nftInfos[nft.groupId].circulation">
               {{ $t("lang.offer") }}
+            </button>
+          </div>
+          <br>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button 
+              class="btn btn-primary" 
+              type="button" 
+              v-on:click="approveNft(nft.tokenId, nft.groupId, true)" 
+              :disabled="nft.isTransferApproved">
+              {{ $t("lang.approve") }}
+            </button>
+            <button 
+              class="btn btn-primary active" 
+              type="button" 
+              v-on:click="lock(nft.tokenId, nft.groupId)" 
+              :disabled="toOffer[nft.tokenId] <= 0 || !nft.isTransferApproved">
+              {{ $t("lang.transfer") }}
             </button>
           </div>
           <div class="css-lvpxlc">
@@ -185,14 +202,18 @@ export default {
       await airdropWithSigner.claim();
       console.log('claim 10000 lowb!');
     },
-    approveNft: function (tokenId, groupId) {
+    approveNft: function (tokenId, groupId, isTransfer) {
       console.log("start approve nft")
-      this.$store.dispatch('approveItemBid', {item: tokenId, group: groupId})
+      this.$store.dispatch('approveItemBid', {item: tokenId, group: groupId, isTransfer: isTransfer})
     },
     offer: function (tokenId, groupId) {
       console.log("start offer nft")
       this.$store.dispatch('offerItem', {id: tokenId, groupId: groupId, amount: this.toOffer[tokenId]})
       this.$set(this.toOffer, tokenId, 0)
+    },
+    lock: function (tokenId) {
+      console.log("start lock nft")
+      this.$store.dispatch('lockItem', tokenId)
     },
   }
 }
