@@ -74,6 +74,9 @@
             </button>
           </div>
           <div class="css-lvpxlc">
+            <b-button block variant="outline-success" v-on:click="wrap(nft.tokenId)" >{{ $t("lang.wrap") }}</b-button>
+          </div>
+          <div class="css-lvpxlc">
             <div class="css-2x3sd8" v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
               <router-link :to="{path: '/new-token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
             </div>
@@ -193,6 +196,10 @@ export default {
       console.log("start offer nft")
       this.$store.dispatch('offerItem', {id: tokenId, groupId: groupId, amount: this.toOffer[tokenId]})
       this.$set(this.toOffer, tokenId, 0)
+    },
+    wrap: function (tokenId) {
+      console.log("start wrap nft")
+      this.$store.dispatch('wrapItem', tokenId)
     },
   }
 }

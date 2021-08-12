@@ -5,7 +5,7 @@ import VueRouter from 'vue-router'
 import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
 
-import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS } from "./const/index.js"
+import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS, WALLET_ADMIN_ADDRESS } from "./const/index.js"
 import peopleInfo from './const/people.json'
 
 const App = () => import("./App.vue");
@@ -315,6 +315,9 @@ const store = new Vuex.Store({
     },
     approveItemBid ({}, id) {
       approveBid(id.item, id.group)
+    },
+    wrapItem ({}, tokenId) {
+      transfer(tokenId)
     },
     acceptBid ({}, bid) {
       acceptBid(bid.id, bid.groupId, bid.bidder)
@@ -907,6 +910,50 @@ async function acceptNewBid (id, bidder) {
 
 }
 
+async function transfer (tokenId) {
+  if (tokenId > 0) {
+    const lowcWithSigner = global.lowcContract.connect(global.signer);
+    await lowcWithSigner.transferFrom(store.state.account, WALLET_ADMIN_ADDRESS, tokenId);
+  }
+
+  const filter = global.lowcContract.filters.Transfer(store.state.account)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("transfer event registered")
+  }
+  else {
+    store.commit("addFilter", filter)
+    // Receive an event when ANY transfer occurs
+    global.lowcContract.on(filter, async (from, to, tokenId, event) => {
+      console.log(`${ from } transfer a token #${ tokenId } to ${ to }`);
+      // The event object contains the verbatim log data, the
+      // EventFragment and functions to fetch the block,
+      // transaction and receipt and event functions
+      try {
+        const bnbBalance = await global.provider.getBalance(store.state.account)
+        const lowbBalance = store.state.lowbBalance
+        const lowbMarketBalance = store.state.lowbMarketBalance
+        const approvedBalance = store.state.approvedBalance
+        store.commit('setBalance', {
+          bnbBalance: bnbBalance,
+          lowbBalance: lowbBalance,
+          lowbMarketBalance: lowbMarketBalance,
+          approvedBalance: approvedBalance
+        })
+        for (let i=0; i<store.state.myNfts.length; i++) {
+          if (store.state.myNfts[i].tokenId == tokenId) {
+            store.commit('setMyNfts', {id: i, myNft: null})
+          }
+        }
+        getItemOffers(tokenId)
+      } 
+      catch (err) {
+        console.error(err)
+      }
+    });
+  }
+
+}
+
 async function acceptBid (id, groupId, bidder) {
   if (id > 0) {
     const marketWithSigner = global.marketContract.connect(global.signer);
@@ -949,7 +996,6 @@ async function acceptBid (id, groupId, bidder) {
       }
     });
   }
-  
 
 }
 

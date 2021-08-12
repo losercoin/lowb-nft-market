@@ -87,6 +87,7 @@ export const lang = {
     myBids: '我的出价',
     noNFTs: '您当前还未拥有Loser NFT',
     noBids: '未查询到您当前的出价信息',
+    wrap: '传送至Matic链',
     //NewTokenDetail.vue 部分
     groupId:'组ID',
     inProgress:'进行中',

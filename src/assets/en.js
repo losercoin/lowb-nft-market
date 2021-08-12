@@ -87,6 +87,7 @@ export const lang = {
     myBids: 'My Bids',
     noNFTs: 'Loser NFTs not found',
     noBids: 'Bids not found',
+    wrap: 'Wrap to Matic',
     //NewTokenDetail.vue 部分
     groupId:'group id',
     inProgress:'In progress',
