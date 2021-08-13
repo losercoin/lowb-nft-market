@@ -16,7 +16,7 @@
           <a href="#" class="nav-link px-2 fs-4">{{ $t("lang.clickHeretoInstallMetaMask") }}</a>
         </div>
         <div v-else-if="$store.state.chainId != $store.state.CHAIN_ID">
-          <a href="#" v-on:click="switch_network" class="nav-link px-2 fs-4">{{ $t("lang.connecttoBinanceSmartChain") }}</a>
+          <a href="#" v-on:click="switch_network" class="nav-link px-2 fs-4">{{ $t("lang.connectto")+chainName }}</a>
         </div>
         <div v-else-if="$store.state.account == ''">
           <a href="#" v-on:click="connect_wallet" class="nav-link px-2 fs-4">{{ $t("lang.connectWallet") }}</a>
@@ -38,11 +38,17 @@
 <script>
 import IconBase from './IconBase.vue'
 import IconLowb from './icons/IconLowb.vue'
+import { chainInfo } from "../const/index.js"
 
 export default {
   components: {
     IconBase,
     IconLowb
+  },
+  data: function() {
+    return {
+      chainName: chainInfo.chainName
+    };
   },
   methods: {
     switch_network: function () {
