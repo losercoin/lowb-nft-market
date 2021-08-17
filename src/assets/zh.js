@@ -8,6 +8,7 @@ export const lang = {
     connecttoBinanceSmartChain:'请将网络设置为币安智能链！',
     connectWallet:'请连接您的钱包！',
     viewMyNFTs:'我的资产',
+    staking:'挖矿',
     //AppHome.vue 部分
     series1:"系列一",
     circulation:'发行量: ',

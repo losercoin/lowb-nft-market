@@ -8,6 +8,7 @@ export const lang = {
     connecttoBinanceSmartChain:'Connect to Binance Smart Chain',
     connectWallet:'Connect Wallet',
     viewMyNFTs:'My Assets',
+    staking:'Staking',
     //AppHome.vue 部分
     series1:'Series 1',
     circulation:'Circulation: ',
