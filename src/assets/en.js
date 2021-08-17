@@ -9,6 +9,8 @@ export const lang = {
     connectWallet:'Connect Wallet',
     viewMyNFTs:'My Assets',
     lottery:'Lottery',
+    bridge:'Bridge',
+    switchChain: 'Switch to BSC Chain',
     //AppHome.vue 部分
     series1:'Series 1',
     circulation:'Circulation: ',

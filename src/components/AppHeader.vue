@@ -9,6 +9,7 @@
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li><router-link :to="'/about-'+$root.$i18n.locale" class="nav-link px-2 fs-4" style="color:white;">{{ $t("lang.about") }}</router-link></li>
           <li><router-link to="/lottery" class="nav-link px-2 fs-4" style="color:white;">{{ $t("lang.lottery") }}</router-link></li>
+          <li><a href="https://matic.loserbridge.org" class="nav-link px-2 fs-4" style="color:white;">{{ $t("lang.bridge") }}</a></li>
         </ul>
         
 
@@ -27,6 +28,7 @@
               {{$store.getters.abbr_account}} | {{$store.getters.bnb_balance}} MATIC
             </template>
             <b-dropdown-item><router-link to="/my-nfts" class="nav-link px-2 link-dark">{{ $t("lang.viewMyNFTs") }}</router-link></b-dropdown-item>
+            <b-dropdown-item><a href="https://www.losernft.org" class="nav-link px-2 link-dark">{{ $t("lang.switchChain") }}</a></b-dropdown-item>
             <b-dropdown-item><a href="#" v-on:click="$store.commit('setModal', true)" class="nav-link px-2 link-dark">{{ $t("lang.setLanguage") }}</a></b-dropdown-item>
             <b-dropdown-item><a href="#" v-on:click="sign_out" class="nav-link px-2 link-dark">{{ $t("lang.signOut") }}</a></b-dropdown-item>
           </b-dropdown>

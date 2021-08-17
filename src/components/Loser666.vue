@@ -56,8 +56,8 @@
         <input type="radio" class="btn-check" name="btnradio" id="for_sale" autocomplete="off" :checked="$store.state.punkMode=='for_sale'">
         <label class="btn btn-outline-primary" for="for_sale" v-on:click="filter_punks('for_sale')">{{ $t("lang.forSale") }}</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="pre_sale" autocomplete="off" :checked="$store.state.punkMode=='pre_sale'">
-        <label class="btn btn-outline-primary" for="pre_sale" v-on:click="filter_punks('pre_sale')">{{ $t("lang.preSale") }}</label>
+        <!-- <input type="radio" class="btn-check" name="btnradio" id="pre_sale" autocomplete="off" :checked="$store.state.punkMode=='pre_sale'">
+        <label class="btn btn-outline-primary" for="pre_sale" v-on:click="filter_punks('pre_sale')">{{ $t("lang.preSale") }}</label> -->
       </div>
       <!-- low列表开始 -->
       <div>

@@ -9,6 +9,8 @@ export const lang = {
     connectWallet:'请连接您的钱包！',
     viewMyNFTs:'我的资产',
     lottery:'抽奖',
+    bridge:'跨链',
+    switchChain: '切换到BSC链',
     //AppHome.vue 部分
     series1:"系列一",
     circulation:'发行量: ',
@@ -108,7 +110,7 @@ export const lang = {
     currentBlock:'当前区块',
     latestLuckyNumber:'最新一期幸运号码',
     pastLuckyNumber:'往期幸运号码',
-    cheat:'作弊',
+    cheat:'有黑幕，重开！',
     draw:'开奖',
     refresh:'刷新',
     youHaveParticipated:'您已参与抽奖（中奖后需重新参加）',
