@@ -4,8 +4,8 @@
       <li class="list-group-item">No.{{roundInfo.id}}</li>
       <li class="list-group-item list-group-item-primary">{{ $t("lang.poolSize") }}: {{Math.round(roundInfo.pool/1e18)}}</li>
       <li class="list-group-item list-group-item-warning">{{ $t("lang.cheatFee") }}: {{roundInfo.cheatFee/1e18+1000}}</li>
-      <li class="list-group-item list-group-item-info">{{ $t("lang.drawBlock") }}: {{Number(roundInfo.block)+2400}}</li>
-      <li class="list-group-item list-group-item-success" v-if="currentBlock>=Number(roundInfo.block)+2400">{{ $t("lang.currentBlock") }}: {{currentBlock}}</li>
+      <li class="list-group-item list-group-item-info">{{ $t("lang.drawBlock") }}: {{Number(roundInfo.block)+5000}}</li>
+      <li class="list-group-item list-group-item-success" v-if="currentBlock>=Number(roundInfo.block)+5000">{{ $t("lang.currentBlock") }}: {{currentBlock}}</li>
       <li class="list-group-item list-group-item-dark" v-else>{{ $t("lang.currentBlock") }}: {{currentBlock}}</li>
     </ul>
     <br>
@@ -16,7 +16,7 @@
     <br>
     <div class="mb-2 light text-center">
       <button class="btn btn-warning" type="button" @click="cheat()">{{ $t("lang.cheat") }} -{{roundInfo.cheatFee/1e18+1000}}lowb</button>
-      <button class="btn btn-success" type="button" @click="moveToNextRound()" v-if="currentBlock>=Number(roundInfo.block)+2400">{{ $t("lang.draw") }} +1000lowb</button>
+      <button class="btn btn-success" type="button" @click="moveToNextRound()" v-if="currentBlock>=Number(roundInfo.block)+5000">{{ $t("lang.draw") }} +1000lowb</button>
       <button class="btn btn-light" type="button" @click="getTotalRounds()">{{ $t("lang.refresh") }}</button>
     </div>
     <br>
