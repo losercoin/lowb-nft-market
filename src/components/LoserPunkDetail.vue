@@ -101,6 +101,9 @@
                   <div v-if="offer.seller.toLowerCase() == $store.state.account.toLowerCase()">
                     <a href="#" @click="withdrawOffer(offer.itemId)">[{{ $t("lang.withdraw") }}]</a>
                   </div>
+                  <div v-else-if="offer.seller.toLowerCase() != $store.getters.owner(groupId).address.toLowerCase()">
+                    {{ $t("lang.invalidOffer") }}
+                  </div>
                   <div v-else>
                     <a href="#" @click="approveLowb(offer.minValue/1e18)" v-if="offer.minValue > $store.state.approvedBalance">[{{ $t("lang.approveLowbtoBuy") }}]</a>
                     <a href="#" @click="buy(offer.itemId, offer.minValue/1e18)" v-else>[{{ $t("lang.buy") }}]</a>

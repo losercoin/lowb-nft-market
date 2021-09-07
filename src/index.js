@@ -5,7 +5,7 @@ import VueRouter from 'vue-router'
 import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
 
-import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS, WALLET_ADMIN_ADDRESS } from "./const/index.js"
+import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS, WALLET_ADMIN_ADDRESS, WEDDING_CONTRACT_ADDRESS, STAKING_ADDRESS, MATIC_ADDRESS } from "./const/index.js"
 import peopleInfo from './const/people.json'
 
 const App = () => import("./App.vue");
@@ -15,6 +15,7 @@ const AppHome = () => import("./components/Loser666.vue");
 const MyNFTs = () => import("./components/MyNFTs.vue");
 const TokenDetail = () => import("./components/LoserPunkDetail.vue");
 const NewTokenDetail = () => import("./components/NewTokenDetail.vue");
+const Adopt = () => import("./components/Adopt.vue");
 
 Vue.use(Vuex)
 Vue.use(VueI18n)
@@ -36,7 +37,8 @@ const routes = [
   { path: '/about-en', component: About_en },
   { path: '/my-nfts', component: MyNFTs },
   { path: '/token-details/:id', component: TokenDetail },
-  { path: '/new-token-details/:id', component: NewTokenDetail }
+  { path: '/new-token-details/:id', component: NewTokenDetail },
+  { path: '/adopt', component: Adopt }
 ]
 
 const router = new VueRouter({
@@ -111,6 +113,18 @@ const store = new Vuex.Store({
           ownerInfo.name = "(官方仓库)"
         else
           ownerInfo.name = "(Offical Store)"
+      }
+      else if (owner.toLowerCase() == STAKING_ADDRESS.toLowerCase()) {
+        if (i18n.locale=='zh')
+          ownerInfo.name = "(挖矿地址)"
+        else
+          ownerInfo.name = "(Staking Address)"
+      }
+      else if (owner.toLowerCase() == MATIC_ADDRESS.toLowerCase()) {
+        if (i18n.locale=='zh')
+          ownerInfo.name = "(马蹄链地址)"
+        else
+          ownerInfo.name = "(Matic Bridge Address)"
       }
       else {
         const vip = peopleInfo.find(people => people.address.toLowerCase() == owner.toLowerCase())
@@ -469,6 +483,10 @@ async function getContracts (firstTime = true) {
   const lowcFile = () => import("./assets/MyCollectible.json")
   const lowcAbi = (await lowcFile())['abi']
   global.lowcContract = new ethers.Contract(LOWC_TOKEN_ADDRESS, lowcAbi, global.provider)
+
+  const weddingFile = () => import("./assets/WeddingGift.json")
+  const weddingAbi = (await weddingFile())['abi']
+  global.weddingContract = new ethers.Contract(WEDDING_CONTRACT_ADDRESS, weddingAbi, global.provider)
 
   const testFile = () => import("./assets/loserpunk.json")
   global.loserpunk = (await testFile())

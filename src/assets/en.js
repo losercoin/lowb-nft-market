@@ -9,6 +9,7 @@ export const lang = {
     connectWallet:'Connect Wallet',
     viewMyNFTs:'My Assets',
     staking:'Staking',
+    adopt:'Adopt',
     //AppHome.vue 部分
     series1:'Series 1',
     circulation:'Circulation: ',
@@ -53,6 +54,7 @@ export const lang = {
     withdraw:'Withdraw',
     approveLowbtoBuy:'Approve lowb to buy',
     buy:'Buy',
+    invalidOffer:'Invalid Offer',
     thisPunkhasnotbeenListedForSalebyItsOwner:'This punk has not been listed for sale by its owner.',
     openBids:'Open Bids',
     none:'none',
@@ -100,6 +102,19 @@ export const lang = {
     onSale:'On Sale',
     youCanBuyThisItemWith:'You can buy this item with',
     //TokenDetail.vue 部分
-    lowestSalePrice:'Lowest Sale Price'
+    lowestSalePrice:'Lowest Sale Price',
+    //Adopt.vue 部分
+    luckyNumber:'Your Lucky Number',
+    refresh:'Refresh',
+    rule:'You can adopt a punk if',
+    number1:'The first number ending with 500 or 000.',
+    number2:'The second number ending with 250, 500, 750 or 000.',
+    number3:'The third number ending with 00.',
+    number4:'The forth number ending with 50 or 00.',
+    number5:'The fifth number ending with 20, 40, 60, 80 or 00.',
+    number6:'The sixth number ending with 5 or 0.',
+    number7:'The seventh number is not zero.',
+    number8:'If the eighth number is not zero, you can adotp six punks.',
+    toAdopt: "Currently To Adopt： "
 
 }

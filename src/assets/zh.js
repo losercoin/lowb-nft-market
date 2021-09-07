@@ -9,6 +9,7 @@ export const lang = {
     connectWallet:'请连接您的钱包！',
     viewMyNFTs:'我的资产',
     staking:'挖矿',
+    adopt:'领养',
     //AppHome.vue 部分
     series1:"系列一",
     circulation:'发行量: ',
@@ -53,6 +54,7 @@ export const lang = {
     withdraw:'撤回',
     approveLowbtoBuy:'授权使用LOWB购买',
     buy:'购买',
+    invalidOffer:'无效出价',
     thisPunkhasnotbeenListedForSalebyItsOwner:'此Punk还未被其持有者进行出售',
     openBids:'公开出价',
     none:'无！',
@@ -100,7 +102,19 @@ export const lang = {
     onSale:'正在出售',
     youCanBuyThisItemWith:'你可以购买此款付',
     //TokenDetail.vue 部分
-    lowestSalePrice:'最低出价'
-
+    lowestSalePrice:'最低出价',
+    //Adopt.vue 部分
+    luckyNumber:'您的幸运号码',
+    refresh:'刷新',
+    rule:'中奖规则',
+    number1:'第一个数字以500或000结尾。',
+    number2:'第二个数字以250，500，750或000结尾。',
+    number3:'第三个数字以00结尾。',
+    number4:'第四个数字以50或00结尾。',
+    number5:'第五个数字以20，40，60，80或00结尾。',
+    number6:'第六个数字以5或0结尾。',
+    number7:'第七个数字不为0时可领取1个punk。',
+    number8:'第八个数字不为0时可领取6个punk。',
+    toAdopt: "当前待领养: "
 
 }
