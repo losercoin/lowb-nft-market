@@ -115,6 +115,7 @@ export const lang = {
     refresh:'刷新',
     youHaveParticipated:'您已参与抽奖（中奖后需重新参加）',
     noLoserPunk:'你未持有任何loser punk',
-    participateLottery:'参与抽奖'
+    participateLottery:'参与抽奖',
+    gotoGame: '游戏期间彩票功能暂停，请将nft转回bsc链，并前往 https://losergame.org/ 报名参加游戏获取lowb。'
 
 }
