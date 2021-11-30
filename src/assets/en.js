@@ -116,6 +116,6 @@ export const lang = {
     youHaveParticipated:'You have participated the lottery. (You will need to reparticipate it if you get rewards.)',
     noLoserPunk:'You do not have any loser punks',
     participateLottery:'participate the lottery',
-    gotoGame: 'The lottery is paused during the game. Tansfer your punk to bsc chain and go https://losergame.org/ to enroll the game.'
+    gotoGame: 'The lottery is paused during the game. Go https://www.reddit.com/r/Losercoin_Official/comments/qk4bgl/how_to_participate_in_the_loserland_game/ to enroll the game.'
 
 }

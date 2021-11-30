@@ -9,8 +9,8 @@
       <li class="list-group-item list-group-item-dark" v-else>{{ $t("lang.currentBlock") }}: {{currentBlock}}</li>
     </ul>
     <br>
-    <!-- <h3>{{$t("lang.gotoGame")}}</h3> -->
-    <h1 class="mb-2 light text-center">{{ $t("lang.latestLuckyNumber") }}</h1>
+    <h3>{{$t("lang.gotoGame")}}</h3>
+    <!-- <h1 class="mb-2 light text-center">{{ $t("lang.latestLuckyNumber") }}</h1>
     <div class="row justify-content-center">
       <span v-for="luckyNumber in luckyNumbers" class="circle m-3" :style="luckyNumber.background">{{luckyNumber.number}}</span>
     </div>
@@ -29,7 +29,8 @@
     </div>
     <div class="mb-2 light text-center" v-else>
       <button class="btn btn-primary" type="button" @click="setWhitelist()">{{ $t("lang.participateLottery") }}</button>
-    </div>
+    </div> -->
+
     <br>
     <br>
     <h1 class="mb-2 light text-center">{{ $t("lang.pastLuckyNumber") }}</h1>
