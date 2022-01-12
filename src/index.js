@@ -151,7 +151,7 @@ const store = new Vuex.Store({
         return offers
       }
       else if (filter == 'pre_sale') {
-        return state.nftInfos.filter(info => info.startId > 235 && info.startId <= 300)
+        return state.nftInfos.filter(info => (info.startId > 510 && info.startId <= 515) || info.startId == 517)
       }
       else {
         return state.nftInfos

@@ -31,7 +31,7 @@ export const lang = {
     all: 'All',
     allBids: 'All Bids',
     forSale: 'For Sale',
-    preSale: 'Presale',
+    preSale: 'Charity Auction',
     loading: 'Loading...',
 
     //LoserPunkDetail.vue 部分
