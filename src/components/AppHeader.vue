@@ -24,7 +24,7 @@
         <div v-else>
           <b-dropdown size="lg"  variant="link" toggle-class="text-decoration-none" right>
             <template #button-content>
-              {{$store.getters.abbr_account}} | {{$store.getters.bnb_balance}} BNB
+              {{$store.getters.abbr_account}} | {{$store.getters.lowb_balance}} LOWB
             </template>
             <b-dropdown-item><router-link to="/my-nfts" class="nav-link px-2 link-dark">{{ $t("lang.viewMyNFTs") }}</router-link></b-dropdown-item>
             <b-dropdown-item><a href="#" v-on:click="$store.commit('setModal', true)" class="nav-link px-2 link-dark">{{ $t("lang.setLanguage") }}</a></b-dropdown-item>
