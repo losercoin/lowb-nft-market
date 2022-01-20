@@ -15,7 +15,7 @@
             <img class="media-data" v-bind:src="media" />
           </div>
         </div>
-        <input id="media" name="media" accept="image/*, video/*" type="file" style="display:none;" @change="loadMedia"/>
+        <input id="media" name="media" accept="image/*" type="file" style="display:none;" @change="loadMedia"/>
         <div class="border-content" v-if="imageHover">
           <label for="media" class="hover-input">
             <b-icon icon="image" font-scale="5"></b-icon>
