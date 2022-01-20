@@ -21,14 +21,20 @@ export default {
     AppHeader
   },
   data(){
-    return {
-      ps:'fixed',
-      tran:'translate(-50%,0)'
+    if(this.$route.path=='/'){
+      return {
+        ps:'fixed',
+        tran:'translate(-50%,0)'
+      }
+    } else {
+      return {
+        ps:'static',
+        tran:''
+      }
     }
   },
   watch:{
     $route(){
-      // console.log(this.$route.path);
       if(this.$route.path=='/'){
         this.ps='fixed'
         this.tran='translate(-50%,0)'
