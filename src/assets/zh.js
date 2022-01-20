@@ -115,6 +115,11 @@ export const lang = {
     number6:'第六个数字以5或0结尾。',
     number7:'第七个数字不为0时可领取1个punk。',
     number8:'第八个数字不为0时可领取6个punk。',
-    toAdopt: "当前待领养: "
+    toAdopt: "当前待领养: ",
+    AddMyNFT: 'Add My NFT',
+    createNewItem: "Create New NFT",
+    requiredFields: "Required Fields",
+    image: "Image",
+    supportedImage: "File types supported: JPG, PNG, GIF, SVG, MP4, WEBM, MP3, WAV, OGG, GLB, GLTF. Max size: 100 MB",
 
 }

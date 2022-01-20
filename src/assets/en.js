@@ -115,6 +115,10 @@ export const lang = {
     number6:'The sixth number ending with 5 or 0.',
     number7:'The seventh number is not zero.',
     number8:'If the eighth number is not zero, you can adotp six punks.',
-    toAdopt: "Currently To Adopt： "
-
+    toAdopt: "Currently To Adopt： ",
+    AddMyNFT: 'Add My NFT',
+    createNewItem: "Create New NFT",
+    requiredFields: "Required Fields",
+    image: "Image",
+    supportedImage: "File types supported: JPG, PNG, GIF, SVG, MP4, WEBM, MP3, WAV, OGG, GLB, GLTF. Max size: 100 MB",
 }

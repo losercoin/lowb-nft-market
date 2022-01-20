@@ -37,7 +37,10 @@
       </div>
     </div>
     <br>
-    <h2>{{ $t("lang.NFTsOwned") }}</h2>
+    <div class="d-inline-flex">
+      <h2>{{ $t("lang.NFTsOwned") }}</h2>
+      <button class="btn btn-primary css-add-button" type="button"><router-link to="/new" class="link">{{ $t("lang.AddMyNFT") }}</router-link></button>
+    </div>
     <div class="row">
       <div v-for="nft in $store.state.myNfts" :key="nft.tokenId" class="col-sm-3">
         <b-card
@@ -239,9 +242,16 @@ export default {
     border-radius: 4px;
     cursor: pointer;
 }
+.css-add-button {
+  margin-left: 10px;
+}
+.link {
+  color: white;
+}
 a {
     color: #ff04b4;
     text-decoration: none;
     font-weight: 700;
 }
+
 </style>

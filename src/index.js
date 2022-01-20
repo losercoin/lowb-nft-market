@@ -16,6 +16,7 @@ const MyNFTs = () => import("./components/MyNFTs.vue");
 const TokenDetail = () => import("./components/LoserPunkDetail.vue");
 const NewTokenDetail = () => import("./components/NewTokenDetail.vue");
 const Adopt = () => import("./components/Adopt.vue");
+const AddNFT = () => import("./components/AddNFT.vue");
 
 Vue.use(Vuex)
 Vue.use(VueI18n)
@@ -26,6 +27,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
 // Optionally install the BootstrapVue icon components plugin
 // Vue.use(IconsPlugin)
 
@@ -38,7 +40,8 @@ const routes = [
   { path: '/my-nfts', component: MyNFTs },
   { path: '/token-details/:id', component: TokenDetail },
   { path: '/new-token-details/:id', component: NewTokenDetail },
-  { path: '/adopt', component: Adopt }
+  { path: '/adopt', component: Adopt },
+  { path: '/new', component: AddNFT}
 ]
 
 const router = new VueRouter({
