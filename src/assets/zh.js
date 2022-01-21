@@ -121,5 +121,8 @@ export const lang = {
     requiredFields: "Required Fields",
     image: "Image",
     supportedImage: "File types supported: JPG, PNG, GIF, SVG",
-
+    name: "Name",
+    description: "Description",
+    detailedDescription: "The description will be included on the item's detail page underneath its image.",
+    create: "Create"
 }
