@@ -425,17 +425,41 @@ async function switchToBinanceSmartChain () {
   try {
     await ethereum.request({ 
       method: 'wallet_addEthereumChain', 
-      params: [{ 
-        chainId: chainInfo.chainId, //'0x38', 
-        chainName: 'BSC Testnet', //'Binance Smart Chain', 
-        nativeCurrency: { name: 'BNBT', symbol: 'BNBT', decimals: 18 }, 
-        rpcUrls: ['https://data-seed-prebsc-1-s2.binance.org:8545/'], //['https://bsc-dataseed.binance.org/'], 
-        blockExplorerUrls: ['https://testnet.bscscan.com'] //['https://bscscan.com/'] 
-      }] 
+      params: [getNetwork()] 
     })
     window.location.reload()
   } catch (err) {
     console.error(err)
+  }
+}
+
+function getNetwork() {
+  console.log(chainInfo.chainId);
+  switch(chainInfo.chainId) {
+    case '0x38':
+      return {
+        chainId: chainInfo.chainId,
+        chainName: 'Binance Smart Chain',
+        nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 }, 
+        rpcUrls: ['https://bsc-dataseed.binance.org/'],
+        blockExplorerUrls: ['https://bscscan.com/']
+      }
+    case '0x61': 
+      return {
+        chainId: chainInfo.chainId,
+        chainName: 'BSC Testnet',
+        nativeCurrency: { name: 'BNBT', symbol: 'BNBT', decimals: 18 }, 
+        rpcUrls: ['https://data-seed-prebsc-1-s2.binance.org:8545/'],
+        blockExplorerUrls: ['https://testnet.bscscan.com']
+      }
+    default :
+      return {
+        chainId: chainInfo.chainId,
+        chainName: 'Ganache Testnet',
+        nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 1337 }, 
+        rpcUrls: ['http://127.0.0.1:7545/'],
+        blockExplorerUrls: ['']
+      }
   }
 }
 
@@ -471,19 +495,19 @@ async function getBalance (account) {
 }
 
 async function getContracts (firstTime = true) {
-  const lowbFile = () => import("./assets/ERC20Template.json")
+  const lowbFile = () => import("./abis/ERC20Template.json")
   const lowbAbi = (await lowbFile())['abi']
   global.lowbContract = new ethers.Contract(LOWB_TOKEN_ADDRESS, lowbAbi, global.provider)
 
-  const marketFile = () => import("./assets/LowbMarket.json")
+  const marketFile = () => import("./abis/LowbMarket.json")
   const marketAbi = (await marketFile())['abi']
   global.marketContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, marketAbi, global.provider)
 
-  const helperFile = () => import("./assets/LowbMarketHelper.json")
+  const helperFile = () => import("./abis/LowbMarketHelper.json")
   const helperAbi = (await helperFile())['abi']
   global.helperContract = new ethers.Contract(HELPER_CONTRACT_ADDRESS, helperAbi, global.provider)
 
-  const lowcFile = () => import("./assets/MyCollectible.json")
+  const lowcFile = () => import("./abis/MyCollectible.json")
   const lowcAbi = (await lowcFile())['abi']
   global.lowcContract = new ethers.Contract(LOWC_TOKEN_ADDRESS, lowcAbi, global.provider)
 

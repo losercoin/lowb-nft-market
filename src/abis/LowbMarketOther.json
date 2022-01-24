@@ -1,0 +1,1294 @@
+{
+  "contractName": "LowbMarketOther",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "itemsOfferedForSale",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "isForSale",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "itemId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "seller",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "minValue",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "onlySellTo",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct LowbMarketOther.Offer",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "itemBids",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "prevBidder",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "nextBidder",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct LowbMarketOther.Bid",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "newTokenOffer",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.3+commit.8d00100c\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"itemBids\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"prevBidder\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"nextBidder\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"internalType\":\"struct LowbMarketOther.Bid\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"itemsOfferedForSale\",\"outputs\":[{\"components\":[{\"internalType\":\"bool\",\"name\":\"isForSale\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"itemId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"seller\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"minValue\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"onlySellTo\",\"type\":\"address\"}],\"internalType\":\"struct LowbMarketOther.Offer\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"newTokenOffer\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/LowbMarketHelper/LowbMarketOther.sol\":\"LowbMarketOther\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/LowbMarketHelper/LowbMarketOther.sol\":{\"keccak256\":\"0xeeeadb670488a2fca40d588b874799a1968433170e7aa245424e9c9b056516a1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://9d7edf434545724154716055159d5f145889a4aab50ad9cb94aae154e2145dcb\",\"dweb:/ipfs/QmbPp6qs5aSDH1mxsaxk7WNWMMZTnWiENLosLNts3wRihz\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// contracts/LowbMarket.sol\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ninterface LowbMarketOther {\r\n\r\n    struct Offer {\r\n        bool isForSale;\r\n        uint itemId;\r\n        address seller;\r\n        uint minValue;          // in lowb\r\n        address onlySellTo;     // specify to sell only to a specific person\r\n    }\r\n\r\n    struct Bid {\r\n        address prevBidder;\r\n        address nextBidder;\r\n        uint value;\r\n    }\r\n\r\n    // A record of items that are offered for sale at a specific minimum value, and perhaps to a specific person\r\n    function itemsOfferedForSale(uint) external view returns (Offer memory);\r\n\r\n    // A record of the highest bid\r\n    function itemBids(uint, address) external view returns (Bid memory);\r\n    //mapping (uint => mapping (address => Bid)) public itemBids;\r\n\r\n    function newTokenOffer(uint) external view returns (uint);\r\n    //mapping (uint => uint) public newTokenOffer;\r\n\r\n}",
+  "sourcePath": "E:\\work\\lowb\\source\\LowbMarket\\contracts\\LowbMarketHelper\\LowbMarketOther.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/LowbMarketHelper/LowbMarketOther.sol",
+    "exportedSymbols": {
+      "LowbMarketOther": [
+        6907
+      ]
+    },
+    "id": 6908,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 6863,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "62:23:33"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 6907,
+        "linearizedBaseContracts": [
+          6907
+        ],
+        "name": "LowbMarketOther",
+        "nameLocation": "99:15:33",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "LowbMarketOther.Offer",
+            "id": 6874,
+            "members": [
+              {
+                "constant": false,
+                "id": 6865,
+                "mutability": "mutable",
+                "name": "isForSale",
+                "nameLocation": "153:9:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6874,
+                "src": "148:14:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 6864,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "148:4:33",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6867,
+                "mutability": "mutable",
+                "name": "itemId",
+                "nameLocation": "178:6:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6874,
+                "src": "173:11:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 6866,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "173:4:33",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6869,
+                "mutability": "mutable",
+                "name": "seller",
+                "nameLocation": "203:6:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6874,
+                "src": "195:14:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 6868,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "195:7:33",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6871,
+                "mutability": "mutable",
+                "name": "minValue",
+                "nameLocation": "225:8:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6874,
+                "src": "220:13:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 6870,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "220:4:33",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6873,
+                "mutability": "mutable",
+                "name": "onlySellTo",
+                "nameLocation": "272:10:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6874,
+                "src": "264:18:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 6872,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "264:7:33",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Offer",
+            "nameLocation": "131:5:33",
+            "nodeType": "StructDefinition",
+            "scope": 6907,
+            "src": "124:215:33",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "LowbMarketOther.Bid",
+            "id": 6881,
+            "members": [
+              {
+                "constant": false,
+                "id": 6876,
+                "mutability": "mutable",
+                "name": "prevBidder",
+                "nameLocation": "377:10:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6881,
+                "src": "369:18:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 6875,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "369:7:33",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6878,
+                "mutability": "mutable",
+                "name": "nextBidder",
+                "nameLocation": "406:10:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6881,
+                "src": "398:18:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 6877,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "398:7:33",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6880,
+                "mutability": "mutable",
+                "name": "value",
+                "nameLocation": "432:5:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6881,
+                "src": "427:10:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 6879,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "427:4:33",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Bid",
+            "nameLocation": "354:3:33",
+            "nodeType": "StructDefinition",
+            "scope": 6907,
+            "src": "347:98:33",
+            "visibility": "public"
+          },
+          {
+            "functionSelector": "4b4ddfa6",
+            "id": 6889,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "itemsOfferedForSale",
+            "nameLocation": "576:19:33",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6884,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6883,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6889,
+                  "src": "596:4:33",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6882,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "596:4:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "595:6:33"
+            },
+            "returnParameters": {
+              "id": 6888,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6887,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6889,
+                  "src": "625:12:33",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Offer_$6874_memory_ptr",
+                    "typeString": "struct LowbMarketOther.Offer"
+                  },
+                  "typeName": {
+                    "id": 6886,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 6885,
+                      "name": "Offer",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 6874,
+                      "src": "625:5:33"
+                    },
+                    "referencedDeclaration": 6874,
+                    "src": "625:5:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Offer_$6874_storage_ptr",
+                      "typeString": "struct LowbMarketOther.Offer"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "624:14:33"
+            },
+            "scope": 6907,
+            "src": "567:72:33",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "1a6c0940",
+            "id": 6899,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "itemBids",
+            "nameLocation": "692:8:33",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6894,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6891,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6899,
+                  "src": "701:4:33",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6890,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "701:4:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6893,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6899,
+                  "src": "707:7:33",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 6892,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "707:7:33",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "700:15:33"
+            },
+            "returnParameters": {
+              "id": 6898,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6897,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6899,
+                  "src": "739:10:33",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Bid_$6881_memory_ptr",
+                    "typeString": "struct LowbMarketOther.Bid"
+                  },
+                  "typeName": {
+                    "id": 6896,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 6895,
+                      "name": "Bid",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 6881,
+                      "src": "739:3:33"
+                    },
+                    "referencedDeclaration": 6881,
+                    "src": "739:3:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Bid_$6881_storage_ptr",
+                      "typeString": "struct LowbMarketOther.Bid"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "738:12:33"
+            },
+            "scope": 6907,
+            "src": "683:68:33",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "310e1b26",
+            "id": 6906,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "newTokenOffer",
+            "nameLocation": "835:13:33",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6902,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6901,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6906,
+                  "src": "849:4:33",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6900,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "849:4:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "848:6:33"
+            },
+            "returnParameters": {
+              "id": 6905,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6904,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6906,
+                  "src": "878:4:33",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6903,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "878:4:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "877:6:33"
+            },
+            "scope": 6907,
+            "src": "826:58:33",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 6908,
+        "src": "89:852:33"
+      }
+    ],
+    "src": "62:879:33"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/contracts/LowbMarketHelper/LowbMarketOther.sol",
+    "exportedSymbols": {
+      "LowbMarketOther": [
+        6907
+      ]
+    },
+    "id": 6908,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 6863,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "62:23:33"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 6907,
+        "linearizedBaseContracts": [
+          6907
+        ],
+        "name": "LowbMarketOther",
+        "nameLocation": "99:15:33",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "LowbMarketOther.Offer",
+            "id": 6874,
+            "members": [
+              {
+                "constant": false,
+                "id": 6865,
+                "mutability": "mutable",
+                "name": "isForSale",
+                "nameLocation": "153:9:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6874,
+                "src": "148:14:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 6864,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "148:4:33",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6867,
+                "mutability": "mutable",
+                "name": "itemId",
+                "nameLocation": "178:6:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6874,
+                "src": "173:11:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 6866,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "173:4:33",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6869,
+                "mutability": "mutable",
+                "name": "seller",
+                "nameLocation": "203:6:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6874,
+                "src": "195:14:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 6868,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "195:7:33",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6871,
+                "mutability": "mutable",
+                "name": "minValue",
+                "nameLocation": "225:8:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6874,
+                "src": "220:13:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 6870,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "220:4:33",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6873,
+                "mutability": "mutable",
+                "name": "onlySellTo",
+                "nameLocation": "272:10:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6874,
+                "src": "264:18:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 6872,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "264:7:33",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Offer",
+            "nameLocation": "131:5:33",
+            "nodeType": "StructDefinition",
+            "scope": 6907,
+            "src": "124:215:33",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "LowbMarketOther.Bid",
+            "id": 6881,
+            "members": [
+              {
+                "constant": false,
+                "id": 6876,
+                "mutability": "mutable",
+                "name": "prevBidder",
+                "nameLocation": "377:10:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6881,
+                "src": "369:18:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 6875,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "369:7:33",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6878,
+                "mutability": "mutable",
+                "name": "nextBidder",
+                "nameLocation": "406:10:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6881,
+                "src": "398:18:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 6877,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "398:7:33",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 6880,
+                "mutability": "mutable",
+                "name": "value",
+                "nameLocation": "432:5:33",
+                "nodeType": "VariableDeclaration",
+                "scope": 6881,
+                "src": "427:10:33",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 6879,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "427:4:33",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Bid",
+            "nameLocation": "354:3:33",
+            "nodeType": "StructDefinition",
+            "scope": 6907,
+            "src": "347:98:33",
+            "visibility": "public"
+          },
+          {
+            "functionSelector": "4b4ddfa6",
+            "id": 6889,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "itemsOfferedForSale",
+            "nameLocation": "576:19:33",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6884,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6883,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6889,
+                  "src": "596:4:33",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6882,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "596:4:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "595:6:33"
+            },
+            "returnParameters": {
+              "id": 6888,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6887,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6889,
+                  "src": "625:12:33",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Offer_$6874_memory_ptr",
+                    "typeString": "struct LowbMarketOther.Offer"
+                  },
+                  "typeName": {
+                    "id": 6886,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 6885,
+                      "name": "Offer",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 6874,
+                      "src": "625:5:33"
+                    },
+                    "referencedDeclaration": 6874,
+                    "src": "625:5:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Offer_$6874_storage_ptr",
+                      "typeString": "struct LowbMarketOther.Offer"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "624:14:33"
+            },
+            "scope": 6907,
+            "src": "567:72:33",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "1a6c0940",
+            "id": 6899,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "itemBids",
+            "nameLocation": "692:8:33",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6894,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6891,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6899,
+                  "src": "701:4:33",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6890,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "701:4:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6893,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6899,
+                  "src": "707:7:33",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 6892,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "707:7:33",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "700:15:33"
+            },
+            "returnParameters": {
+              "id": 6898,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6897,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6899,
+                  "src": "739:10:33",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Bid_$6881_memory_ptr",
+                    "typeString": "struct LowbMarketOther.Bid"
+                  },
+                  "typeName": {
+                    "id": 6896,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 6895,
+                      "name": "Bid",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 6881,
+                      "src": "739:3:33"
+                    },
+                    "referencedDeclaration": 6881,
+                    "src": "739:3:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Bid_$6881_storage_ptr",
+                      "typeString": "struct LowbMarketOther.Bid"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "738:12:33"
+            },
+            "scope": 6907,
+            "src": "683:68:33",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "310e1b26",
+            "id": 6906,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "newTokenOffer",
+            "nameLocation": "835:13:33",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6902,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6901,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6906,
+                  "src": "849:4:33",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6900,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "849:4:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "848:6:33"
+            },
+            "returnParameters": {
+              "id": 6905,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6904,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6906,
+                  "src": "878:4:33",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6903,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "878:4:33",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "877:6:33"
+            },
+            "scope": 6907,
+            "src": "826:58:33",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 6908,
+        "src": "89:852:33"
+      }
+    ],
+    "src": "62:879:33"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.3+commit.8d00100c.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.4",
+  "updatedAt": "2022-01-24T09:16:55.448Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

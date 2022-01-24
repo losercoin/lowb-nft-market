@@ -121,7 +121,7 @@
 </template>
 
 <script>
-import airdropFile from '../assets/AirdropClaim.json'
+import airdropFile from '../abis/AirdropClaim.json'
 import { ethers } from "ethers";
 
 export default {
