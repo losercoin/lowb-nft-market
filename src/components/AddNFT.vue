@@ -35,7 +35,7 @@
         </div>
         <textarea class="form-control" v-model="description"/>
       </div>
-      <button class="btn btn-primary css-add-button" type="button">{{ $t("lang.create") }}</button>
+      <button class="btn btn-primary css-add-button" type="button" @click="mint">{{ $t("lang.create") }}</button>
     </form>
   </div>
 </template>
@@ -50,12 +50,18 @@ export default {
         name: '',
         isName: true,
         description: '',
+        imageFile: null,
       }
     },
     methods: {
       loadMedia: function(event) {
         this.media = window.URL.createObjectURL(event.target.files[0]);
-        event.target.value = null;
+        const reader = new window.FileReader();
+        reader.readAsArrayBuffer(event.target.files[0]);
+        reader.onloadend = () => {
+          this.imageFile = reader.result; 
+          event.target.value = null;
+        }
       },
       closeMedia: function() {
         this.media=null;
@@ -66,6 +72,12 @@ export default {
         } else {
           this.isName = true;
         }
+      },
+      mint: function() {
+        if(!this.name) {
+          this.isName = false;
+        }
+        this.media && this.imageFile && this.name && this.$store.dispatch('mintNFT', {image: this.imageFile, name: this.name, description: this.description})
       }
     }
 

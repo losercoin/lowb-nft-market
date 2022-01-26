@@ -4,6 +4,8 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import VueRouter from 'vue-router'
 import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
+const ipfsClient = require('ipfs-http-client');
+const IPFS = ipfsClient.create({ host: '23.105.221.248', port: 80});
 
 import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS, WALLET_ADMIN_ADDRESS, WEDDING_CONTRACT_ADDRESS, STAKING_ADDRESS, MATIC_ADDRESS } from "./const/index.js"
 import peopleInfo from './const/people.json'
@@ -365,6 +367,9 @@ const store = new Vuex.Store({
     },
     filterPunks ({}, filter) {
       filterPunks(filter)
+    },
+    mintNFT({}, data) {
+      mintNFT(data);
     }
   }
 })
@@ -1328,6 +1333,42 @@ async function addLowbToken () {
   
 }
 
+async function mintNFT(data) {
+  console.log(data);
+
+  const fileAdded = await IPFS.add(data.image);
+  if(!fileAdded) {
+    console.error('Something went wrong when updloading the file');
+    return;
+  }
+  
+  const metadata = {
+    title: "Asset Metadata",
+    type: "object",
+    properties: {
+      name: {
+        type: "string",
+        description: data.name
+      },
+      description: {
+        type: "string",
+        description: data.description
+      },
+      image: {
+        type: "string",
+        description: fileAdded.path
+      }
+    }
+  };
+
+  const metadataAdded = await IPFS.add(JSON.stringify(metadata));
+  if(!metadataAdded) {
+    console.error('Something went wrong when updloading the file');
+    return;
+  }
+
+  console.log(metadataAdded);
+}
 
 if (isWalletInstalled()) {
 
