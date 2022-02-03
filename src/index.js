@@ -1341,33 +1341,8 @@ async function mintNFT(data) {
     console.error('Something went wrong when updloading the file');
     return;
   }
+  console.log(fileAdded);
   
-  const metadata = {
-    title: "Asset Metadata",
-    type: "object",
-    properties: {
-      name: {
-        type: "string",
-        description: data.name
-      },
-      description: {
-        type: "string",
-        description: data.description
-      },
-      image: {
-        type: "string",
-        description: fileAdded.path
-      }
-    }
-  };
-
-  const metadataAdded = await IPFS.add(JSON.stringify(metadata));
-  if(!metadataAdded) {
-    console.error('Something went wrong when updloading the file');
-    return;
-  }
-
-  console.log(metadataAdded);
 }
 
 if (isWalletInstalled()) {
