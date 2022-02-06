@@ -2,6 +2,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const webpack = require('webpack');
+const dotenv = require('dotenv').config({ path: __dirname + '/.env' })
 
 module.exports = {
   entry: {
@@ -16,6 +18,9 @@ module.exports = {
     new VueLoaderPlugin(),
     new CssMinimizerPlugin(),
     new MiniCssExtractPlugin(),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(dotenv.parsed),
+    }),
   ],
   resolve: {
     alias: {

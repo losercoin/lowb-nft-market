@@ -6,7 +6,8 @@ import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
 import sha256 from 'crypto-js/sha256';
 const ipfsClient = require('ipfs-http-client');
-const IPFS = ipfsClient.create({ host: '23.105.221.248', port: 80});
+
+const IPFS = ipfsClient.create({ host: process.env.VUE_APP_IPFS, port: 80});
 
 import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS, WALLET_ADMIN_ADDRESS, WEDDING_CONTRACT_ADDRESS, STAKING_ADDRESS, MATIC_ADDRESS } from "./const/index.js"
 import peopleInfo from './const/people.json'
@@ -1340,8 +1341,6 @@ async function addLowbToken () {
 }
 
 async function mintNFT(data) {
-  console.log(data);
-
   const fileAdded = await IPFS.add(data.image);
   if(!fileAdded) {
     console.error('Something went wrong when updloading the file');
@@ -1349,10 +1348,10 @@ async function mintNFT(data) {
   }
 
   const tokenId = '0x' + sha256(fileAdded.path).toString();
-  // console.log(global.signer);
+  console.log(global.signer);
   const nftCollectionSigner = await global.nftCollectionContract.connect(global.signer);
   await nftCollectionSigner.safeMint(tokenId, fileAdded.path, data.name, data.description);
-  
+  location.href = "/#/my-nfts";
 }
 
 if (isWalletInstalled()) {
