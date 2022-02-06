@@ -4,6 +4,7 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import VueRouter from 'vue-router'
 import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
+import sha256 from 'crypto-js/sha256';
 const ipfsClient = require('ipfs-http-client');
 const IPFS = ipfsClient.create({ host: '23.105.221.248', port: 80});
 
@@ -515,6 +516,11 @@ async function getContracts (firstTime = true) {
   const lowcFile = () => import("./abis/MyCollectible.json")
   const lowcAbi = (await lowcFile())['abi']
   global.lowcContract = new ethers.Contract(LOWC_TOKEN_ADDRESS, lowcAbi, global.provider)
+
+  const nftCollectionFile = () => import("./abis/NFTCollection.json");
+  const nftCollectionAbi = (await nftCollectionFile())['abi'];
+  const nftCollectionAddress = (await nftCollectionFile())['networks'][parseInt(chainInfo.chainId)]['address'];
+  global.nftCollectionContract = new ethers.Contract(nftCollectionAddress, nftCollectionAbi, global.provider)
 
   const weddingFile = () => import("./assets/WeddingGift.json")
   const weddingAbi = (await weddingFile())['abi']
@@ -1341,7 +1347,11 @@ async function mintNFT(data) {
     console.error('Something went wrong when updloading the file');
     return;
   }
-  console.log(fileAdded);
+
+  const tokenId = '0x' + sha256(fileAdded.path).toString();
+  // console.log(global.signer);
+  const nftCollectionSigner = await global.nftCollectionContract.connect(global.signer);
+  await nftCollectionSigner.safeMint(tokenId, fileAdded.path, data.name, data.description);
   
 }
 
