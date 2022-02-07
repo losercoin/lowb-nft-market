@@ -1,5 +1,8 @@
 <template>
   <div class="container css-main">
+    <notifications 
+      group="addnft" 
+      position="top right"/>
     <h1>{{ $t("lang.createNewItem") }}</h1>
     <form>
       <p class="gwsEKa"><span class="asterisk">*</span>{{ $t("lang.requiredFields") }}</p>

@@ -5,6 +5,9 @@ import VueRouter from 'vue-router'
 import { ethers } from "ethers";
 import VueI18n from 'vue-i18n';
 import sha256 from 'crypto-js/sha256';
+import Notifications from 'vue-notification'
+import axios from 'axios';
+window.axios = require('axios');
 const ipfsClient = require('ipfs-http-client');
 
 const IPFS = ipfsClient.create({ host: process.env.VUE_APP_IPFS, port: 80});
@@ -24,7 +27,7 @@ const AddNFT = () => import("./components/AddNFT.vue");
 
 Vue.use(Vuex)
 Vue.use(VueI18n)
-
+Vue.use(Notifications)
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -78,6 +81,7 @@ const store = new Vuex.Store({
     loserPunkState: 'idle',
     nftInfos: [],
     myNfts: [],
+    myNFTList: [],
     itemsOwner: {},
     itemBids: {},
     itemOffers: {},
@@ -86,7 +90,9 @@ const store = new Vuex.Store({
     bidsAdmin: {},
     eventFilters: [],
     modalShow: false,
-    CHAIN_ID: chainInfo.chainId
+    CHAIN_ID: chainInfo.chainId,
+    IPFS_SERVER: process.env.VUE_APP_IPFS_URL,
+    BACKEND_SERVER: process.env.VUE_APP_SERVER,
   },
   getters: {
     abbr_account: state => {
@@ -248,6 +254,12 @@ const store = new Vuex.Store({
         console.log("set my NFTs: ", payload.id)
       }
     },
+    setMyNFTList(state, payload) {
+      // Vue.set(state.myNFTList, payload.id, payload.myNft)
+      state.myNFTList.push(payload.myNft);
+      console.log(state.myNFTList);
+      // state.myNFTList.push(nft);
+    },
     setItemsOwner (state, payload) {
       state.itemsOwner[payload.id] = payload.owner
       console.log(`set ${ payload.id }'s owner: `, payload.owner)
@@ -396,7 +408,7 @@ function handleNewChain (chainId) {
   if(chainId == chainInfo.chainId) {
     if (store.state.account != '') {
       getBalance(store.state.account)
-      store.dispatch('updateMyNfts')
+      // store.dispatch('updateMyNfts')
     }
     store.dispatch('updateTotalGroup')
     addLowbToken ()
@@ -407,7 +419,7 @@ function handleNewAccounts (accounts) {
   store.commit('setAccount', accounts[0])
   if(store.state.chainId == chainInfo.chainId) {
     getBalance(accounts[0])
-    store.dispatch('updateMyNfts')
+    // store.dispatch('updateMyNfts')
     addLowbToken ()
   }
 }
@@ -691,19 +703,22 @@ async function getGroupNumber () {
 
 async function getMyNfts () {
   try {
-    let prev_length = store.state.myNfts.length
-    for (let i=0; i<prev_length; i++) {
-      store.commit('setMyNfts', {id: 0, myNft: null})
+    let response = await axios.get(store.state.BACKEND_SERVER + '/v1/nft/my', {
+      params: {
+        address: store.state.account
+      }
+    });
+
+    if(response.data.code != 200) {
+      console.log(response.data.message);
+      return; 
     }
-    const lowcNumber = await global.lowcContract.balanceOf(store.state.account)
-    for (let i=0; i<lowcNumber; i++) {
-      const tokenId = (await global.lowcContract.tokenOfOwnerByIndex(store.state.account, i)).toString()
-      const groupId = tokenId//(await global.lowcContract.groupOf(tokenId)).toString()
-      await getNftInfo(groupId, false)
-      const getApproved = await global.lowcContract.getApproved(tokenId)
-      const isApproved = (getApproved.toLowerCase() == MARKET_CONTRACT_ADDRESS.toLowerCase())
-      const myNft = {tokenId: tokenId, groupId: groupId, isApproved: isApproved}
-      store.commit('setMyNfts', {id: i, myNft: myNft})
+
+    let listData = response.data.data.data;
+    store.state.myNFTList = [];
+    for(var i = 0; i < listData.length; i++) {
+      let cell = listData[i];
+      store.commit('setMyNFTList', {id:cell._id, myNft:cell});
     }
   } catch (err) {
     console.error(err)
@@ -1350,8 +1365,34 @@ async function mintNFT(data) {
   const tokenId = '0x' + sha256(fileAdded.path).toString();
   console.log(global.signer);
   const nftCollectionSigner = await global.nftCollectionContract.connect(global.signer);
-  await nftCollectionSigner.safeMint(tokenId, fileAdded.path, data.name, data.description);
-  location.href = "/#/my-nfts";
+  try {
+    await nftCollectionSigner.safeMint(tokenId, fileAdded.path, data.name, data.description);
+  } catch(err) {
+    console.log('Mint error')
+    Vue.notify({
+      group: 'addnft',
+      title: 'Mint result',
+      text: 'Failed to mint your nft!',
+      type: 'error'
+    });
+    return;
+  }
+   
+  const filter = global.nftCollectionContract.filters.mintNFT(tokenId, store.state.account)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("withdraw bid event registered")
+  }
+  else {
+    console.log('Mint success');
+    setTimeout(() => {
+      Vue.notify({
+        group: 'addnft',
+        title: 'Mint result',
+        text: 'Success to mint your nft!',
+        type: 'success'
+      })
+    }, 3000);
+  }
 }
 
 if (isWalletInstalled()) {

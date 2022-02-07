@@ -42,17 +42,17 @@
       <button class="btn btn-primary css-add-button" type="button"><router-link to="/new" class="link">{{ $t("lang.AddMyNFT") }}</router-link></button>
     </div>
     <div class="row">
-      <div v-for="nft in $store.state.myNfts" :key="nft.tokenId" class="col-sm-3">
+      <div v-for="nft in this.myNfts" :key="nft.tokenId" class="col-sm-3">
         <b-card
-          :title="$store.state.nftInfos[nft.groupId-1].name"
-          :img-src="$store.state.nftInfos[nft.groupId-1].image"
+          :title="nft.name"
+          :img-src="$store.state.IPFS_SERVER + nft.uri"
           img-alt="Image"
           img-top
           tag="article"
           style="max-width: 20rem;"
           class="mb-2"
         >
-          <h6 class="card-subtitle mb-2 text-muted">
+          <!-- <h6 class="card-subtitle mb-2 text-muted">
             <div v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">#{{nft.tokenId}}  [{{ $t("lang.new") }}]</div>
             <div v-else>#{{nft.tokenId}}  {{ $t("lang.circulation") }}: {{$store.state.nftInfos[nft.groupId-1].circulation}}</div>
           </h6>
@@ -86,12 +86,12 @@
             <div class="css-2x3sd8" v-else>
               <router-link :to="{path: '/token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
             </div>
-          </div>
+          </div> -->
           
         </b-card>
       </div>
     </div>
-    <div class="row" v-if="$store.state.myNfts.length==0">
+    <div class="row" v-if="this.myNfts.length==0">
       <br><p>{{ $t("lang.noNFTs") }}</p>
     </div>
     <br><br><br>
@@ -129,12 +129,16 @@ export default {
     return {
       toDeposit: 0,
       toWithdraw: 0,
-      toOffer: []
+      toOffer: [],
+      myNfts: [],
     };
   },
   created () {
-    console.log(this.$store.state.approvedBalance, this.toDeposit)
     this.$store.dispatch('filterPunks', 'my_bids')
+    // this.$store.dispatch('updateMyNfts')
+  },
+  mounted() {
+    this.getMyNFTs();
   },
   methods: {
     correct_toDeposit: function () {
@@ -204,6 +208,24 @@ export default {
       console.log("start wrap nft")
       this.$store.dispatch('wrapItem', tokenId)
     },
+    getMyNFTs: async function() {
+      let response = await axios.get(this.$store.state.BACKEND_SERVER + '/v1/nft/my', {
+        params: {
+          address: this.$store.state.account
+        }
+      });
+
+      if(response.data.code != 200) {
+        console.log(response.data.message);
+        return; 
+      }
+
+      let listData = response.data.data.data;
+      for(var i = 0; i < listData.length; i++) {
+        let cell = listData[i];
+        this.myNfts.push(cell);
+      }
+    }
   }
 }
 </script>
