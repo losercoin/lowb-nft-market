@@ -124,5 +124,7 @@ export const lang = {
     name: "Name",
     description: "Description",
     detailedDescription: "The description will be included on the item's detail page underneath its image.",
-    create: "Create"
+    create: "Create",
+    edit: "Edit",
+    editItem: "Edit NFT",
 }

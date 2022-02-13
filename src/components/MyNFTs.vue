@@ -52,42 +52,11 @@
           style="max-width: 20rem;"
           class="mb-2"
         >
-          <!-- <h6 class="card-subtitle mb-2 text-muted">
-            <div v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">#{{nft.tokenId}}  [{{ $t("lang.new") }}]</div>
-            <div v-else>#{{nft.tokenId}}  {{ $t("lang.circulation") }}: {{$store.state.nftInfos[nft.groupId-1].circulation}}</div>
-          </h6>
-          <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="0" v-model="toOffer[nft.tokenId]" @keyup="correct_toOffer(nft.tokenId)">
-            <span class="input-group-text">lowb</span>
+          <div class="css-price-area">
+            <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base> 
+            <span class="css-price">{{nft.price}}&nbsp;LOWB</span>
+            <button class="css-edit-button"><router-link :to="{path: '/edit/'+nft._id}" class="link">{{ $t("lang.edit") }}</router-link></button>
           </div>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button 
-              class="btn btn-primary" 
-              type="button" 
-              v-on:click="approveNft(nft.tokenId, nft.groupId)" 
-              :disabled="nft.isApproved || $store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
-              {{ $t("lang.approve") }}
-            </button>
-            <button 
-              class="btn btn-primary active" 
-              type="button" 
-              v-on:click="offer(nft.tokenId, nft.groupId)" 
-              :disabled="toOffer[nft.tokenId] <= 0 || !nft.isApproved || $store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
-              {{ $t("lang.offer") }}
-            </button>
-          </div>
-          <div class="css-lvpxlc">
-            <b-button block variant="outline-success" v-on:click="wrap(nft.tokenId)" >{{ $t("lang.wrap") }}</b-button>
-          </div>
-          <div class="css-lvpxlc">
-            <div class="css-2x3sd8" v-if="$store.state.nftInfos[nft.groupId-1].currentSupply<$store.state.nftInfos[nft.groupId-1].circulation">
-              <router-link :to="{path: '/new-token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
-            </div>
-            <div class="css-2x3sd8" v-else>
-              <router-link :to="{path: '/token-details/'+nft.groupId}">{{ $t("lang.details") }}</router-link>
-            </div>
-          </div> -->
-          
         </b-card>
       </div>
     </div>
@@ -123,8 +92,14 @@
 <script>
 import airdropFile from '../abis/AirdropClaim.json'
 import { ethers } from "ethers";
+import IconBase from './IconBase.vue'
+import IconLowb from './icons/IconLowb.vue'
 
 export default {
+  components: {
+    IconBase,
+    IconLowb
+  },
   data: function() {
     return {
       toDeposit: 0,
@@ -269,6 +244,24 @@ export default {
 }
 .link {
   color: white;
+}
+.css-price-area {
+  display: flex;
+  align-items: center;
+}
+.css-price {
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 5px;
+}
+.css-edit-button {
+  margin-left: auto;
+  cursor: pointer;
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
 }
 a {
     color: #ff04b4;

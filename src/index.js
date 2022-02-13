@@ -24,6 +24,7 @@ const TokenDetail = () => import("./components/LoserPunkDetail.vue");
 const NewTokenDetail = () => import("./components/NewTokenDetail.vue");
 const Adopt = () => import("./components/Adopt.vue");
 const AddNFT = () => import("./components/AddNFT.vue");
+const EditNFT = () => import("./components/EditNFT.vue");
 
 Vue.use(Vuex)
 Vue.use(VueI18n)
@@ -48,7 +49,8 @@ const routes = [
   { path: '/token-details/:id', component: TokenDetail },
   { path: '/new-token-details/:id', component: NewTokenDetail },
   { path: '/adopt', component: Adopt },
-  { path: '/new', component: AddNFT}
+  { path: '/new', component: AddNFT},
+  { path: '/edit/:id', component: EditNFT},
 ]
 
 const router = new VueRouter({
