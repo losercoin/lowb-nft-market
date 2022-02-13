@@ -386,6 +386,9 @@ const store = new Vuex.Store({
     },
     mintNFT({}, data) {
       mintNFT(data);
+    },
+    editNFT({}, data) {
+      editNFT(data);
     }
   }
 })
@@ -1394,6 +1397,43 @@ async function mintNFT(data) {
         type: 'success'
       })
     }, 3000);
+  }
+}
+
+async function editNFT(data) {
+  console.log(data);
+  let uri = data.uri.replace(store.state.IPFS_SERVER, '');
+  if(data.image != null) {
+    const fileAdded = await IPFS.add(data.image);
+    if(!fileAdded) {
+      console.error('Something went wrong when updloading the file');
+      return;
+    }
+    uri = fileAdded.path;
+  }
+  
+  let response = await axios.post(store.state.BACKEND_SERVER + '/v1/nft', {
+      id: data.id,
+      uri: uri,
+      name: data.name,
+      description: data.description
+    
+  });
+  
+  if(response.data.code == 200) {
+    Vue.notify({
+      group: 'editnft',
+      title: 'Edit result',
+      text: 'Success to edit your nft!',
+      type: 'success'
+    })
+  } else {
+    Vue.notify({
+      group: 'editnft',
+      title: 'Edit result',
+      text: 'Failed to edit your nft!',
+      type: 'error'
+    })
   }
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div class="container css-main">
     <notifications 
-      group="addnft" 
+      group="editnft" 
       position="top right"/>
     <h1>{{ $t("lang.editItem") }}</h1>
     <form>
@@ -38,7 +38,7 @@
         </div>
         <textarea class="form-control" v-model="description"/>
       </div>
-      <button class="btn btn-primary css-add-button" type="button" @click="mint">{{ $t("lang.edit") }}</button>
+      <button class="btn btn-primary css-add-button" type="button" @click="edit">{{ $t("lang.edit") }}</button>
     </form>
   </div>
 </template>
@@ -80,11 +80,12 @@ export default {
           this.isName = true;
         }
       },
-      mint: function() {
+      edit: function() {
         if(!this.name) {
           this.isName = false;
         }
-        this.media && this.imageFile && this.name && this.$store.dispatch('mintNFT', {image: this.imageFile, name: this.name, description: this.description})
+        console.log(this.media);
+        this.media && this.name && this.$store.dispatch('editNFT', {id:this.id, uri:this.media, image: this.imageFile, name: this.name, description: this.description})
       },
       getNFT: async function() {
         let response = await axios.get(this.$store.state.BACKEND_SERVER + '/v1/nft', {
