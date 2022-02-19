@@ -43,21 +43,23 @@
     </div>
     <div class="row">
       <div v-for="nft in this.myNfts" :key="nft.tokenId" class="col-sm-3">
-        <b-card
-          :title="nft.name"
-          :img-src="$store.state.IPFS_SERVER + nft.uri"
-          img-alt="Image"
-          img-top
-          tag="article"
-          style="max-width: 20rem;"
-          class="mb-2"
-        >
-          <div class="css-price-area">
-            <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base> 
-            <span class="css-price">{{nft.price}}&nbsp;LOWB</span>
-            <button class="css-edit-button"><router-link :to="{path: '/edit/'+nft._id}" class="link">{{ $t("lang.edit") }}</router-link></button>
-          </div>
-        </b-card>
+        <router-link :to="{path: '/detail/'+nft._id}" class="link">
+          <b-card
+            :title="nft.name"
+            :img-src="$store.state.IPFS_SERVER + nft.uri"
+            img-alt="Image"
+            img-top
+            tag="article"
+            style="max-width: 20rem;"
+            class="mb-2"
+          >
+            <div class="css-price-area">
+              <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base> 
+              <span class="css-price">{{nft.price}}&nbsp;LOWB</span>
+              <button class="css-edit-button"><router-link :to="{path: '/edit/'+nft._id}" class="link">{{ $t("lang.edit") }}</router-link></button>
+            </div>
+          </b-card>
+        </router-link>
       </div>
     </div>
     <div class="row" v-if="this.myNfts.length==0">

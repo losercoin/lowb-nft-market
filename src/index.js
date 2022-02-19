@@ -25,6 +25,7 @@ const NewTokenDetail = () => import("./components/NewTokenDetail.vue");
 const Adopt = () => import("./components/Adopt.vue");
 const AddNFT = () => import("./components/AddNFT.vue");
 const EditNFT = () => import("./components/EditNFT.vue");
+const NFTDetail = () => import("./components/NFTDetail.vue");
 
 Vue.use(Vuex)
 Vue.use(VueI18n)
@@ -51,6 +52,7 @@ const routes = [
   { path: '/adopt', component: Adopt },
   { path: '/new', component: AddNFT},
   { path: '/edit/:id', component: EditNFT},
+  { path: '/detail/:id', component: NFTDetail},
 ]
 
 const router = new VueRouter({

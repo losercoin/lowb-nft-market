@@ -43,7 +43,7 @@
           <th scope="col">{{ $t("lang.maker") }}</th>
           <th scope="col">{{ $t("lang.taker") }}</th>
           <th scope="col">{{ $t("lang.price") }}</th>
-          <th scope="col">{{ $t("lang.action") }}</th>
+          <th scope="col">  </th>
         </tr>
       </thead>
       <tbody>

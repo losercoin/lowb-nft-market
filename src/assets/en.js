@@ -127,4 +127,7 @@ export const lang = {
     create: "Create",
     edit: "Edit",
     editItem: "Edit NFT",
+    sell: "Sell",
+    offerlist: "Offer List",
+    time: "Time",
 }
