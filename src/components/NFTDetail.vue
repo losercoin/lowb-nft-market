@@ -12,8 +12,8 @@
         <div class="col-sm-8" style="padding: 20px 30px">
           <h1>{{this.name}}</h1>
           <div class="row" v-if="owner==this.$store.state.account" style="margin-left: 0px">
-            <button class="btn btn-primary col-3" type="button"><router-link :to="{path: '/edit/'+this.id}" class="link">{{ $t("lang.edit") }}</router-link></button>
-            <button class="btn btn-primary col-3" type="button" style="margin-left: 20px">{{ $t("lang.sell") }}</button>
+            <router-link :to="{path: '/edit/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button">{{ $t("lang.edit") }}</button></router-link>
+            <router-link :to="{path: '/sell/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button" style="margin-left: 20px">{{ $t("lang.sell") }}</button></router-link>
           </div>
           <div class="border-area">
             <h5 class="title-area">{{$t("lang.offerlist")}}</h5>
@@ -48,10 +48,6 @@
 </template>
 
 <script>
-import airdropFile from '../abis/AirdropClaim.json'
-import { ethers } from "ethers";
-import IconBase from './IconBase.vue'
-import IconLowb from './icons/IconLowb.vue'
 
 export default {
   components: {
@@ -124,5 +120,8 @@ export default {
 .link {
   color: white;
   text-decoration: none !important;
+}
+.css-button {
+  width: 100%;
 }
 </style>

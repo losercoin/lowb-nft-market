@@ -130,4 +130,9 @@ export const lang = {
     sell: "Sell",
     offerlist: "Offer List",
     time: "Time",
+    preview: "Preview",
+    listforsale: "List item for sale",
+    fee: "Fee",
+    servicefee: "Service Fee",
+    completelist: "Complete listing",
 }

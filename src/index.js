@@ -26,6 +26,7 @@ const Adopt = () => import("./components/Adopt.vue");
 const AddNFT = () => import("./components/AddNFT.vue");
 const EditNFT = () => import("./components/EditNFT.vue");
 const NFTDetail = () => import("./components/NFTDetail.vue");
+const SellNFT = () => import("./components/SellNFT.vue");
 
 Vue.use(Vuex)
 Vue.use(VueI18n)
@@ -53,6 +54,7 @@ const routes = [
   { path: '/new', component: AddNFT},
   { path: '/edit/:id', component: EditNFT},
   { path: '/detail/:id', component: NFTDetail},
+  { path: '/sell/:id', component: SellNFT},
 ]
 
 const router = new VueRouter({
@@ -391,7 +393,10 @@ const store = new Vuex.Store({
     },
     editNFT({}, data) {
       editNFT(data);
-    }
+    },
+    saleNFT({}, data) {
+      saleNFT(data);
+    },
   }
 })
 
@@ -1384,7 +1389,7 @@ async function mintNFT(data) {
     });
     return;
   }
-   
+
   const filter = global.nftCollectionContract.filters.mintNFT(tokenId, store.state.account)
   if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
     console.log("withdraw bid event registered")
@@ -1401,6 +1406,25 @@ async function mintNFT(data) {
     }, 3000);
   }
 }
+
+async function saleNFT(data) {
+  const nftCollectionSigner = await global.nftCollectionContract.connect(global.signer);
+  try {
+    await nftCollectionSigner.prepareForSale(data.tokenId, data.price);
+  } catch(err) {
+    console.log('Mint error')
+  }
+
+  const number = '0x' + (new Number(parseInt(data.tokenId)).toString(16));
+  const filter = global.nftCollectionContract.filters.saleNFT(number)
+  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
+    console.log("withdraw bid event registered")
+  }
+  else {
+    console.log('Mint success');
+  }
+}
+
 
 async function editNFT(data) {
   console.log(data);
