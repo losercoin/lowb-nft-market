@@ -50,7 +50,7 @@
             img-alt="Image"
             img-top
             tag="article"
-            style="max-width: 20rem;"
+            style="max-width: 20rem; color: #000"
             class="mb-2"
           >
             <div class="css-price-area">
