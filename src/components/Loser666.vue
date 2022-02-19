@@ -68,24 +68,22 @@
         <div v-else>
           <div class="list">
             <div v-for="nft in nowData" :key="nft.id" class="item">
-              <b-card
-                :title="nft.name"
-                :img-src="nft.image"
-                img-alt="Image"
-                img-top
-                tag="article"
-             >
-                <!-- <b-card-text>
-                  {{nft.description}}
-                </b-card-text> -->
-
-                <!-- <b-button href="#" variant="primary">Go somewhere</b-button> -->
-                <div class="m-t-10">
-                  <router-link :to="{path: '/token-details/'+nft.id}">{{ $t("lang.go") }} #{{nft.id}} {{ $t("lang.details") }}</router-link>
-                  <span class="badge rounded-pill bg-success" v-if="nft.price > 0">{{Math.round(nft.price/1e18)}} lowb</span>
-                  <span class="badge rounded-pill bg-info" v-else-if="nft.bids > 0">{{Math.round(nft.bids/1e18)}} lowb</span>
-                </div>
-              </b-card>
+              <router-link :to="{path: '/detail/'+nft._id}" class="link">
+                <b-card
+                  :title="nft.name"
+                  :img-src="$store.state.IPFS_SERVER + nft.uri"
+                  img-alt="Image"
+                  img-top
+                  tag="article"
+                  style="max-width: 20rem; color: #000"
+                  class="mb-2"
+                >
+                  <div class="css-price-area">
+                    <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base> 
+                    <span class="css-price">{{nft.price}}&nbsp;LOWB</span>
+                  </div>
+                </b-card>
+              </router-link>
             </div>
           </div>
           <!-- 分页组件 -->
@@ -111,7 +109,14 @@
 </template>
 
 <script>
+import IconBase from './IconBase.vue'
+import IconLowb from './icons/IconLowb.vue'
+
 export default {
+  components: {
+    IconBase,
+    IconLowb
+  },
     data() {
       return {
         slide: 0,
@@ -123,29 +128,11 @@ export default {
       }
     },
     mounted (){
-      this.data = this.$store.getters.loser_punks(this.$store.state.punkMode);
+      // this.data = this.$store.getters.loser_punks(this.$store.state.punkMode);
+      this.getMyNFTs();
     },
     watch: {
-      'data.length': {
-        handler(newValue, oldValue) {
-          this.rows = newValue;
-          if (newValue <= 12) {
-            this.page(1);
-          }else if(newValue > 12){
-            this.page(this.$store.state.punkPage);
-          }
-        }
-      },
-      '$store.state.loserPunkState': {
-        handler(newValue, oldValue) {
-          //console.log(newValue, oldValue)
-          if (newValue == 'idle') {
-            this.data = this.$store.getters.loser_punks(this.$store.state.punkMode);
-            this.$store.commit('setPunkPage', 1)
-            //this.page(1)
-          }
-        }
-      }
+      
     },
     methods: {
       onSlideStart(slide) {
@@ -155,17 +142,28 @@ export default {
         this.sliding = false
       },
       page(page){
-        this.nowData = [...this.data].slice((page-1)*12,page*12);
-        this.$store.commit('setPunkPage', page)
-        this.goPage = page
+        this.goPage = page;
+        this.getMyNFTs();
       },
       filter_punks(filter){
-        this.$store.commit('setPunkMode', filter)
-        this.$store.dispatch('filterPunks', filter)
+
       },
       go_page(){
-        if (this.goPage >= 1 && this.goPage < this.data.length/12+1)
-        this.page(Math.floor(this.goPage))
+        this.getMyNFTs();
+      },
+      getMyNFTs: async function() {
+        let response = await axios.get(this.$store.state.BACKEND_SERVER + '/v1/nft/all', {
+          params: {
+            page: this.goPage
+          }
+        });
+
+        if(response.data.code != 200) {
+          console.log(response.data.message);
+          return; 
+        }
+        console.log(response.data.data);
+        this.nowData = response.data.data.data;
       }
     }
 }
@@ -213,6 +211,10 @@ body {
     &:hover{
       transform: translate(0,-10px);
     }
+  }
+  .css-price-area {
+    display: flex;
+    align-items: center;
   }
 }
 

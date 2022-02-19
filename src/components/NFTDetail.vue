@@ -15,6 +15,10 @@
             <router-link :to="{path: '/edit/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button">{{ $t("lang.edit") }}</button></router-link>
             <router-link :to="{path: '/sell/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button" style="margin-left: 20px">{{ $t("lang.sell") }}</button></router-link>
           </div>
+          <div class="row" v-else>
+            <h3 class="col-5" style="margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} Lowb</h3>
+            <button class="btn btn-primary col-6" type="button" style="margin-left: 20px">{{ $t("lang.offer") }}</button>
+          </div>
           <div class="border-area">
             <h5 class="title-area">{{$t("lang.offerlist")}}</h5>
             <table class="table table-hover">
@@ -24,16 +28,16 @@
                   <th scope="col">{{ $t("lang.maker") }}</th>
                   <th scope="col">{{ $t("lang.price") }}</th>
                   <th scope="col">{{ $t("lang.time") }}</th>
-                  <th scope="col">{{ $t("lang.action") }}</th>
+                  <th scope="col" v-if="owner==this.$store.state.account">{{ $t("lang.action") }}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(offer, index) in offerlist" :key="Number(offer.maker)">
-                  <th style="vertical-align: middle">{{index+1}}</th>
-                  <th style="vertical-align: middle">{{offer.maker}}</th>
-                  <th style="vertical-align: middle">{{offer.price}}</th>
-                  <th style="vertical-align: middle">{{offer.time}}</th>
-                  <th>
+                  <th scope="col" style="vertical-align: middle">{{index+1}}</th>
+                  <th scope="col" style="vertical-align: middle">{{offer.maker}}</th>
+                  <th scope="col" style="vertical-align: middle">{{offer.price}}</th>
+                  <th scope="col" style="vertical-align: middle">{{offer.time}}</th>
+                  <th scope="col"  v-if="owner==myaccount">
                     <button class="btn btn-primary" type="button">Accept</button>
                   </th>
                 </tr>
@@ -63,7 +67,9 @@ export default {
       imageFile: null,
       id: this.$route.params.id,
       owner: '',
-      offerlist: [{maker: "0x123321321321", "price": "12345", "time": "12:12:2021"}]
+      offerlist: [],
+      price: '',
+      myaccount: this.$store.state.account,
     }
   },
   created () {
@@ -92,6 +98,7 @@ export default {
       this.name = nft.name;
       this.description = nft.description;
       this.owner = nft.owner;
+      this.price = nft.price;
     },
   }
 }

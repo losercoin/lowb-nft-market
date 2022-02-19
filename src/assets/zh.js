@@ -135,4 +135,5 @@ export const lang = {
     fee: "Fee",
     servicefee: "Service Fee",
     completelist: "Complete listing",
+    offer: "Offer",
 }
