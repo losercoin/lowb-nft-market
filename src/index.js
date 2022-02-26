@@ -1481,8 +1481,8 @@ async function offerNft(data) {
 async function acceptOffer(data) {
   const lowbContractSigner = await global.lowbContract.connect(global.signer);
   try {
-    let result = await lowbContractSigner.approve(data.sender, ethers.utils.parseUnits(data.price, 18));
-    await lowbContractSigner.transferFrom(data.sender, store.state.account, ethers.utils.parseUnits(data.price, 18));
+    // let result = await lowbContractSigner.approve(data.sender, ethers.utils.parseUnits(data.price, 18));
+    // await lowbContractSigner.transferFrom(data.sender, store.state.account, ethers.utils.parseUnits(data.price, 18));
   } catch(error) {
     console.log(error);
   }
