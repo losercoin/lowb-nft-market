@@ -397,6 +397,9 @@ const store = new Vuex.Store({
     saleNFT({}, data) {
       saleNFT(data);
     },
+    offer({}, data) {
+      offerNft(data);
+    },
   }
 })
 
@@ -1414,7 +1417,7 @@ async function saleNFT(data) {
   } catch(err) {
     console.log('Mint error')
   }
-
+  
   const number = '0x' + (new Number(parseInt(data.tokenId)).toString(16));
   const filter = global.nftCollectionContract.filters.saleNFT(number)
   if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
@@ -1460,6 +1463,15 @@ async function editNFT(data) {
       text: 'Failed to edit your nft!',
       type: 'error'
     })
+  }
+}
+
+async function offerNft(data) {
+  const nftCollectionSigner = await global.nftCollectionContract.connect(global.signer);
+  try {
+    await nftCollectionSigner.bidNFT(data.tokenId, data.price);
+  } catch(err) {
+    console.log('Mint error')
   }
 }
 

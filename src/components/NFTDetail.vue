@@ -15,9 +15,13 @@
             <router-link :to="{path: '/edit/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button">{{ $t("lang.edit") }}</button></router-link>
             <router-link :to="{path: '/sell/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button" style="margin-left: 20px">{{ $t("lang.sell") }}</button></router-link>
           </div>
-          <div class="row" v-else>
-            <h3 class="col-5" style="margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} Lowb</h3>
-            <button class="btn btn-primary col-6" type="button" style="margin-left: 20px">{{ $t("lang.offer") }}</button>
+          <div v-else>
+            <h3 style="margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} Lowb</h3>
+            <div class="row" style="margin-top: 20px">
+              <h3 class="col-3">{{ $t("lang.myOfferPice") }}: </h3>
+              <input style="width:300px" v-model="bidPrice" type="number" />
+              <button class="btn btn-primary" type="button" style="width:300px; margin-left: 20px" @click="offer">{{ $t("lang.offer") }}</button>
+            </div>
           </div>
           <div class="border-area">
             <h5 class="title-area">{{$t("lang.offerlist")}}</h5>
@@ -34,9 +38,9 @@
               <tbody>
                 <tr v-for="(offer, index) in offerlist" :key="Number(offer.maker)">
                   <th scope="col" style="vertical-align: middle">{{index+1}}</th>
-                  <th scope="col" style="vertical-align: middle">{{offer.maker}}</th>
-                  <th scope="col" style="vertical-align: middle">{{offer.price}}</th>
-                  <th scope="col" style="vertical-align: middle">{{offer.time}}</th>
+                  <th scope="col" style="vertical-align: middle">{{offer.sender.toLowerCase()}}</th>
+                  <th scope="col" style="vertical-align: middle">{{offer.price}} Lowb</th>
+                  <th scope="col" style="vertical-align: middle">{{new Date(offer.date).toLocaleString('en-GB', { timeZone: 'UTC' })}}</th>
                   <th scope="col"  v-if="owner==myaccount">
                     <button class="btn btn-primary" type="button">Accept</button>
                   </th>
@@ -69,6 +73,8 @@ export default {
       owner: '',
       offerlist: [],
       price: '',
+      bidPrice: '',
+      tokenId: '',
       myaccount: this.$store.state.account,
     }
   },
@@ -80,7 +86,6 @@ export default {
   },
   methods: {
     getNFT: async function() {
-      console.log(this.id)
       let response = await axios.get(this.$store.state.BACKEND_SERVER + '/v1/nft', {
         params: {
           id: this.id
@@ -93,13 +98,36 @@ export default {
       }
 
       let nft = response.data.data.data;
-      console.log(nft);
+
+      response = await axios.get(this.$store.state.BACKEND_SERVER + '/v1/nft/offer', {
+        params: {
+          tokenId: '52025463752823348721984942518262554230180322744910514853950239834779951425937'
+        }
+      });
+
+      if(response.data.code != 200) {
+        console.log(response.data.message);
+        return; 
+      }
+
+      let offerlist = response.data.data;
+      const myoffer = offerlist.filter(cell => cell.sender.toLowerCase() == this.myaccount);
+
       this.media = this.$store.state.IPFS_SERVER+nft.uri;
       this.name = nft.name;
       this.description = nft.description;
       this.owner = nft.owner;
       this.price = nft.price;
+      this.bidPrice = myoffer.length == 1 ? myoffer[0].price : nft.price;
+      this.tokenId = nft.tokenId;
+      this.offerlist = offerlist;
     },
+    offer: function() {
+      this.bidPrice > '0' && this.$store.dispatch('offer', {tokenId: this.tokenId, price: this.bidPrice})
+    },
+    getDateTime: function(timestamp) {
+
+    }
   }
 }
 </script>

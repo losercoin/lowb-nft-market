@@ -136,4 +136,5 @@ export const lang = {
     servicefee: "Service Fee",
     completelist: "Complete listing",
     offer: "Offer",
+    myOfferPice: "My offer price",
 }
