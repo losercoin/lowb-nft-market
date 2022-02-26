@@ -400,6 +400,9 @@ const store = new Vuex.Store({
     offer({}, data) {
       offerNft(data);
     },
+    accept({}, data) {
+      acceptOffer(data);
+    }
   }
 })
 
@@ -1472,6 +1475,16 @@ async function offerNft(data) {
     await nftCollectionSigner.bidNFT(data.tokenId, data.price);
   } catch(err) {
     console.log('Mint error')
+  }
+}
+
+async function acceptOffer(data) {
+  const lowbContractSigner = await global.lowbContract.connect(global.signer);
+  try {
+    let result = await lowbContractSigner.approve(data.sender, ethers.utils.parseUnits(data.price, 18));
+    await lowbContractSigner.transferFrom(data.sender, store.state.account, ethers.utils.parseUnits(data.price, 18));
+  } catch(error) {
+    console.log(error);
   }
 }
 

@@ -42,7 +42,7 @@
                   <th scope="col" style="vertical-align: middle">{{offer.price}} Lowb</th>
                   <th scope="col" style="vertical-align: middle">{{new Date(offer.date).toLocaleString('en-GB', { timeZone: 'UTC' })}}</th>
                   <th scope="col"  v-if="owner==myaccount">
-                    <button class="btn btn-primary" type="button">Accept</button>
+                    <button class="btn btn-primary" type="button" @click="accept(offer.tokenId, offer.sender, offer.price)">Accept</button>
                   </th>
                 </tr>
               </tbody>
@@ -75,7 +75,7 @@ export default {
       price: '',
       bidPrice: '',
       tokenId: '',
-      myaccount: this.$store.state.account,
+      myaccount: '',
     }
   },
   created () {
@@ -83,6 +83,7 @@ export default {
   },
   mounted() {
     this.getNFT();
+    this.myaccount = this.$store.state.account;
   },
   methods: {
     getNFT: async function() {
@@ -101,7 +102,7 @@ export default {
 
       response = await axios.get(this.$store.state.BACKEND_SERVER + '/v1/nft/offer', {
         params: {
-          tokenId: '52025463752823348721984942518262554230180322744910514853950239834779951425937'
+          tokenId: nft.tokenId
         }
       });
 
@@ -111,7 +112,7 @@ export default {
       }
 
       let offerlist = response.data.data;
-      const myoffer = offerlist.filter(cell => cell.sender.toLowerCase() == this.myaccount);
+      const myoffer = offerlist.filter(cell => cell.sender.toLowerCase() == this.$store.state.account);
 
       this.media = this.$store.state.IPFS_SERVER+nft.uri;
       this.name = nft.name;
@@ -125,8 +126,8 @@ export default {
     offer: function() {
       this.bidPrice > '0' && this.$store.dispatch('offer', {tokenId: this.tokenId, price: this.bidPrice})
     },
-    getDateTime: function(timestamp) {
-
+    accept: function(tokenId, sender, price) {
+      this.$store.dispatch('accept', {tokenId, sender, price});
     }
   }
 }
