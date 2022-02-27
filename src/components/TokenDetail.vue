@@ -1,10 +1,8 @@
 <template>
   <div>
-    <notifications 
-      group="tokendetail" 
-      position="top right"/>
     <div>
       <b-card no-body class="overflow-hidden">
+        
         <b-row no-gutters>
           <b-col md="4">
             <b-card-img :src="require('../assets/'+$store.state.nftInfos[groupId-1].image)" alt="Image" class="rounded-0"></b-card-img>

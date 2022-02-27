@@ -137,4 +137,7 @@ export const lang = {
     completelist: "Selling preperation",
     offer: "Offer",
     myOfferPice: "My offer price",
+    seller: "seller",
+    buyer: "buyer",
+    tradeHistory: "Trade History",
 }

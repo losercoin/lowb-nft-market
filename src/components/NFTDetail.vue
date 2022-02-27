@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <notifications 
+          group="tokendetail" 
+          position="top right"/>
     <div>
       <div class="row">
         <div class="col-4">
@@ -12,34 +15,33 @@
         <div class="col-sm-8" style="padding: 20px 30px">
           <h1>{{this.name}}</h1>
           <div class="row" v-if="owner==this.$store.state.account" style="margin-left: 0px">
+            <h3 v-if="this.sell == 1" style="width: 300px; margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} Lowb</h3>
             <router-link :to="{path: '/edit/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button">{{ $t("lang.edit") }}</button></router-link>
-            <router-link :to="{path: '/sell/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button" style="margin-left: 20px">{{ $t("lang.sell") }}</button></router-link>
+            <router-link v-if="this.sell==0" :to="{path: '/sell/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button" style="margin-left: 20px">{{ $t("lang.sell") }}</button></router-link>
           </div>
           <div class="row" v-else>
             <h3 style="width: 300px; margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} Lowb</h3>
             <button class="btn btn-primary" type="button" style="width:300px; margin-left: auto" @click="buyNFT">{{ $t("lang.buy") }}</button>
           </div>
-          <div class="border-area">
-            <h5 class="title-area">{{$t("lang.offerlist")}}</h5>
+          <div class="border-area history-area">
+            <h5 class="title-area">{{$t("lang.tradeHistory")}}</h5>
             <table class="table table-hover">
               <thead>
                 <tr>
                   <th scope="col">No</th>
-                  <th scope="col">{{ $t("lang.maker") }}</th>
+                  <th scope="col">{{ $t("lang.seller") }}</th>
+                  <th scope="col">{{ $t("lang.buyer") }}</th>
                   <th scope="col">{{ $t("lang.price") }}</th>
                   <th scope="col">{{ $t("lang.time") }}</th>
-                  <th scope="col" v-if="owner==this.$store.state.account">{{ $t("lang.action") }}</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(offer, index) in offerlist" :key="Number(offer.maker)">
-                  <th scope="col" style="vertical-align: middle">{{index+1}}</th>
-                  <th scope="col" style="vertical-align: middle">{{offer.sender.toLowerCase()}}</th>
-                  <th scope="col" style="vertical-align: middle">{{offer.price}} Lowb</th>
-                  <th scope="col" style="vertical-align: middle">{{new Date(offer.date).toLocaleString('en-GB', { timeZone: 'UTC' })}}</th>
-                  <th scope="col"  v-if="owner==myaccount">
-                    <button class="btn btn-primary" type="button" @click="accept(offer.tokenId, offer.sender, offer.price)">Accept</button>
-                  </th>
+                <tr v-for="(cell, index) in history" :key="cell._id">
+                  <th scope="col">{{index+1}}</th>
+                  <th scope="col">{{cell.seller.toLowerCase()}}</th>
+                  <th scope="col">{{cell.buyer.toLowerCase()}}</th>
+                  <th scope="col">{{cell.price}} Lowb</th>
+                  <th scope="col">{{new Date(cell.date).toLocaleString('en-GB', { timeZone: 'UTC' })}}</th>
                 </tr>
               </tbody>
             </table>
@@ -67,11 +69,12 @@ export default {
       imageFile: null,
       id: this.$route.params.id,
       owner: '',
-      offerlist: [],
+      history: [],
       price: '',
       bidPrice: '',
       tokenId: '',
       myaccount: '',
+      sell: 0,
     }
   },
   created () {
@@ -96,7 +99,7 @@ export default {
 
       let nft = response.data.data.data;
 
-      response = await axios.get(this.$store.state.BACKEND_SERVER + '/v1/nft/offer', {
+      response = await axios.get(this.$store.state.BACKEND_SERVER + '/v1/nft/history', {
         params: {
           tokenId: nft.tokenId
         }
@@ -106,18 +109,15 @@ export default {
         console.log(response.data.message);
         return; 
       }
-
-      let offerlist = response.data.data;
-      const myoffer = offerlist.filter(cell => cell.sender.toLowerCase() == this.$store.state.account);
-
+      
+      this.history = response.data.data;
       this.media = this.$store.state.IPFS_SERVER+nft.uri;
       this.name = nft.name;
       this.description = nft.description;
       this.owner = nft.owner;
       this.price = nft.price;
-      this.bidPrice = myoffer.length == 1 ? myoffer[0].price : nft.price;
       this.tokenId = nft.tokenId;
-      this.offerlist = offerlist;
+      this.sell = nft.sell;
     },
     buyNFT: function() {
       this.$store.dispatch('buyNFT', {tokenId: this.tokenId, owner: this.owner, price: this.price})
@@ -152,5 +152,12 @@ export default {
 }
 .css-button {
   width: 100%;
+}
+.history-area {
+  overflow: auto;
+}
+th {
+  white-space:nowrap;
+  vertical-align: middle;
 }
 </style>
