@@ -1429,8 +1429,20 @@ async function saleNFT(data) {
     })
     nftMarketplaceSigner.once("saleNFT", () => {
       console.log('success the prepare the sell.');
+      Vue.notify({
+        group: 'sellnft',
+        title: 'Prepare',
+        text: 'The selling preparation was successfully complete.',
+        type: 'success'
+      })
     });
   } catch(err) {
+    Vue.notify({
+      group: 'sellnft',
+      title: 'Prepare',
+      text: 'The selling preparation was failed.',
+      type: 'error'
+    })
     console.log('Mint error')
   }
   
@@ -1483,10 +1495,20 @@ async function buyNFT(data) {
     await lowbWithSigner.transfer(data.owner, amount_in_wei);
     await nftMarketplaceSigner.sellNFT(data.owner, data.tokenId, data.price);
     nftMarketplaceSigner.once("buyNFT", () => {
-      console.log('The nft was successfully bought.');
+      Vue.notify({
+        group: 'tokendetail',
+        title: 'Prepare',
+        text: 'The nft was successfully bought.',
+        type: 'success'
+      })
     });
   } catch(error) {
-    console.log(error)
+    Vue.notify({
+      group: 'tokendetail',
+      title: 'Prepare',
+      text: 'The trade was failed.',
+      type: 'error'
+    })
   }
 }
 

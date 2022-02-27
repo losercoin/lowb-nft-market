@@ -134,7 +134,7 @@ export const lang = {
     listforsale: "List item for sale",
     fee: "Fee",
     servicefee: "Service Fee",
-    completelist: "Complete listing",
+    completelist: "Selling preperation",
     offer: "Offer",
     myOfferPice: "My offer price",
 }

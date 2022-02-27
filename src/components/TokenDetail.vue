@@ -1,5 +1,8 @@
 <template>
   <div>
+    <notifications 
+      group="tokendetail" 
+      position="top right"/>
     <div>
       <b-card no-body class="overflow-hidden">
         <b-row no-gutters>

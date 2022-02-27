@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <notifications 
+      group="sellnft" 
+      position="top right"/>
     <div>
       <div class="row">
         <div class="col-5">
