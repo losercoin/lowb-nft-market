@@ -15,13 +15,9 @@
             <router-link :to="{path: '/edit/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button">{{ $t("lang.edit") }}</button></router-link>
             <router-link :to="{path: '/sell/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button" style="margin-left: 20px">{{ $t("lang.sell") }}</button></router-link>
           </div>
-          <div v-else>
-            <h3 style="margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} Lowb</h3>
-            <div class="row" style="margin-top: 20px">
-              <h3 class="col-3">{{ $t("lang.myOfferPice") }}: </h3>
-              <input style="width:300px" v-model="bidPrice" type="number" />
-              <button class="btn btn-primary" type="button" style="width:300px; margin-left: 20px" @click="offer">{{ $t("lang.offer") }}</button>
-            </div>
+          <div class="row" v-else>
+            <h3 style="width: 300px; margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} Lowb</h3>
+            <button class="btn btn-primary" type="button" style="width:300px; margin-left: auto" @click="buyNFT">{{ $t("lang.buy") }}</button>
           </div>
           <div class="border-area">
             <h5 class="title-area">{{$t("lang.offerlist")}}</h5>
@@ -123,11 +119,8 @@ export default {
       this.tokenId = nft.tokenId;
       this.offerlist = offerlist;
     },
-    offer: function() {
-      this.bidPrice > '0' && this.$store.dispatch('offer', {tokenId: this.tokenId, price: this.bidPrice})
-    },
-    accept: function(tokenId, sender, price) {
-      this.$store.dispatch('accept', {tokenId, sender, price});
+    buyNFT: function() {
+      this.$store.dispatch('buyNFT', {tokenId: this.tokenId, owner: this.owner, price: this.price})
     }
   }
 }

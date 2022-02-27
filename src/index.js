@@ -96,6 +96,7 @@ const store = new Vuex.Store({
     bidsAdmin: {},
     eventFilters: [],
     modalShow: false,
+    marketplaceAddress: '',
     CHAIN_ID: chainInfo.chainId,
     IPFS_SERVER: process.env.VUE_APP_IPFS_URL,
     BACKEND_SERVER: process.env.VUE_APP_SERVER,
@@ -397,11 +398,8 @@ const store = new Vuex.Store({
     saleNFT({}, data) {
       saleNFT(data);
     },
-    offer({}, data) {
-      offerNft(data);
-    },
-    accept({}, data) {
-      acceptOffer(data);
+    buyNFT({}, data) {
+      buyNFT(data);
     }
   }
 })
@@ -552,6 +550,11 @@ async function getContracts (firstTime = true) {
   const nftCollectionAbi = (await nftCollectionFile())['abi'];
   const nftCollectionAddress = (await nftCollectionFile())['networks'][parseInt(chainInfo.chainId)]['address'];
   global.nftCollectionContract = new ethers.Contract(nftCollectionAddress, nftCollectionAbi, global.provider)
+
+  const nftMarketplaceFile = () => import("./abis/NFTMarketplace.json");
+  const nftMarketplaceAbi = (await nftMarketplaceFile())['abi'];
+  const nftMarketplaceAddress = (await nftMarketplaceFile())['networks'][parseInt(chainInfo.chainId)]['address'];
+  global.nftMarketplaceContract = new ethers.Contract(nftMarketplaceAddress, nftMarketplaceAbi, global.provider)
 
   const weddingFile = () => import("./assets/WeddingGift.json")
   const weddingAbi = (await weddingFile())['abi']
@@ -1413,22 +1416,24 @@ async function mintNFT(data) {
   }
 }
 
+
+
 async function saleNFT(data) {
   const nftCollectionSigner = await global.nftCollectionContract.connect(global.signer);
+  const nftMarketplaceSigner = await global.nftMarketplaceContract.connect(global.signer);
+
   try {
-    await nftCollectionSigner.prepareForSale(data.tokenId, data.price);
+    await nftCollectionSigner.approve(global.nftMarketplaceContract.address, data.tokenId);
+    nftCollectionSigner.once("Approval", async() => {
+      await nftMarketplaceSigner.prepareForSale(data.tokenId, data.price);
+    })
+    nftMarketplaceSigner.once("saleNFT", () => {
+      console.log('success the prepare the sell.');
+    });
   } catch(err) {
     console.log('Mint error')
   }
   
-  const number = '0x' + (new Number(parseInt(data.tokenId)).toString(16));
-  const filter = global.nftCollectionContract.filters.saleNFT(number)
-  if (store.state.eventFilters.find(element => JSON.stringify(element) == JSON.stringify(filter))) {
-    console.log("withdraw bid event registered")
-  }
-  else {
-    console.log('Mint success');
-  }
 }
 
 
@@ -1469,22 +1474,19 @@ async function editNFT(data) {
   }
 }
 
-async function offerNft(data) {
-  const nftCollectionSigner = await global.nftCollectionContract.connect(global.signer);
-  try {
-    await nftCollectionSigner.bidNFT(data.tokenId, data.price);
-  } catch(err) {
-    console.log('Mint error')
-  }
-}
+async function buyNFT(data) {
+  const lowbWithSigner = await global.lowbContract.connect(global.signer);
+  const nftMarketplaceSigner = await global.nftMarketplaceContract.connect(global.signer);
 
-async function acceptOffer(data) {
-  const lowbContractSigner = await global.lowbContract.connect(global.signer);
   try {
-    // let result = await lowbContractSigner.approve(data.sender, ethers.utils.parseUnits(data.price, 18));
-    // await lowbContractSigner.transferFrom(data.sender, store.state.account, ethers.utils.parseUnits(data.price, 18));
+    const amount_in_wei = ethers.utils.parseUnits(data.price.toString(), 18);
+    await lowbWithSigner.transfer(data.owner, amount_in_wei);
+    await nftMarketplaceSigner.sellNFT(data.owner, data.tokenId, data.price);
+    nftMarketplaceSigner.once("buyNFT", () => {
+      console.log('The nft was successfully bought.');
+    });
   } catch(error) {
-    console.log(error);
+    console.log(error)
   }
 }
 
