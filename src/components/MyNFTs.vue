@@ -111,7 +111,7 @@ export default {
     };
   },
   created () {
-    this.$store.dispatch('filterPunks', 'my_bids')
+    // this.$store.dispatch('filterPunks', 'my_bids')
     // this.$store.dispatch('updateMyNfts')
   },
   mounted() {
