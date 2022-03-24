@@ -1425,7 +1425,8 @@ async function saleNFT(data) {
   try {
     await nftCollectionSigner.approve(global.nftMarketplaceContract.address, data.tokenId);
     nftCollectionSigner.once("Approval", async() => {
-      await nftMarketplaceSigner.prepareForSale(data.tokenId, data.price);
+      const amount_in_wei = ethers.utils.parseUnits(data.price.toString(), 18);
+      await nftMarketplaceSigner.prepareForSale(data.tokenId, amount_in_wei);
     })
     nftMarketplaceSigner.once("saleNFT", () => {
       console.log('success the prepare the sell.');
@@ -1493,7 +1494,8 @@ async function buyNFT(data) {
   try {
     const amount_in_wei = ethers.utils.parseUnits(data.price.toString(), 18);
     await lowbWithSigner.transfer(data.owner, amount_in_wei);
-    await nftMarketplaceSigner.sellNFT(data.owner, data.tokenId, data.price);
+    await nftMarketplaceSigner.sellNFT(data.owner, data.tokenId, amount_in_wei);
+    
     nftMarketplaceSigner.once("buyNFT", () => {
       Vue.notify({
         group: 'tokendetail',
