@@ -54,8 +54,9 @@
             class="mb-2"
           >
             <div class="css-price-area">
-              <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base> 
-              <span class="css-price">{{nft.price}}&nbsp;LOWB</span>
+              <!-- <icon-base width="20" height="20" icon-name="bnb"><icon-bnb /></icon-base>  -->
+              <IconBNB />
+              <span class="css-price">{{nft.price}}&nbsp;BNB</span>
               <button class="css-edit-button"><router-link :to="{path: '/edit/'+nft._id}" class="link">{{ $t("lang.edit") }}</router-link></button>
             </div>
           </b-card>
@@ -96,11 +97,13 @@ import airdropFile from '../abis/AirdropClaim.json'
 import { ethers } from "ethers";
 import IconBase from './IconBase.vue'
 import IconLowb from './icons/IconLowb.vue'
+import IconBNB from './icons/IconBNB.vue'
 
 export default {
   components: {
     IconBase,
-    IconLowb
+    IconLowb,
+    IconBNB
   },
   data: function() {
     return {

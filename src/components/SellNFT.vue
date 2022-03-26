@@ -17,8 +17,9 @@
             class="mb-2"
           >
             <div class="css-price-area">
-              <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base> 
-              <span class="css-price">{{this.price}}&nbsp;LOWB</span>
+              <!-- <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base>  -->
+              <IconBNB />
+              <span class="css-price">{{this.price}}&nbsp;BNB</span>
             </div>
           </b-card>
         </div>
@@ -28,8 +29,9 @@
             <h5>{{$t("lang.price")}}</h5>
             <div class="row">
               <div class="css-lowb-icon col-sm-2">
-                <icon-base width="30" height="30" icon-name="lowb"><icon-lowb /></icon-base> 
-                <span style="font-size:20px;margin-left:10px;">Lowb</span>
+                <!-- <icon-base width="30" height="30" icon-name="lowb"><icon-lowb /></icon-base>  -->
+                <IconBNB />
+                <span style="font-size:20px;margin-left:10px;">BNB</span>
               </div>
               <div class="col-10">
                 <input class="form-control" v-model="price" type="number"/>
@@ -54,11 +56,13 @@ import airdropFile from '../abis/AirdropClaim.json'
 import { ethers } from "ethers";
 import IconBase from './IconBase.vue'
 import IconLowb from './icons/IconLowb.vue'
+import IconBNB from './icons/IconBNB.vue'
 
 export default {
   components: {
     IconBase,
-    IconLowb
+    IconLowb,
+    IconBNB
   },
   data() {
     return {

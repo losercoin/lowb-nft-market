@@ -79,8 +79,9 @@
                   class="mb-2"
                 >
                   <div class="css-price-area">
-                    <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base> 
-                    <span class="css-price">{{nft.price}}&nbsp;LOWB</span>
+                    <!-- <IconBNB /> -->
+                    <!-- <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base>  -->
+                    <span class="css-price">{{nft.price}}&nbsp;BNB</span>
                   </div>
                 </b-card>
               </router-link>
@@ -111,11 +112,13 @@
 <script>
 import IconBase from './IconBase.vue'
 import IconLowb from './icons/IconLowb.vue'
+import IconBNB from './icons/IconBNB.vue'
 
 export default {
   components: {
     IconBase,
-    IconLowb
+    IconLowb,
+    IconBNB
   },
     data() {
       return {
