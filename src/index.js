@@ -1488,22 +1488,11 @@ async function editNFT(data) {
 }
 
 async function buyNFT(data) {
-  // const lowbWithSigner = await global.lowbContract.connect(global.signer);
   const nftMarketplaceSigner = await global.nftMarketplaceContract.connect(global.signer);
 
   try {
     const amount_in_wei = ethers.utils.parseUnits(data.price.toString(), 18);
-    // await lowbWithSigner.transfer(data.owner, amount_in_wei);
-    const params = {
-      from: store.state.account,
-      to: data.owner,
-      value: amount_in_wei,
-    };
-    global.signer.sendTransaction(params).then(async (transaction) => {
-      await nftMarketplaceSigner.sellNFT(data.owner, data.tokenId, amount_in_wei);
-  });
-    // const transactionResult = await global.provider.send('sellNFT', data.owner, data.tokenId , params);
-    
+    await nftMarketplaceSigner.sellNFT(data.tokenId, {value: amount_in_wei});
     nftMarketplaceSigner.once("buyNFT", () => {
       Vue.notify({
         group: 'tokendetail',
