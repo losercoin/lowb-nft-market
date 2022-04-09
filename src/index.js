@@ -10,7 +10,7 @@ import axios from 'axios';
 window.axios = require('axios');
 const ipfsClient = require('ipfs-http-client');
 
-const IPFS = ipfsClient.create({ host: process.env.VUE_APP_IPFS, port: 80});
+const IPFS = ipfsClient.create(process.env.VUE_APP_IPFS);
 
 import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS, WALLET_ADMIN_ADDRESS, WEDDING_CONTRACT_ADDRESS, STAKING_ADDRESS, MATIC_ADDRESS, NFTCOLLECTION_ETC_ADDRESS, NFTMARKET_ETC_ADDRESS } from "./const/index.js"
 import peopleInfo from './const/people.json'
