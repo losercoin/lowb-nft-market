@@ -12,7 +12,7 @@ const ipfsClient = require('ipfs-http-client');
 
 const IPFS = ipfsClient.create({ host: process.env.VUE_APP_IPFS, port: 80});
 
-import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS, WALLET_ADMIN_ADDRESS, WEDDING_CONTRACT_ADDRESS, STAKING_ADDRESS, MATIC_ADDRESS } from "./const/index.js"
+import { chainInfo, LOWB_TOKEN_ADDRESS, MARKET_CONTRACT_ADDRESS, HELPER_CONTRACT_ADDRESS, LOWC_TOKEN_ADDRESS, ADMIN_ADDRESS, WALLET_ADMIN_ADDRESS, WEDDING_CONTRACT_ADDRESS, STAKING_ADDRESS, MATIC_ADDRESS, NFTCOLLECTION_ETC_ADDRESS, NFTMARKET_ETC_ADDRESS } from "./const/index.js"
 import peopleInfo from './const/people.json'
 
 const App = () => import("./App.vue");
@@ -487,6 +487,14 @@ function getNetwork() {
         rpcUrls: ['https://data-seed-prebsc-1-s2.binance.org:8545/'],
         blockExplorerUrls: ['https://testnet.bscscan.com']
       }
+      case '0x3d': 
+        return {
+          chainId: chainInfo.chainId,
+          chainName: 'Ethereum Classic',
+          nativeCurrency: { name: 'ETC', symbol: 'ETC', decimals: 18 }, 
+          rpcUrls: ['https://www.ethercluster.com/etc'],
+          blockExplorerUrls: ['https://blockscout.com/etc/mainnet/']
+      }
     default :
       return {
         chainId: chainInfo.chainId,
@@ -548,13 +556,11 @@ async function getContracts (firstTime = true) {
 
   const nftCollectionFile = () => import("./abis/NFTCollection.json");
   const nftCollectionAbi = (await nftCollectionFile())['abi'];
-  const nftCollectionAddress = (await nftCollectionFile())['networks'][parseInt(chainInfo.chainId)]['address'];
-  global.nftCollectionContract = new ethers.Contract(nftCollectionAddress, nftCollectionAbi, global.provider)
+  global.nftCollectionContract = new ethers.Contract(NFTCOLLECTION_ETC_ADDRESS, nftCollectionAbi, global.provider)
 
   const nftMarketplaceFile = () => import("./abis/NFTMarketplace.json");
   const nftMarketplaceAbi = (await nftMarketplaceFile())['abi'];
-  const nftMarketplaceAddress = (await nftMarketplaceFile())['networks'][parseInt(chainInfo.chainId)]['address'];
-  global.nftMarketplaceContract = new ethers.Contract(nftMarketplaceAddress, nftMarketplaceAbi, global.provider)
+  global.nftMarketplaceContract = new ethers.Contract(NFTMARKET_ETC_ADDRESS, nftMarketplaceAbi, global.provider)
 
   const weddingFile = () => import("./assets/WeddingGift.json")
   const weddingAbi = (await weddingFile())['abi']
