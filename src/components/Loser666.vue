@@ -81,7 +81,7 @@
                   <div class="css-price-area">
                     <!-- <IconBNB /> -->
                     <!-- <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base>  -->
-                    <span class="css-price">{{nft.price}}&nbsp;BNB</span>
+                    <span class="css-price">{{nft.price}}&nbsp;ETC</span>
                   </div>
                 </b-card>
               </router-link>

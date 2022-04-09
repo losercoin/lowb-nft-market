@@ -18,8 +18,8 @@
           >
             <div class="css-price-area">
               <!-- <icon-base width="20" height="20" icon-name="lowb"><icon-lowb /></icon-base>  -->
-              <IconBNB />
-              <span class="css-price">{{this.price}}&nbsp;BNB</span>
+              <!-- <IconBNB /> -->
+              <span class="css-price">{{this.price}}&nbsp;ETC</span>
             </div>
           </b-card>
         </div>
@@ -30,8 +30,8 @@
             <div class="row">
               <div class="css-lowb-icon col-sm-2">
                 <!-- <icon-base width="30" height="30" icon-name="lowb"><icon-lowb /></icon-base>  -->
-                <IconBNB />
-                <span style="font-size:20px;margin-left:10px;">BNB</span>
+                <!-- <IconBNB /> -->
+                <span style="font-size:20px;margin-left:10px;">ETC</span>
               </div>
               <div class="col-10">
                 <input class="form-control" v-model="price" type="number"/>
@@ -62,7 +62,7 @@ export default {
   components: {
     IconBase,
     IconLowb,
-    IconBNB
+    IconBNB,
   },
   data() {
     return {

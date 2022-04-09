@@ -15,12 +15,12 @@
         <div class="col-sm-8" style="padding: 20px 30px">
           <h1>{{this.name}}</h1>
           <div class="row" v-if="owner==this.$store.state.account" style="margin-left: 0px">
-            <h3 v-if="this.sell == 1" style="width: 300px; margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} BNB</h3>
+            <h3 v-if="this.sell == 1" style="width: 300px; margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} ETC</h3>
             <router-link :to="{path: '/edit/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button">{{ $t("lang.edit") }}</button></router-link>
             <router-link v-if="this.sell==0" :to="{path: '/sell/'+this.id}" class="link col-3"><button class="btn btn-primary css-button" type="button" style="margin-left: 20px">{{ $t("lang.sell") }}</button></router-link>
           </div>
           <div class="row" v-else>
-            <h3 style="width: 300px; margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} BNB</h3>
+            <h3 style="width: 300px; margin-bottom: 0px">{{ $t("lang.price") }}: {{price}} ETC</h3>
             <button class="btn btn-primary" type="button" style="width:300px; margin-left: auto" @click="buyNFT">{{ $t("lang.buy") }}</button>
           </div>
           <div class="border-area history-area">

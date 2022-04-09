@@ -6,6 +6,7 @@ export const lang = {
     lowbNFTMarket:'Lowb NFT Market',
     clickHeretoInstallMetaMask:'Wallet not found',
     connecttoBinanceSmartChain:'Connect to Binance Smart Chain',
+    connecttoETCChain:'Connect to ETC Chain',
     connectWallet:'Connect Wallet',
     viewMyNFTs:'My Assets',
     staking:'Staking',

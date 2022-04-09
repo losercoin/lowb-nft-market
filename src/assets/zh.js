@@ -6,6 +6,7 @@ export const lang = {
     lowbNFTMarket:'LOWB NFT 交易市场',
     clickHeretoInstallMetaMask:'未探测到钱包',
     connecttoBinanceSmartChain:'请将网络设置为币安智能链！',
+    connecttoETCChain:'连接 ETC 链!',
     connectWallet:'请连接您的钱包！',
     viewMyNFTs:'我的资产',
     staking:'挖矿',

@@ -55,8 +55,8 @@
           >
             <div class="css-price-area">
               <!-- <icon-base width="20" height="20" icon-name="bnb"><icon-bnb /></icon-base>  -->
-              <IconBNB />
-              <span class="css-price">{{nft.price}}&nbsp;BNB</span>
+              <!-- <IconBNB /> -->
+              <span class="css-price">{{nft.price}}&nbsp;ETC</span>
               <button class="css-edit-button"><router-link :to="{path: '/edit/'+nft._id}" class="link">{{ $t("lang.edit") }}</router-link></button>
             </div>
           </b-card>
@@ -103,7 +103,7 @@ export default {
   components: {
     IconBase,
     IconLowb,
-    IconBNB
+    IconBNB,
   },
   data: function() {
     return {
